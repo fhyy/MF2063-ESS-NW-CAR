@@ -57,7 +57,7 @@
 
 \title{MF2063: Design Review Wish-List \#1}
 \author{Leon Fernandez (leonfe@kth.se) \\
-        Jacob Kimblad (jakim@kth.se) \\
+        Jacob Kimblad (jacobki@kth.se) \\
         Fredrik Hyyrynen (fhyy@kth.se) \\
         Jonas Ekman (jonekm@kth.se)}
 \date{} % Activate to display a given date or no date (if empty),
@@ -67,14 +67,16 @@
 \maketitle
 
 \section*{Project: ESS-NW}
-
+The ESS-NW project consists of making a small semi-autonomous car. The car system will be made up of several different computing nodes (roughly 12) such as
+sensors, actuators and controllers. What the project aims to investigate is how a Software Defined Network (SDN) can be used to ensure
+reliability and predictability of the system.
 
 
 \subsection*{Questions}
 \begin{enumerate}
 \item What are the key performance metrics when investigating network traffic and how are these measured?
-\item How do we implement a static schedule on the network as a whole?
-\item How do you run a program you've written yourself on bootup, for example the computer vision application?
+\item Predictability is an important aspect of the system. We are thinking of using a static schedule for this, but how do we implement it on a SDN network?
+\item How do you run a program upon booting the Raspberry Pi or the BeagleBone, for example a computer vision application?
 \end{enumerate}
 
 \end{document}
