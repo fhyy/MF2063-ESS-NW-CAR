@@ -7,9 +7,17 @@ ser=serial.Serial(port='/dev/ttyO1', baudrate=9600)
 ser.close()
 
 ser.open()
-while(1):
+count = 100
+f=open('/usr/games/distance.txt','w')
+while(count):
         while ser.inWaiting()==0:
                 pass
         #dataline = ser.read()
         dataline = ser.readline()
         print dataline
+        f.write(dataline)
+        count = count - 1
+ser.close()
+f.close()
+
+

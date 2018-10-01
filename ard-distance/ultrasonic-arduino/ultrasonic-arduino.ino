@@ -24,12 +24,12 @@ void loop() {
   digitalWrite(trigPin,LOW);
 
   pinMode(echoPin,INPUT);
-  duration = pulseIn(ecnahoPin,HIGH);
+  duration = pulseIn(echoPin,HIGH);
   cm = (duration / 2) / 29.1;
   //str = String(cm);
   mySerial.print(cm);
   mySerial.print("cm\n");
   Serial.print(cm);
   Serial.print("cm\n");  
-  delay(1000);
+  delay(250);
 }
