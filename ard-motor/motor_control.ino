@@ -1,6 +1,6 @@
 
 
-#define MOTOR_PIN 12 //digital pin 9
+#define MOTOR_PIN 10 //digital pin 12 Mega, digital pin 10 Micro
 
 void setMotorPWM(float dutyCycle){
   OCR1B = (int)(((float)OCR1A) * dutyCycle);
@@ -21,7 +21,7 @@ void setupMotorPWM(){
   TCCR1B |= (1 << WGM13);  //1
   
   //Set compare output mode
-  //TCCR1A &= ~(1 << COM1B0);
+  TCCR1A &= ~(1 << COM1B0);
   TCCR1A |= (1 << COM1B1);
   
   //Set OCR1A to 319 := TOP or Period 50Hz
@@ -32,8 +32,8 @@ void setupMotorPWM(){
   
   //Set clock source with no prescaling (1)
   TCCR1B |= (1 << CS10);  //1
-  //TCCR1B &= ~(1 << CS11);  //0
-  //TCCR1B &= ~(1 << CS12); //0
+  TCCR1B &= ~(1 << CS11);  //0
+  TCCR1B &= ~(1 << CS12); //0
   
   //Disable PRTIM0 in PRR0
   //PRR0 &= ~(1 << PRTIM1); //0
