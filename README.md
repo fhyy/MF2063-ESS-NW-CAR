@@ -27,9 +27,9 @@ File headers should inlude file name and a short description of the file as well
 
 ```
 //
-// System.Comment.cs: Handles comments in System files.
+// control.c: Contains the control system functionality.
 //
-// Author:
+// Authors:
 //      John Doe (johndoe@address.com)
 //
 // License:
