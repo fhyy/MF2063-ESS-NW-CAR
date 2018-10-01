@@ -12,7 +12,8 @@ speed = (steps * DISTANCE_PER_STEP) / elapsedTime
 The code depends on an arudino library called "SimpleTimer", the download can be found [here](https://playground.arduino.cc/code/SimpleTimer
 )
 
-**Optional**
+**Optional dependencies**
+
 To be able to use the Output tool _cat_ is needed.
 
 To be able to use the Communication tool _screen_ is needed.
