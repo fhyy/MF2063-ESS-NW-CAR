@@ -27,8 +27,8 @@ void loop() {
   duration = pulseIn(ecnahoPin,HIGH);
   cm = (duration / 2) / 29.1;
   //str = String(cm);
-  mySerial.write(cm);
-  mySerial.write("cm\n");
+  mySerial.print(cm);
+  mySerial.print("cm\n");
   Serial.print(cm);
   Serial.print("cm\n");  
   delay(1000);
