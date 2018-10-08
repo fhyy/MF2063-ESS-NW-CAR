@@ -1,3 +1,14 @@
+//
+// ultrasonic-arduino.ino : read data from sensor and 
+//                            send processed data to BBB
+//
+// Authors:
+//      Yifan Ruan (yifanr@kth.se)
+//
+//Lisence:
+//
+//
+
 #include <SoftwareSerial.h>
 
 SoftwareSerial mySerial(8,7); //Rx,Tx
