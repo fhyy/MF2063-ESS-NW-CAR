@@ -45,7 +45,7 @@
 \renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
 
 \usepackage{lastpage}
-
+\usepackage{rotating}
 
 %---------- Enable IEEEtran.bst configurations ------
 \usepackage{IEEEtrantools}
@@ -302,7 +302,41 @@ respectively.
 \section{Commentary: Resource Plan}
 \section{Risk Analysis}
 \section{Communication}
+The main communications channel used is the kth e-mail. Meetings and
+scheduling is handled with Microsoft Outlook. For shorter and less
+important messages, Slack is used. Slack also interfaces with 
+Trello, Google Drive and Github, which facilitates keeping the
+documentation up to date. Physical meetings takes place on a
+weekly basis during which progress and possible issuesand possible issues are discussed.
+
 \section{Documentation}
+Documentation is a critical part during software development project. It is
+a good way to communicate the implementation of everyone's work. So, we
+need to keep documentation concise and interpretable, for example, overviews
+and roadmaps can be shown in our documentation to let other teammates
+know about the work in a short time. Only important information like what is
+the underlying communication architecture and what type of data it outputs
+should be elaborate in documentation. Another significant point is the
+accuracy of the documentation due to some future work will be done base on
+it. Indexing and linking should also be added to our documentations as
+references project.
+We use Google Drive and GitHub to manage our documentations since
+Google Drive allows us to work on the documentation simultaneously and
+GitHub provides control of builds in case of mis-deleting. Another reason we
+choose to upload our document to the cloud is that typically the well-known
+cloud drive will have good maintenance work. In this case, we normally won’t
+lose any important document if we store them on the server.
+In our project, documentation will be created throughout the entire project
+development lifecycle. And we should write our documents in a iterate way,
+which means that we should update our documents after getting some
+feedback during the whole development process. For instance, we are
+keeping changing the description of a programming code when we add new
+parts of it or if someone in the group gives feedback in case of not
+readable documents. Finally, we should treat our documentation like
+requirements. We need to estimate the priority of our documents and deal
+with the most important one first. This priority may change during the
+development process and some of documents can even be removed, which
+is fully depends on the project's demand.
 
 \clearpage
 \bibliography{ESS-CARNW_2018_projectplan_1}
@@ -313,5 +347,11 @@ respectively.
 \section{Time Plan}
 \section{Resource Plan}
 \section{Work Breakdown Structure}
+%\begin{sidewaysfigure}
+%    \label{fig:wbs}
+%    \caption{The Work Breakdown Structure for the autonomous car.}
+%    \centering
+%    \includegraphics[width=\textwidth]{wbs.png}
+%\end{sidewaysfigure}
 
 \end{document}
