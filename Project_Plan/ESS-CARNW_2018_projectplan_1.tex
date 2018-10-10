@@ -46,6 +46,10 @@
 
 \usepackage{lastpage}
 
+%---------- Enable IEEEtran.bst configurations ------
+\usepackage{IEEEtrantools}
+%----------------------------------------------------
+
 %%% END Article customizations
 
 %%% The "real" document content comes below...
@@ -81,6 +85,8 @@
 
 \begin{document}
 %\maketitle
+\bstctlcite{BSTcontrol} % IEEEtran.bst controls enabled
+
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -179,8 +185,8 @@
 \section{Communication}
 \section{Documentation}
 
-%\bibliography{ESS-CARNW_2018_projectplan_1}
-%\bibliographystyle{IEEEtran}
+\bibliography{ESS-CARNW_2018_projectplan_1}
+\bibliographystyle{IEEEtran}
 
 \clearpage
 \appendix
