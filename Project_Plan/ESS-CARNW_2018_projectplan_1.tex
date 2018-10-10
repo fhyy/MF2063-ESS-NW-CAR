@@ -46,6 +46,7 @@
 
 \usepackage{lastpage}
 
+
 %---------- Enable IEEEtran.bst configurations ------
 \usepackage{IEEEtrantools}
 %----------------------------------------------------
@@ -206,6 +207,52 @@ autonomous.
 \end{itemize}
 
 \section{Goals}
+The goals of the project can be divided into two parts, goals concerning
+the network implementation on the car and goals concerning the remaining
+software and hardware system architecture of the car. As both parts are
+heavily tied into each other some of the sub-goals are dependent on
+sub-goals from the opposing . The overarching goal of the network
+implementation is of a more exploratory nature as it is a problem that has
+not been studied clearly, thus the project aims to explore what different
+network implementations can be beneficial in this type of infrastructure.
+The overarching goal can be stated as ''The goal of the project is to
+reconfigure the network using SDN-switches and a Raspberry Pi as a SDN
+controller''. The overarching goal for the software and hardware system
+architecture can be stated as ''The goal of the project is to increase the
+robustness by revising the existing architecture and implementing
+additional features such as vision control and a display service.''  Not
+related to the technical aspects of the car, but rather the ambitions of
+the project members, are also the business goals of the project.
+
+\subsection{Technical Goals}
+The technical subgoals are divided up into two parts. Subgoals concerning
+the ethernet network which takes care of all of the communication between
+different parts of the system. Subgoals concerning the hardware and system
+architecture which implements all of the functionalities of the system
+except for the network communication.
+
+\subsubsection{Hardware and Software System Architecture}
+As discussed in the background, the project builds on an existing
+architecture. Thus most goals consists of improving the existing
+architecture or examining alternative implementations. The first subgoal
+consists of making the system more robust by extending the hardware
+architecture. This should be done such that there is one unique
+microprocessor for each sensor and actuator in the system while maintaining
+the existing functionalities of the car. The next subgoal is to monitor the
+operations of the ECU’s such that the car can be made fail-safe by
+implementing fault-detection, watchdogs and battery level indication.
+The next subgoal is to develop a formal boot- and shutdown-sequence such
+the the car becomes reliable and fail-safe under normal operation. The
+final subgoal is to extend the functionality of the existing system by
+setting up a camera module and choosing an AI algorithm to detect some
+external stimuli such as a traffic sign such that the rest of the system
+can react to it (choosing the appropriate speed or steering for example). 
+
+\subsection{Business Goals}
+The first subgoal is to assemble the car and set up the physical layer,
+which includes the SDN-switches and the SDN-controller. This is a
+dependency the other goals. 
+
 \section{Organization}
 The requirements of the project were divided into a number of topics,
 with each team member being focused on two topics. Additionally, Leon and
