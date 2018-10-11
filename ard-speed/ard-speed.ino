@@ -1,31 +1,29 @@
 //
 // ard-speed.ino: Calculates the vehicle speed using information from the IR-sensor.
 //
-// Author:
+// Authors:
 //      Jacob Kimblad (jacobki@kth.se)
 //
 // License:
 //      AFL 3.0 
 //
 
-
+#include "SimpleTimer.h"
 // Library installed from:
 // https://playground.arduino.cc/code/SimpleTimer
-#include "SimpleTimer.h"
-
 
 //Constants
-int const MAX_STEPS = 10;
-int const TIMEOUT_TIME = 100;
+int const MAX_STEPS = 5;
+int const TIMEOUT_TIME = 10000;
 int const WHEEL_RADIUS_MM = 55;
 int const WHEEL_CIRCUMFERENCE = 2 * PI * WHEEL_RADIUS_MM;
 int const STEPS_PER_ROTATION = 5;
 int const DISTANCE_PER_STEP = WHEEL_CIRCUMFERENCE / STEPS_PER_ROTATION;
+//Pins
+int const IR_PIN = 22;
 //Global variables
 bool timeoutFlag = false;
 int steps = 0; 
-// Pins
-int irPin = 2;     //IR-sensor connected to pin 78
 // Pin readings
 int irVal = 0;      //Int to store IR-value
 //Timers
@@ -39,16 +37,16 @@ void setup() {
     Serial.println("Serial communication set up!");
 
     //Setup IR-input to interrupt mcu
-    pinMode(irPin, INPUT);
-    attachInterrupt(digitalPinToInterrupt(irPin), irInterruptHandler, RISING);
+    pinMode(IR_PIN, INPUT);
+    attachInterrupt(digitalPinToInterrupt(IR_PIN), irInterruptHandler, RISING);
 
 }
 
 // put your main code here, to run repeatedly:
 void loop() {
-
     //Start timeout countdown until next measurment update
-    int timerID = timer1.setTimeout(100, setTimeoutFlag);
+    int timerID = timer1.setTimeout(TIMEOUT_TIME, setTimeoutFlag);
+    Serial.println(timer1.getNumTimers());
 
     // Start time-measurments
     unsigned long startTime = millis();
