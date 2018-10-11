@@ -1,6 +1,6 @@
 INO = ard-speed.ino
 CC = arduino
-BOARD = arduino:avr:uno
+BOARD = arduino:avr:micro
 PORT := $(shell ls /dev/tty* | grep "ttyACM")
 
 upload:
