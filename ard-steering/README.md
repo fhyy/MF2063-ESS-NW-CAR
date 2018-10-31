@@ -1,5 +1,5 @@
 #Pin mapping (Arduino Micro)
-Servo PWM signal - Digital Pin 8  
+Servo PWM signal - Digital Pin 9  
 SPI - TBD
 
 #Installation
