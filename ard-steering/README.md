@@ -16,7 +16,7 @@ __Goal__
 This arduino reads the wanted steering percentage (0% -> 100%) and sends the correct data to the servo motor.  
 0% is full left, 50% is straight ahead and 100% is full right.
 
-The servo motor turns between 40 and 140 degrees.  
+The servo motor turns the wheels between -20 and +20 degrees.  
 
 __As for now__  
-The arduino turns the motor from full left to full right and back in 1 seconds intervals
+The arduino turns the motor loops from turning full right to forwards to full left to forwards, in 4 seconds intervals
