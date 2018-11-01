@@ -20,11 +20,19 @@ float const DISTANCE_PER_STEP = (float)WHEEL_CIRCUMFERENCE / (float)STEPS_PER_RO
 //Pins
 int const IR_PIN = 2;
 //Global variables
-bool timeoutFlag = false;
+bool timeoutFlag = true;
+bool integerSent = true;
+bool decimalSent = false;
 int steps = 0; 
 float speed = 0.0;
 // Pin readings
 int irVal = 0;      //Int to store IR-value
+//Structs
+struct speedStruct {
+    byte integerPart;
+    byte decimalPart;
+};
+speedStruct speedValue;
 
 void setup() 
 {
@@ -32,9 +40,9 @@ void setup()
     Serial.begin(115200);
 
     //Setup spi
-    SPI.begin();
+    startSPI();
 
-    //Setup IR-input to interrupt mcu
+    //Setup IR-input to generate interrupts
     pinMode(IR_PIN, INPUT);
     attachInterrupt(digitalPinToInterrupt(IR_PIN), irInterruptHandler, RISING);
 }
@@ -57,14 +65,43 @@ void loop()
     unsigned long elapsedTime = stopTime - startTime;
 
     // Calculate actual speed
-    speed = calculateSpeed(elapsedTime);
+    calculateSpeed(elapsedTime);
 
-    //Send speed value over SPI
-    SPI.transfer(speed);
 
     //Reset flags before next loop
+    integerSent = false;
+    decimalSent = false;
     timeoutFlag = false;
     steps = 0;
+}
+
+// Initialize spi
+void startSPI() 
+{
+    SPCR |= (1<<SPE)|(1<<SPIE); //SPI control register ,enable spi interrupt and spi
+    SPSR |= (1<<SPIF);//SPI status register
+    SPI.attachInterrupt();
+    pinMode (MISO, OUTPUT);
+}
+
+// SPI interrupt routine
+ISR(SPI_STC_vect)
+{ 
+    //To differentiate on the receiver side between going at zero speed (0 received) and no information sent (also 0 received) we add the values with one before transmitting and the subtracting the values with 1 on the receiver side
+    if(!integerSent) {
+        SPDR = speedValue.integerPart + 1;
+        integerSent = true;
+    }
+    else if(!decimalSent) {
+        SPDR = speedValue.decimalPart + 1;
+        decimalSent = true;
+    }
+} // end of interrupt routine 
+
+void toSpeedStruct(float speed) 
+{
+  speedValue.integerPart = (int)(speed);
+  speedValue.decimalPart = 100 * (speed - speedValue.integerPart); //10000 b/c float value always have exactly 4 decimal places
 }
 
 // Callback-function from timer
@@ -85,6 +122,6 @@ float calculateSpeed(unsigned long elapsedTime)
     int distance = steps * DISTANCE_PER_STEP; //Gives distance in millimeters
     float speedMMPerS = (float)(distance*1000)/(float)elapsedTime; //Gives distance*1000/time (mm per s)
 
-    return speedMMPerS;
+    toSpeedStruct(speedMMPerS);
 }
 
