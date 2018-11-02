@@ -1,5 +1,7 @@
 #Pin mapping (Arduino Micro)
-Motor PWM signal - Digital Pin 10  
+ESC __S__ signal - Digital Pin 10  
+ESC __-__ signal - GND 
+_Don't connect ESC __+___
 SPI - TBD
 
 #Installation
