@@ -16,8 +16,8 @@ static char* eventText[] = {
     "evOK"
 };
 static char* eventText2[] = {
-    "evRun", 
-    "evStop"
+    "evStop", 
+    "evRun"
 };
 
 static inline void statemachinePrint(stCarStatemachine* sm){
@@ -27,13 +27,12 @@ static inline void statemachinePrint(stCarStatemachine* sm){
 
 int main(){
     stCarStatemachine sm;
-
+    stControllerInput input;
     printf("****************************\n");
     printf("Car controller is online now\n");
     printf("****************************\n");
     
-    statemachineInit(&sm);
-    stControllerInput input;
+    statemachineInit(&sm);    
     statemachinePrint(&sm);
 
     while(1){

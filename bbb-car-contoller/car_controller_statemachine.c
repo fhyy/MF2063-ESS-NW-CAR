@@ -56,7 +56,7 @@ static stStateTransfor stateMatrix[] = {
 };
 
 void statemachineInit(stCarStatemachine* statemachine){
-    //sm = statemachine;
+    sm = statemachine;
     statemachine->state = stateStandingStill;
     statemachine->speed = evLow;
     statemachine->distance = evHigh;
