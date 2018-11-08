@@ -7,3 +7,8 @@ compile the code with
 ```compile cmd
 gcc -o nameYouWant test_sm.c car_controller_statemachine.c
 ```
+## Test cases passed
+### testcase 1
+start at a low distance, acclerate until the constant speed reached. stop when the distance data is smalller then DISTANCE_STOP. Camera flag will always be RUN.
+### testcase 2
+start at a low distance, acclerate until the constant speed reached. stop when a STOP flag is detected. distance data is larger than DISTANCE_STOP.
