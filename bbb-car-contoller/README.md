@@ -7,6 +7,10 @@ compile the code with
 ```compile cmd
 gcc -o nameYouWant test_sm.c car_controller_statemachine.c
 ```
+## Scenario parameters setup
+(the current setup is just for test now)
+DISTANCE_STOP = 100
+CONSTANT_SPEED = 50
 ## Test cases passed
 ### testcase 1
 start at a low distance, acclerate until the constant speed reached. stop when the distance data is smalller then DISTANCE_STOP. Camera flag will always be RUN.
