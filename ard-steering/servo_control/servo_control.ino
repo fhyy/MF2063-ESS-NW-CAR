@@ -10,7 +10,9 @@ Servo myservo;
 
 char lastSignal = 50;
 
-void setSteeringPWM(float pwm){
+void setSteeringPWM(float pwm)
+{
+  Serial.println(pwm);
   if(pwm < 0){
     pwm = 0.0f;
   }
@@ -31,9 +33,6 @@ void setSteeringPWM(float pwm){
   // PLAY_AREA_SIZE is needed as the servo motor rotation won't affect the wheel angles
   // until the pwm signal differs by PLAY_AREA_SIZE, when the servo rotation direction has changed.
 	myservo.write(servo_signal + (direction?PLAY_AREA_SIZE:0));
- 
-  Serial.print(servo_signal + (direction?PLAY_AREA_SIZE:0));
-  Serial.print("\n");
 }
 
 // Initialize spi
@@ -42,15 +41,13 @@ void startSPI()
   SPCR |= (1 << SPE) | (1 << SPIE); //SPI control register ,enable spi interrupt and spi
   SPSR |= (1 << SPIF); //SPI status register
   SPI.attachInterrupt();
-  pinMode(MISO, INPUT);
+  pinMode(MISO, OUTPUT);
 }
 
 ISR(SPI_STC_vect)
-{
-  while (!(SPSR & (1<<SPIF))){}; // Wait for the end of the transmission
+{ 
+  digitalWrite(LED_BUILTIN, HIGH);
   byte spi_in = SPDR;
-
-  Serial.println(spi_in);
   
   if(spi_in < 0){
     spi_in = 0;
@@ -61,16 +58,25 @@ ISR(SPI_STC_vect)
 
   setSteeringPWM(((float)spi_in)/100.0f);
   lastSignal = spi_in;
+
+  while (!SPIF){}; // Wait for the end of the transmission
+  digitalWrite(LED_BUILTIN, LOW);
+
+//  Serial.print("SPI in: ");
+//  Serial.println(spi_in);
 }
 
-void setup() {
+void setup() 
+{
   Serial.begin(9600);
+  startSPI();
   myservo.attach(9);  // attaches the servo on pin 9 to the servo object
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
-void loop() {
-  setSteeringPWM(((float)lastSignal)/100.0f);
-  delay(100);
+void loop() 
+{
+  //setSteeringPWM(((float)lastSignal)/100.0f);
+  delay(1000);
 }
 
