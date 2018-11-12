@@ -1,4 +1,5 @@
 #include <Servo.h>
+#include <SPI.h>
 
 #define FULL_LEFT_PWM 20
 #define CENTER_PWM 60
@@ -7,9 +8,15 @@
 
 Servo myservo;
 
-int lastSignal = 0;
+char lastSignal = 50;
 
 void setSteeringPWM(float pwm){
+  if(pwm < 0){
+    pwm = 0.0f;
+  }
+  if(pwm > 1){
+    pwm = 1.0f;
+  }
 	int servo_signal = 0;
 	if(pwm < 0.5f){
 		servo_signal = FULL_LEFT_PWM+(int)((float)((CENTER_PWM-FULL_LEFT_PWM)<<1)*pwm);
@@ -29,25 +36,41 @@ void setSteeringPWM(float pwm){
   Serial.print("\n");
 }
 
+// Initialize spi
+void startSPI()
+{
+  SPCR |= (1 << SPE) | (1 << SPIE); //SPI control register ,enable spi interrupt and spi
+  SPSR |= (1 << SPIF); //SPI status register
+  SPI.attachInterrupt();
+  pinMode(MISO, INPUT);
+}
+
+ISR(SPI_STC_vect)
+{
+  while (!(SPSR & (1<<SPIF))){}; // Wait for the end of the transmission
+  byte spi_in = SPDR;
+
+  Serial.println(spi_in);
+  
+  if(spi_in < 0){
+    spi_in = 0;
+  }
+  if(spi_in > 100){
+    spi_in = 100;
+  }
+
+  setSteeringPWM(((float)spi_in)/100.0f);
+  lastSignal = spi_in;
+}
+
 void setup() {
   Serial.begin(9600);
   myservo.attach(9);  // attaches the servo on pin 9 to the servo object
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
-float pwm = 0.0f;
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);
-  while (pwm < 1.0f) { // goes from 0 degrees to 180 degrees
-    setSteeringPWM(pwm);              // tell servo to go to position in variable 'pos'
-	  pwm += 0.5f;
-    delay(1000);                       // waits 15ms for the servo to reach the position
-  }
-  digitalWrite(LED_BUILTIN, LOW);
-  while (pwm > 0.0f) { // goes from 180 degrees to 0 degrees
-    setSteeringPWM(pwm);              // tell servo to go to position in variable 'pos'
-	  pwm -= 0.5f;
-    delay(1000);                       // waits 15ms for the servo to reach the position
-  }
+  setSteeringPWM(((float)lastSignal)/100.0f);
+  delay(100);
 }
 
