@@ -33,9 +33,12 @@ void setup (void)
 // SPI interrupt routine
 ISR (SPI_STC_vect)
 { 
-  SPI.transfer(cm1);
-  SPI.transfer(cm2);
-  SPI.transfer(cm3);
+  if(send_it){
+    SPI.transfer(cm1);
+    SPI.transfer(cm2);
+    SPI.transfer(cm3);
+    Serial.println("hi");
+  }
 }  // end of interrupt routine SPI_STC_vect
 
 
@@ -43,10 +46,14 @@ ISR (SPI_STC_vect)
 void loop (void)
 {
 
-
+  send_it = false;
   cm1 = readDistance(trigPin1,echoPin1);  
+  delay(10);
   cm2 = readDistance(trigPin2,echoPin2);  
+  delay(10);
   cm3 = readDistance(trigPin3,echoPin3);
+  delay(10);
+  send_it = true;
 
   Serial.println("Data display:");
   Serial.println(cm1);
@@ -68,5 +75,8 @@ long readDistance(int trigPin, int echoPin){
   //get the distance data
   duration = pulseIn(echoPin,HIGH);
   cm = (duration/2)/39.1;
+  if(cm > 255){
+    cm = 255;
+    }
   return cm;
 }
