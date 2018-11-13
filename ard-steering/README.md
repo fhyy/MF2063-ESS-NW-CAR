@@ -15,9 +15,22 @@ Connect the arduino to any USB-port
 Select the chip type and used USB-port from the menu  
 Upload the code to the Arduino  
 
-#Description
-__Goal__  
-This arduino reads the wanted steering percentage (0% -> 100%) and sends the correct data to the servo motor.  
+# Description
+## Goal  
+This arduino reads the wanted steering percentage (0% -> 100%) through the SPI interface and sends the correct data to the servo motor.  
 0% is full left, 50% is straight ahead and 100% is full right.
 
 The servo motor turns the wheels between -20 and +20 degrees.
+
+## SPI interface
+__Stream__  
+
+|Byte 1|  
+|:---:|  
+|TurnPercentage|  
+
+__Variable definition__  
+
+|Name|Range|Description|  
+|:---:|:---:|:---|  
+|TurnPercentage|(0,100)|0 := full left turn, 50 := straight ahead, 100 := full right turn|  
