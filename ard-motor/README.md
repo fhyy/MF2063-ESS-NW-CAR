@@ -1,22 +1,38 @@
-#Pin mapping (Arduino Micro)
-Motor PWM signal - Digital Pin 10  
-SPI - TBD
+# Pin mapping (Arduino Micro)
+_ESC RX S_ - Digital Pin 10  
+_ESC RX __-___ - GND  
+_SPI CLK_ - SCK  
+_SPI Master out_ - MOSI  
+_SPI Slave select_ - SS  
 
-#Installation
-##Command line
+
+# Installation
+## Command line
 ??
-##IDE
+## IDE
 __Arduino IDE__  
 Load the motor_control.ino  
 Connect the arduino to any USB-port  
+Select the chip type and used USB-port from the menu  
 Upload the code to the Arduino
 
-#Description
-__Goal__  
-This arduino will read input values for motor PWM duty cycle and modify the registers to send out this PWM to the Motor PWM signal pin.
+# Description
+## Goal  
+This arduino will read input values for target speed and the latest encoder speed data through the SPI interface and store these variables for PID-controlling to reach and maintain the target speed.
 
-__As for now__  
-This arduino sets up timer 1 for Fast PWM mode with variable duty cycle.  
-The duty cycle is constantly changing from 0% to 100% and back to 0% in 20 seconds.  
+_Note: The car can only go forwards_
 
-_**Note:** this code does not work with the motor itself at the moment..._
+
+## SPI interface
+__Stream__  
+
+|Byte 1|Byte 2|
+|:---:|:---:|
+|TargetSpeed|CurrentSpeed|
+
+__Variable definition__  
+
+|Name|Range|Description|  
+|:---:|:---:|:---|  
+|TargetSpeed|(0,255)|The target speed in cm/s|  
+|CurrentSped|(0,255)|The latest encoder readings in cm/s|  
