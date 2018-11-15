@@ -12,6 +12,11 @@
 *.cb2
 .*.lb
 
+## Files for status reports
+evm.pdf
+resource_plan.pdf
+timeplan.pdf
+
 ## Intermediate documents:
 *.dvi
 *.xdv
