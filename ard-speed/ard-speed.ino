@@ -11,7 +11,7 @@
 #include <SPI.h>
 
 //Constants
-int const MAX_STEPS = 5;
+int const MAX_STEPS = 1;
 int const TIMEOUT_TIME = 1000;
 int const WHEEL_RADIUS_MM = 55;
 int const WHEEL_CIRCUMFERENCE = 2 * PI * WHEEL_RADIUS_MM;
@@ -25,6 +25,8 @@ bool integerSent = true;
 bool decimalSent = false;
 int steps = 0; 
 float speed = 0.0;
+unsigned long startTime = 0;
+unsigned long stopTime = 0;
 // Pin readings
 int irVal = 0;      //Int to store IR-value
 //Structs
@@ -32,7 +34,7 @@ struct speedStruct {
     byte integerPart;
     byte decimalPart;
 };
-speedStruct speedValue;
+int speedValue;
 
 void setup() 
 {
@@ -45,32 +47,35 @@ void setup()
     //Setup IR-input to generate interrupts
     pinMode(IR_PIN, INPUT);
     attachInterrupt(digitalPinToInterrupt(IR_PIN), irInterruptHandler, RISING);
+
+    //Start time for first iteration
+    startTime = millis();
 }
 
 // put your main code here, to run repeatedly:
 void loop() 
 {
-    // Start time-measurments
-    unsigned long startTime = millis();
 
     //Wait until sufficient data is captured
     while(steps < MAX_STEPS && !timeoutFlag) {
         if (millis() - startTime > TIMEOUT_TIME) {
-            setTimeoutFlag();
+            timeoutFlag = false;
         }
     } 
 
     // Stop time-measurements
-    unsigned long stopTime = millis();
+    stopTime = millis();
     unsigned long elapsedTime = stopTime - startTime;
+    // Start time-measurments for next loop
+    startTime = millis();
 
     // Calculate actual speed
     calculateSpeed(elapsedTime);
 
 
     //Reset flags before next loop
-    integerSent = false;
-    decimalSent = false;
+    speedSent = false;
+    /*decimalSent = false;*/
     timeoutFlag = false;
     steps = 0;
 }
@@ -88,26 +93,17 @@ void startSPI()
 ISR(SPI_STC_vect)
 { 
     //To differentiate on the receiver side between going at zero speed (0 received) and no information sent (also 0 received) we add the values with one before transmitting and the subtracting the values with 1 on the receiver side
-    if(!integerSent) {
-        SPDR = speedValue.integerPart + 1;
-        integerSent = true;
-    }
-    else if(!decimalSent) {
-        SPDR = speedValue.decimalPart + 1;
-        decimalSent = true;
+    if(!speedSent) {
+        SPDR = speedValue + 1;
+        speedSent = true;
+        /*Serial.print("Sending: ");*/
+        /*Serial.println(speedValue + 1);*/
     }
 } // end of interrupt routine 
 
 void toSpeedStruct(float speed) 
 {
-  speedValue.integerPart = (int)(speed);
-  speedValue.decimalPart = 100 * (speed - speedValue.integerPart); //10000 b/c float value always have exactly 4 decimal places
-}
-
-// Callback-function from timer
-void setTimeoutFlag()
-{
-    timeoutFlag = true;
+  speedValue = (int)(speed);
 }
 
 // IR-sensor interrupt handler
@@ -120,8 +116,7 @@ void irInterruptHandler()
 float calculateSpeed(unsigned long elapsedTime)
 {
     int distance = steps * DISTANCE_PER_STEP; //Gives distance in millimeters
-    float speedMMPerS = (float)(distance*1000)/(float)elapsedTime; //Gives distance*1000/time (mm per s)
-
-    toSpeedStruct(speedMMPerS);
+    float speedCMPerS = (float)(distance*100)/(float)elapsedTime; //Gives distance*1000/time (cm per s)
+    speedValue = speedCMPerS;
 }
 
