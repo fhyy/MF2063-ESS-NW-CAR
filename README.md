@@ -1,6 +1,6 @@
 # Introduction
 **Network diagram**  
-![Network diagram](https://lh3.googleusercontent.com/8lX5EewxTj39oWAsWpl0s6hgkTzJ3FvU9wxaoDGPyZtP4NaeIjKd_7ojqrFUPc85DFgnt9TAYYjHUWqIyac=w3200-h1571)
+![Network diagram](https://raw.githubusercontent.com/fhyy/MF2063-ESS-NW-CAR/master/resources/diagrams/network-diagram.svg?sanitize=true)
 
 # Instructions
 _TODO_
