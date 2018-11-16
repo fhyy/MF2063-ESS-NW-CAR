@@ -1,7 +1,7 @@
 #include "car_ctrl_client.hpp"
 
 int main(int argc, char** argv) {
-    CarCTRLClient ccc(2000, 2500);
+    CarCTRLClient ccc(2000, 2500, 1);
 
     if(ccc.init()) {
         ccc.start();
