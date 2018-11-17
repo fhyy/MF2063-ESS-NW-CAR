@@ -18,7 +18,7 @@ bool CarCTRLClient::init() {
     req_st_thread_ = std::thread(std::bind(&CarCTRLClient::run_st, this));
     req_mo_thread_ = std::thread(std::bind(&CarCTRLClient::run_mo, this));
 
-    app_ = vsomeip::runtime::get()->create_application("car_ctr_client");
+    app_ = vsomeip::runtime::get()->create_application("car_ctrl_client");
     if (!app_->init()) {
         std::cerr << "############### Couldn't initialize application" << std::endl;
         return false;
