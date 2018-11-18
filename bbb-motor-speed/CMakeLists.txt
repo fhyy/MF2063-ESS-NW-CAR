@@ -1,6 +1,6 @@
 ################### Build Project #######################################################
 cmake_minimum_required (VERSION 2.8)
-project(bbb-distance-steering)
+project(bbb-motor-speed)
 
 set (CMAKE_CXX_FLAGS "-g -std=c++0x")
 

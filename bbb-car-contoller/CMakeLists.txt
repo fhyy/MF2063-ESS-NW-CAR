@@ -1,4 +1,6 @@
+################### Build Project #######################################################
 cmake_minimum_required (VERSION 2.8)
+project(bbb-car-controller)
 
 set (CMAKE_CXX_FLAGS "-g -std=c++0x")
 
@@ -17,3 +19,30 @@ file(GLOB main_SRC
 
 add_executable(main ${main_SRC})
 target_link_libraries(main vsomeip ${Boost_LIBRARIES})
+#########################################################################################
+
+
+################### Build Docs ##########################################################
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    set(DOXYGEN_IN ${CMAKE_CURRENT_LIST_DIR}/Doxyfile.in)
+    set(DOXYGEN_OUT ${CMAKE_CURRENT_LIST_DIR}/doc/Doxyfile)
+    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
+
+    add_custom_target(doxygen-doc ALL
+        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
+        COMMENT "Doxygen is working..."
+	SOURCES ${DOXYGEN_OUT})
+
+else (DOXYGEN_FOUND)
+  message("Doxygen not found. No documentation will be generated")
+endif (DOXYGEN_FOUND)
+#########################################################################################
+
+################### Link to vsomeip.json ################################################
+set(target ${CMAKE_CURRENT_LIST_DIR}/vsomeip.json)
+set(link ${CMAKE_CURRENT_LIST_DIR}/build/vsomeip.json)
+
+ADD_CUSTOM_TARGET(link_target ALL
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink ${target} ${link})
+#########################################################################################
