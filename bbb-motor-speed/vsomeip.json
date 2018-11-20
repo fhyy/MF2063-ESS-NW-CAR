@@ -18,8 +18,13 @@
     [
         {
             "service" : "0x0003",
-            "instance" : "0x0033",
+            "instance" : "0x0003",
             "unreliable" : "30003"
+        },
+        {
+            "service" : "0x0033",
+            "instance" : "0x0033",
+            "unreliable" : "30033"
         }
     ],
     "routing" : "dist_steer_service",
