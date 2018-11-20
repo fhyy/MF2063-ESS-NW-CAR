@@ -4,25 +4,32 @@
 stCarStatemachine *sm = 0x0;
 
 void stopping(){
-    sm->throttle = STATEMACHINE_THROTTLE_STOP;
+    sm->targetSpeed = TARGET_SPEED_STOP;
+    
+    setSpeed(sm->targetSpeed, SPEED_PRIO);
 }
 
 void accelerating(){
-    sm->throttle += STATEMACHINE_THROTTLE_STEP;
-    if(sm->throttle > STATEMACHINE_THROTTLE_MAX){
-        sm->throttle = STATEMACHINE_THROTTLE_MAX;
+    sm->targetSpeed += TARGET_SPEED_STEP;
+    if(sm->targetSpeed > TARGET_SPEED_MAX){
+        sm->targetSpeed = TARGET_SPEED_MAX;
     }
+
+    setSpeed(sm->targetSpeed, SPEED_PRIO);
 }
 
 void constantSpeed(){}
 
 void retarding(){
-    sm->throttle -= STATEMACHINE_THROTTLE_STEP;
-    if(sm->throttle < STATEMACHINE_THROTTLE_STOP){
-        sm->throttle = STATEMACHINE_THROTTLE_STOP;
+    sm->targetSpeed -= TARGET_SPEED_STEP;
+    if(sm->targetSpeed < TARGET_SPEED_STOP){
+        sm->targetSpeed = TARGET_SPEED_STOP;
         sm->state = stateStandingStill;
     }
+
+    setSpeed(sm->targetSpeed, SPEED_PRIO);
 }
+
 typedef void (*func)(void);
 static func stateFunctionAry[] = {
     &stopping,
@@ -34,10 +41,12 @@ static func stateFunctionAry[] = {
 //currently put the steering flag in the camera,
 //  may put it in distance node later
 static stStateTransfor stateMatrix[] = {
-    //currentState  distanceFlag   speedFlag  nextState
+    //currentState  distanceFlag   speedFlag  cameraFlag nextState
     {stateAny, evAny, evAny, evStop, stateStandingStill},
     {stateAny,  evLow,  evAny, evRun,   stateStandingStill},
     
+    {stateAny, evAny, evAny, evLeft, stateSteeringLeft},
+    {stateAny, evAny, evAny, evRight, stateSteeringRight},
 
     {stateStandingStill, evHigh, evLow, evRun, stateAccelerating},
 
@@ -61,35 +70,46 @@ void statemachineInit(stCarStatemachine* statemachine){
     statemachine->speed = evLow;
     statemachine->distance = evHigh;
     statemachine->camera = evStop;
-    statemachine->throttle = 90;
+    statemachine->targetSpeed = TARGET_SPEED_STOP;
 }
+// call self-defined library functions to get current car events
+void statemachineGetEvents(){
+    int speed, cameraFlag, averDistance;
+    int *p;
 
-void statemachineGetEvents(stControllerInput* input){
+
+
+    // read data from different places
+    speed = getSpeed();
+    cameraFlag = getFlag();
+    p = getDistance();
+    averDistance = (*p + *(p + 1) + *(p + 2)) / 3;
+
     // speed setup
-    if(input->speed == SPEED_OK){
+   if(speed == SPEED_OK){
         sm->speed = evOk;
-    }else if(input->speed > SPEED_OK){
+    }else if(speed > SPEED_OK){
         sm->speed = evHigh;
     }else{
         sm->speed = evLow;
-    }
+    } 
     // distance setup
-    if(input->distance > DISTANCE_STOP){
+    if(averDistance > DISTANCE_STOP){
         sm->distance = evHigh;
     }else{
         sm->distance = evLow;
     }
     // camera setup
-    if(input->camera == 1){
+    if(cameraFlag == 1){
         sm->camera = evRun;
     }else{
         sm->camera = evStop;
     }
 }
 
-void statemachineIteration(stControllerInput* input){
+void statemachineIteration(){
     int i = 0;
-    statemachineGetEvents(input);
+    statemachineGetEvents();
     for (i = 0; i < sizeof(stateMatrix) / sizeof(stateMatrix[0]);i++){
         if(sm->state == stateMatrix[i].currentState || stateMatrix[i].currentState==stateAny){
             if(sm->speed == stateMatrix[i].currentSpeedEvent || stateMatrix[i].currentSpeedEvent == evAny){
