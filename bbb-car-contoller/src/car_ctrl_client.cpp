@@ -227,6 +227,8 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
                 speed_group,
                 false); // TODO what does this boolean do?
         app_->subscribe(SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SPEED_EVENTGROUP_ID);
+
+        update_go_status();
     }
     else if(state == vsomeip::state_type_e::ST_DEREGISTERED) {
         app_->release_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
@@ -235,6 +237,7 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
         app_->release_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
 
         if(go_)
+            go_ = false;
             app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
 }

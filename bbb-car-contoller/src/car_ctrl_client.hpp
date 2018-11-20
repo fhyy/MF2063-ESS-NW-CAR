@@ -66,7 +66,6 @@ private:
     std::mutex mu_di_q_;
     std::condition_variable cond_di_q_;
 
-
     std::shared_ptr<vsomeip::application> app_;
     std::shared_ptr<vsomeip::payload> payload_;
     std::shared_ptr<vsomeip::message> request_;
