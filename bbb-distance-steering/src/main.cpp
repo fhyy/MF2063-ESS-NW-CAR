@@ -1,16 +1,31 @@
+#include <csignal>
+#include <iostream>
 #include "dist_steer_service.hpp"
+
+
+DistSteerService dss(7000);
+
+void signalHandler(int signum);
 
 int main(int argc, char** argv) {
 
+    signal(SIGINT, signalHandler);
+
     //TODO process user arguments
 
-    DistSteerService dss(7000);
-    
     if (dss.init()) {
         dss.start();
-        dss.pub_di_thread_.join();
+        while(dss.is_running());
         return 0;
     }
     else
         return 1;
+}
+
+void signalHandler(int signum) {
+    std::cout << "Interrupt signal: " << signum << std::endl;
+
+    dss.stop();
+
+    exit(signum);
 }
