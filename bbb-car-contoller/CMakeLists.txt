@@ -10,12 +10,12 @@ find_package( Boost 1.65 COMPONENTS system thread log REQUIRED )
 include_directories (
     ${Boost_INCLUDE_DIR}
     ${VSOMEIP_INCLUDE_DIRS}
+    "./build/"
 )
 
 file(GLOB main_SRC
     "./src/*.hpp"
     "./src/*.cpp"
-    "./include/*.hpp"
 )
 
 add_executable(main ${main_SRC})
