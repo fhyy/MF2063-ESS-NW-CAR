@@ -1,247 +1,284 @@
 #include "car_ctrl_client.hpp"
 
-CarCTRLClient::CarCTRLClient(uint32_t st_sleep, uint32_t mo_sleep, uint32_t n) :
-    req_st_sleep_(st_sleep),
-    req_mo_sleep_(mo_sleep),
-    slaves_tot_(n),
-    slaves_disc_(0),
+CarCTRLClient::CarCTRLClient(uint32_t n) :
+    services_tot_(n),
+    services_disc_(0),
     is_init_(false),
     go_(false),
+    is_ava_di_(false),
     is_ava_st_(false),
     is_ava_mo_(false),
+    is_ava_sp_(false),
     app_busy_(false)
     {}
 
 bool CarCTRLClient::init() {
-    std::lock_guard<std::mutex> init_lk(mu_init_);
-
-    req_st_thread_ = std::thread(std::bind(&CarCTRLClient::run_st, this));
-    req_mo_thread_ = std::thread(std::bind(&CarCTRLClient::run_mo, this));
-
     app_ = vsomeip::runtime::get()->create_application("car_ctrl_client");
     if (!app_->init()) {
-        std::cerr << "############### Couldn't initialize application" << std::endl;
         return false;
     }
     payload_ = vsomeip::runtime::get()->create_payload();
     request_ = vsomeip::runtime::get()->create_request(false); // false=>UDP
 
-
     app_->register_state_handler(
         std::bind(&CarCTRLClient::on_state, this,
         std::placeholders::_1));
 
-    app_->register_availability_handler(DIST_STEER_SERVICE_ID, DIST_STEER_INSTANCE_ID,
-        std::bind(&CarCTRLClient::on_availability,
-        this,
-        std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    app_->register_availability_handler(vsomeip::ANY_SERVICE,
+                                        vsomeip::ANY_INSTANCE,
+                                        std::bind(&CarCTRLClient::on_availability,
+                                                  this,
+                                                  std::placeholders::_1,
+                                                  std::placeholders::_2,
+                                                  std::placeholders::_3));
 
-
-    app_->register_message_handler(
-        DIST_STEER_SERVICE_ID,
-        DIST_STEER_INSTANCE_ID,
+    /* TODO app_->register_message_handler(
+        DIST_SERVICE_ID,
+        DIST_INSTANCE_ID,
         DIST_EVENT_ID,
         std::bind(&CarCTRLClient::on_dist_eve, this,
+                  std::placeholders::_1));*/
+
+    app_->register_message_handler(
+        SPEED_SERVICE_ID,
+        SPEED_INSTANCE_ID,
+        SPEED_EVENT_ID,
+        std::bind(&CarCTRLClient::on_speed_eve, this,
                   std::placeholders::_1));
 
     is_init_ = true;
-    cond_init_.notify_all();
-
-    std::cout << "############### Successfully initialized" << std::endl; // TODO remove
-
     return true;
 }
 
 void CarCTRLClient::start() {
     app_->start();
-    std::cout << "############### Successfully started" << std::endl; // TODO remove
 }
 
-void CarCTRLClient::on_state(vsomeip::state_type_e state) {
-    if(state == vsomeip::state_type_e::ST_REGISTERED) {
-        std::cout << "################ Succesfully registered at runtime!" << std::endl; // TODO remove
-
-        app_->request_service(DIST_STEER_SERVICE_ID, DIST_STEER_INSTANCE_ID);
-        std::cout << "################ Succesfully requested at dist/steer!" << std::endl; // TODO remove
-
-        std::set<vsomeip::eventgroup_t> dist_group;
-        dist_group.insert(DIST_EVENTGROUP_ID);
-        app_->request_event(
-                DIST_STEER_SERVICE_ID,
-                DIST_STEER_INSTANCE_ID,
-                DIST_EVENT_ID,
-                dist_group,
-                false); // TODO what does this boolean do?
-        app_->subscribe(DIST_STEER_SERVICE_ID, DIST_STEER_INSTANCE_ID, DIST_EVENTGROUP_ID);
-
-        std::cout << "################ Succesfully subscribed to dist!" << std::endl; // TODO remove
-
-        // TODO similar request for motor server
-
-        // TODO similar subscription to speed events
-
-    }
-    // TODO handle deregistration
+bool CarCTRLClient::check_availability(vsomeip::service_t serv, vsomeip::instance_t inst) {
+    if (!is_init_)
+        return false;
+    else if (DIST_SERVICE_ID == serv && DIST_INSTANCE_ID == inst)
+        return is_ava_di_;
+    else if (STEER_SERVICE_ID == serv && STEER_INSTANCE_ID == inst)
+        return is_ava_st_;
+    else if (MOTOR_SERVICE_ID == serv && MOTOR_INSTANCE_ID == inst)
+        return is_ava_mo_;
+    else if (SPEED_SERVICE_ID == serv && SPEED_INSTANCE_ID == inst)
+        return is_ava_sp_;
 }
 
-void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t inst, bool is_ava) {
-                std::cout << "############### Go status: " << go_ << std::endl; // TODO remove
-                std::cout << "############### Init status: " << is_init_ << std::endl; // TODO remove
-                std::cout << "############### Slave status: " << slaves_disc_ << std::endl;
-        if (DIST_STEER_SERVICE_ID == serv && DIST_STEER_INSTANCE_ID == inst) {
-            if (is_ava_st_ && !is_ava) {
-                is_ava_st_ = false;
-                slaves_disc_--;
-                check_go_status();
-                std::cout << "############### STEERING NOT AVAILABLE" << std::endl; // TODO remove
-                std::cout << "############### Go status: " << go_ << std::endl; // TODO remove
-                std::cout << "############### Init status: " << is_init_ << std::endl; // TODO remove
-                std::cout << "############### Slave status: " << slaves_disc_ << std::endl;
-            } else if (!is_ava_st_ && is_ava) {
-                is_ava_st_ = true;
-                slaves_disc_++;
-                check_go_status();
-                std::cout << "############### STEERING AVAILABLE" << std::endl; // TODO remove
-                std::cout << "############### Go status: " << go_ << std::endl; // TODO remove
-                std::cout << "############### Init status: " << is_init_ << std::endl; // TODO remove
-                std::cout << "############### Slave status: " << slaves_disc_ << std::endl;
-            }
-        }
-        else {
-            std::cout << "############### on_availability triggd, no match" << std::endl; // TODO remove
-        }
-}
-
-void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &_msg) {
-    std::cout << "############### dist event received" << std::endl; // TODO remove
-    // TODO code for sharing payload with arduino system
-}
-
-// TODO on_availability and on_event for motor server
-
-/*
- * Checks if the dexpected number of slaves have been discovered
- */
-void CarCTRLClient::check_go_status() {
-    std::cout << "############### checking go status" << std::endl; // TODO remove
-    if (slaves_disc_ == slaves_tot_) {
+bool CarCTRLClient::update_go_status() {
+    if (!is_init_)
+        return false;        
+    else if (services_disc_ == services_tot_) {
         go_ = true;
         app_->offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
-        std::cout << "############### GO!" << std::endl; // TODO remove
     }
     else {
         go_ = false;
         app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
-        std::cout << "############### NOT GO!" << std::endl; // TODO remove
     }
-
+    return go_;
 }
+
+void CarCTRLClient::send_motor_req(char s, bool prio) {
+    std::vector<vsomeip::byte_t> data;
+    if (prio)
+        data.push_back(0xF0);
+    else
+        data.push_back(0x00);
+    data.push_back(s);
+
+    std::unique_lock<std::mutex> req_lk(mu_app_);
+    while (app_busy_)
+        cond_app_.wait(req_lk);
+    app_busy_ = true;
+
+    send_req(data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, MOTOR_METHOD_ID);
+
+    app_busy_ = false;
+    req_lk.unlock();
+    cond_app_.notify_one();
+}
+
+void CarCTRLClient::send_motor_req(char s, char a, bool prio) {
+    std::vector<vsomeip::byte_t> data;
+    if (prio)
+        data.push_back(0xFF);
+    else
+        data.push_back(0x00);
+    data.push_back(s);
+    data.push_back(a);
+
+    std::unique_lock<std::mutex> req_lk(mu_app_);
+    while (app_busy_)
+        cond_app_.wait(req_lk);
+    app_busy_ = true;
+
+    send_req(data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, MOTOR_METHOD_ID);
+
+    app_busy_ = false;
+    req_lk.unlock();
+    cond_app_.notify_one();
+}
+
+void CarCTRLClient::send_steer_req(char d, bool prio) {
+    std::vector<vsomeip::byte_t> data;
+    if (prio)
+        data.push_back(0xF0);
+    else
+        data.push_back(0x00);
+    data.push_back(d);
+
+    std::unique_lock<std::mutex> req_lk(mu_app_);
+    while (app_busy_)
+        cond_app_.wait(req_lk);
+    app_busy_ = true;
+
+    send_req(data, STEER_SERVICE_ID, STEER_INSTANCE_ID, STEER_METHOD_ID);
+
+    app_busy_ = false;
+    req_lk.unlock();
+    cond_app_.notify_one();
+}
+
+char CarCTRLClient::pop_speed() {
+    char data;
+    std::unique_lock<std::mutex> q_lk(mu_di_q_);
+    while (speed_q_.empty())
+        cond_sp_q_.wait(q_lk);
+    data = speed_q_.front();
+    speed_q_.pop();
+    q_lk.unlock();
+    return data;
+}
+
+/*char* CarCTRLClient::pop_distance() {
+
+}*/
 
 /*
- * This is a thread
+ *-------------------------------------------------------------------------------------------------
+ *                                  HERE BE PRIVATE MEMBER FUNCTIONS
+ *-------------------------------------------------------------------------------------------------
  */
-void CarCTRLClient::run_st() {
-    std::cout << "############### Hello, I'm a steering thread!" << std::endl; //TODO remove
-    {
-        std::unique_lock<std::mutex> init_lk(mu_init_);
-        while (!is_init_)
-            cond_init_.wait(init_lk);
+
+/*void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &_msg) {
+    //TODO extract sensor data from msg
+    char data[3] = {7, 7, 7};
+    std::unique_lock<std::mutex> q_lk(mu_di_q_);
+    if (dist_q_.size() == DIST_Q_DEPTH) // Pop oldest data if queue is full
+        dist_q_.pop();
+    dist_q_.push(data);
+
+    q_lk.unlock();
+    cond_di_q_.notify_one();
+}*/
+
+void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &_msg) {
+    //TODO extract sensor data from msg
+    char data = 7;
+    std::unique_lock<std::mutex> q_lk(mu_sp_q_);
+    if (speed_q_.size() == SPEED_Q_DEPTH) // Pop oldest data if queue is full
+        speed_q_.pop();
+    speed_q_.pop();
+
+    q_lk.unlock();
+    cond_sp_q_.notify_one();
+}
+
+void CarCTRLClient::send_req(std::vector<vsomeip::byte_t> data,
+                             vsomeip::service_t serv,
+                             vsomeip::instance_t inst,
+                             vsomeip::method_t meth) {
+
+    request_->set_service(serv);
+    request_->set_instance(inst);
+    request_->set_method(meth);
+
+    payload_->set_data(data);
+    request_->set_payload(payload_);
+    app_->send(request_, true);
+}
+
+void CarCTRLClient::on_state(vsomeip::state_type_e state) {
+    if(state == vsomeip::state_type_e::ST_REGISTERED) {
+        app_->request_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
+        app_->request_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
+        app_->request_service(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID);
+        app_->request_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
+
+        std::set<vsomeip::eventgroup_t> dist_group;
+        dist_group.insert(DIST_EVENTGROUP_ID);
+        app_->request_event(
+                DIST_SERVICE_ID,
+                DIST_INSTANCE_ID,
+                DIST_EVENT_ID,
+                dist_group,
+                false); // TODO what does this boolean do?
+        app_->subscribe(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENTGROUP_ID);
+
+        std::set<vsomeip::eventgroup_t> speed_group;
+        dist_group.insert(SPEED_EVENTGROUP_ID);
+        app_->request_event(
+                SPEED_SERVICE_ID,
+                SPEED_INSTANCE_ID,
+                SPEED_EVENT_ID,
+                speed_group,
+                false); // TODO what does this boolean do?
+        app_->subscribe(SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SPEED_EVENTGROUP_ID);
     }
+    else if(state == vsomeip::state_type_e::ST_DEREGISTERED) {
+        app_->release_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
+        app_->release_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
+        app_->release_service(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID);
+        app_->release_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
 
-    std::cout << "############### Steering thread unleashed!" << std::endl; //TODO remove
-
-
-    while(true) { // TODO some sort of exit condition for program termination
-        while(!go_);
-
-        std::unique_lock<std::mutex> req_lk(mu_req_);
-        while (app_busy_ && go_)
-            cond_req_.wait(req_lk);
-        app_busy_ = true;
-        std::cout << "############### Steering thread acquired request mutex!" << std::endl;
-
-        if(is_ava_st_) { // TODO put into function which takes ID's as arguments?
-            request_->set_service(DIST_STEER_SERVICE_ID);
-            request_->set_instance(DIST_STEER_INSTANCE_ID);
-            request_->set_method(STEER_METHOD_ID);
-
-            // TODO Replace this block with geting arduio values -------------------------------------
-            std::vector<vsomeip::byte_t> data;
-            data.push_back(7);
-            payload_->set_data(data);
-            request_->set_payload(payload_);
-            //------------------------------------------------------------------
-
-            app_->send(request_, true);
-            std::cout << "############### Steering Requested" << std::endl; // TODO remove
-        }
-
-        app_busy_ = false;
-        req_lk.unlock();
-        cond_req_.notify_one();
-        std::this_thread::sleep_for(std::chrono::milliseconds(req_st_sleep_));
+        if(go_)
+            app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
 }
 
-/*
- * This is a thread
- */
-void CarCTRLClient::run_mo() {
-    std::cout << "############### Hello, I'm a motor thread!" << std::endl; //TODO remove
-    {
-        std::unique_lock<std::mutex> init_lk(mu_init_);
-        while (!is_init_)
-            cond_init_.wait(init_lk);
-    }
-
-    std::cout << "############### Motor thread unleashed!" << std::endl; //TODO remove
-
-    while(true) { // TODO some sort of exit condition for program termination
-        while(!go_);        
-
-        std::unique_lock<std::mutex> req_lk(mu_req_);
-        while (app_busy_)
-            cond_req_.wait(req_lk);
-        app_busy_ = true;
-        std::cout << "############### Motor thread acquired request mutex!" << std::endl; //TODO remove
-
-        if(is_ava_mo_) {
-            request_->set_service(MOTOR_SPEED_SERVICE_ID);
-            request_->set_instance(MOTOR_SPEED_INSTANCE_ID);
-            request_->set_method(MOTOR_METHOD_ID);
-
-            // TODO Replace this block with geting arduio values -------------------------------------
-            std::vector<vsomeip::byte_t> data;
-            data.push_back(7);
-            payload_->set_data(data);
-            request_->set_payload(payload_);
-            //------------------------------------------------------------------
-
-
-            app_->send(request_, true);
-            std::cout << "############### Motor Requested" << std::endl; // TODO remove
+void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t inst, bool is_ava) {
+    if (DIST_SERVICE_ID == serv && DIST_INSTANCE_ID == inst) {
+        if (is_ava_di_ && !is_ava) {
+            is_ava_di_ = false;
+            services_disc_--;
         }
+        else if (!is_ava_di_ && is_ava) {
 
-        app_busy_ = false;
-        req_lk.unlock();
-        cond_req_.notify_one();
-        std::this_thread::sleep_for(std::chrono::milliseconds(req_mo_sleep_));
+            is_ava_di_ = true;
+            services_disc_++;
+        }
+    }
+    else if (STEER_SERVICE_ID == serv && STEER_INSTANCE_ID == inst) {
+        if (is_ava_st_ && !is_ava) {
+            is_ava_st_ = false;
+            services_disc_--;
+        }
+        else if (!is_ava_st_ && is_ava) {
+            is_ava_st_ = true;
+            services_disc_++;
+        }
+    }
+    else if (MOTOR_SERVICE_ID == serv && MOTOR_INSTANCE_ID == inst) {
+        if (is_ava_mo_ && !is_ava) {
+            is_ava_mo_ = false;
+            services_disc_--;
+        }
+        else if (!is_ava_mo_ && is_ava) {
+            is_ava_mo_ = true;
+            services_disc_++;
+        }
+    }
+    else if (SPEED_SERVICE_ID == serv && SPEED_INSTANCE_ID == inst) {
+        if (is_ava_sp_ && !is_ava) {
+            is_ava_sp_ = false;
+            services_disc_--;
+        }
+        else if (!is_ava_sp_ && is_ava) {
+            is_ava_sp_ = true;
+            services_disc_++;
+        }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

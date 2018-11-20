@@ -18,7 +18,7 @@
     [
         {
             "service" : "0x0001",
-            "instance" : "0x0011",
+            "instance" : "0x0001",
             "unreliable" : "30001"
         }
     ],

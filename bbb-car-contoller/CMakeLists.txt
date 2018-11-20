@@ -15,6 +15,7 @@ include_directories (
 file(GLOB main_SRC
     "./src/*.hpp"
     "./src/*.cpp"
+    "./include/*.hpp"
 )
 
 add_executable(main ${main_SRC})
