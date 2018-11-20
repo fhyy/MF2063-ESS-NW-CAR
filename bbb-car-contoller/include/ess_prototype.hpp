@@ -4,6 +4,7 @@
 #include "../src/car_ctrl_client.hpp"
 
 class ESSPrototype {
+public:
     /**
      * @brief
      * @param ccc
