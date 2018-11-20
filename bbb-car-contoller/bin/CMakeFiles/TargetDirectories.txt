@@ -1,3 +1,0 @@
-D:/Embedded System Design Project/MF2063-ESS-NW-CAR/bbb-car-contoller/bin/CMakeFiles/test_sm.c.dir
-D:/Embedded System Design Project/MF2063-ESS-NW-CAR/bbb-car-contoller/bin/CMakeFiles/ALL_BUILD.dir
-D:/Embedded System Design Project/MF2063-ESS-NW-CAR/bbb-car-contoller/bin/CMakeFiles/ZERO_CHECK.dir
