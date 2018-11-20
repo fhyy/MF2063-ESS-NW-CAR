@@ -60,7 +60,7 @@ char ESSPrototype::getSpeed() {
 }
 
 
-/* TODO char ESSPrototype::getSpeed() {
+/* TODO char ESSPrototype::getDistance() {
     if (!checkDistanceSensor()) {
         return {0};
     } else {
