@@ -182,7 +182,7 @@ char CarCTRLClient::pop_speed() {
     cond_di_q_.notify_one();
 }*/
 
-void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &_msg) {
+void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &msg) {
     //TODO extract sensor data from msg
     char data = 7;
     std::unique_lock<std::mutex> q_lk(mu_sp_q_);
@@ -194,7 +194,7 @@ void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &_msg) 
     cond_sp_q_.notify_one();
 }
 
-void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &_msg) {
+void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg) {
     //TODO extract sensor data from msg
     std::cout << "EMERGENCY BREAK EVENT!!!!!!!!!!" << std::endl;
 }

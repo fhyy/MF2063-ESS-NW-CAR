@@ -1,4 +1,4 @@
-#include "dist_steer_service.hpp"
+#include "motor_speed_service.hpp"
 
 /*
  *-------------------------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ void DistSteerService::on_state(vsomeip::state_type_e state) {
  *--------------------------------- on_steer_req --------------------------------------------------
  *-------------------------------------------------------------------------------------------------
  */
-void DistSteerService::on_steer_req(const std::shared_ptr<vsomeip::message> &_msg) {
+void DistSteerService::on_steer_req(const std::shared_ptr<vsomeip::message> &msg) {
     // TODO unpack message and write to shared variable
 }
 
