@@ -1,7 +1,7 @@
 #ifndef ESS_PROTOTYPE_HPP
 #define ESS_PROTOTYPE_HPP
 
-#include "../src/car_ctrl_client.hpp"
+#include "car_ctrl_client.hpp"
 
 class ESSPrototype {
 public:
