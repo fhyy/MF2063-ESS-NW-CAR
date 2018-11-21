@@ -29,6 +29,7 @@
  * application may subscribe to this sevice to get regular distance sensor updates. The
  * steering service follows a client-server model where the client app sends a request
  * and the server (this class) sets the wheels to the requested angle.
+ * @author Leon Fernandez
  */
 class DistSteerService {
 public:
@@ -36,6 +37,7 @@ public:
      * @brief Constructor for the DistSteerService class.
      * @param di_sleep Time (in millisec) that the distance notifier thread will sleep
      *        during each cycle.
+     * @author Leon Fernandez
      */
     DistSteerService(uint32_t di_sleep);
 
@@ -46,22 +48,25 @@ public:
      * Initializes the DistSteering app by registering @ref on_state, @ref on_steer_req and
      * @ref on_go_availability as handlers for different vsomeip events. It also initializes
      * @ref pub_di_thread_.
-     * 
+     * @author Leon Fernandez
      */
     bool init();
 
     /**
      * @brief Starts the application by registering it to the vsomeip runtime environment.
+     * @author Leon Fernandez
      */
     void start();
 
     /**
      * @brief Stops the application by joining all threads and deregistering from the vsomeip RTE
+     * @author Leon Fernandez
      */
     void stop();
 
     /**
      * @brief Getter so external entities can read the run_ member.
+     * @author Leon Fernandez
      */
     bool is_running();
 private:
@@ -132,6 +137,7 @@ private:
      *            desired angle for the wheels.
      *
      * Currently does nothing
+     * @author Leon Fernandez
      */
     void on_steer_req(const std::shared_ptr<vsomeip::message>& msg);
 
@@ -140,6 +146,7 @@ private:
      * @param msg vsomeip message with SHUTDOWN_METHOD_ID
      *
      * Shuts down the application and the entire program by calling @ref stop.
+     * @author Leon Fernandez
      */
     void on_shutdown(const std::shared_ptr<vsomeip::message>& msg);
 
@@ -147,11 +154,12 @@ private:
      * @brief Function that is called when the availability of the go-service changes.
      * @param serv ID of the service, should always be ==GO_SERVICE_ID
      * @param inst ID of the specific service instance, should always be ==GO_INSTANCE_ID
-     * @param go True if the service
+     * @param go True if the service is available, false otherwise
      *
      * The go-service is a service made available by the central node (bbb-car-controller)
      * when that node has a preset number of services (ie when it has discovered all actuators).
      * The availability of the go-service basically works as a pause/play switch for this Class.
+     * @author Leon Fernandez
      */
     void on_go_availability(vsomeip::service_t serv, vsomeip::instance_t inst, bool go);
 
@@ -161,6 +169,7 @@ private:
      * 
      * Upon succesful registration within the vsomeip runtime it offers the steering and
      * distance services (makes them available) and requests association with the go-server.
+     * @author Leon Fernandez
      */
     void on_state(vsomeip::state_type_e state);
 };

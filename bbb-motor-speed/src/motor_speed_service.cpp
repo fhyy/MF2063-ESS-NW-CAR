@@ -173,7 +173,7 @@ void MotorSpeedService::on_state(vsomeip::state_type_e state) {
  *-------------------------------------------------------------------------------------------------
  */
 void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
-    //TODO if dist<min_dist_
+    //TODO if dist<min_dist_ && use_dist_
     //            app_->notify();
 }
 
