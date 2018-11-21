@@ -27,7 +27,7 @@
             "unreliable" : "30033"
         }
     ],
-    "routing" : "dist_steer_service",
+    "routing" : "motor_speed_service",
     "service-discovery" :
     {
         "enable" : "true",
