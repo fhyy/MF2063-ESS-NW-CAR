@@ -2,20 +2,14 @@
 cmake_minimum_required (VERSION 2.8)
 project(bbb-motor-speed)
 
-set (CMAKE_CXX_FLAGS "-g -std=c++0x")
+set(CMAKE_CXX_FLAGS "-g -std=c++0x")
 
-find_package (vsomeip 2.6.0 REQUIRED)
-find_package( Boost 1.65 COMPONENTS system thread log REQUIRED )
+find_package(vsomeip 2.6.0 REQUIRED)
+find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 
-include_directories (
-    ${Boost_INCLUDE_DIR}
-    ${VSOMEIP_INCLUDE_DIRS}
-)
+include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
-file(GLOB main_SRC
-    "./src/*.hpp"
-    "./src/*.cpp"
-)
+file(GLOB main_SRC "./src/*.hpp" "./src/*.cpp")
 
 add_executable(main ${main_SRC})
 target_link_libraries(main vsomeip ${Boost_LIBRARIES})
@@ -24,7 +18,7 @@ target_link_libraries(main vsomeip ${Boost_LIBRARIES})
 
 ################### Build Docs ##########################################################
 find_package(Doxygen)
-if (DOXYGEN_FOUND)
+if(DOXYGEN_FOUND)
     set(DOXYGEN_IN ${CMAKE_CURRENT_LIST_DIR}/Doxyfile.in)
     set(DOXYGEN_OUT ${CMAKE_CURRENT_LIST_DIR}/doc/Doxyfile)
     configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
@@ -34,9 +28,9 @@ if (DOXYGEN_FOUND)
         COMMENT "Doxygen is working..."
 	SOURCES ${DOXYGEN_OUT})
 
-else (DOXYGEN_FOUND)
+else()
   message("Doxygen not found. No documentation will be generated")
-endif (DOXYGEN_FOUND)
+endif()
 #########################################################################################
 
 ################### Link to vsomeip.json ################################################
