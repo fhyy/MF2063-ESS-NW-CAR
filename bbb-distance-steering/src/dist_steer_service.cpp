@@ -115,7 +115,9 @@ void DistSteerService::on_state(vsomeip::state_type_e state) {
         app_->request_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
     else if (state == vsomeip::state_type_e::ST_REGISTERED) {
+        app_->stop_offer_event(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENT_ID);
         app_->stop_offer_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
+
         app_->stop_offer_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
 
         app_->release_service(GO_SERVICE_ID, GO_INSTANCE_ID);
