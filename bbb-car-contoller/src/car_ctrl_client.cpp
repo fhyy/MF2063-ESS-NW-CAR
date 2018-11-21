@@ -46,6 +46,13 @@ bool CarCTRLClient::init() {
         std::bind(&CarCTRLClient::on_speed_eve, this,
                   std::placeholders::_1));
 
+    app_->register_message_handler(
+        vsomeip::ANY_SERVICE,
+        vsomeip::ANY_INSTANCE,
+        EMERGENCY_BREAK_EVENT_ID,
+        std::bind(&CarCTRLClient::on_embreak_eve, this,
+                  std::placeholders::_1));
+
     is_init_ = true;
     return true;
 }
@@ -187,6 +194,11 @@ void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &_msg) 
     cond_sp_q_.notify_one();
 }
 
+void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &_msg) {
+    //TODO extract sensor data from msg
+    std::cout << "EMERGENCY BREAK EVENT!!!!!!!!!!" << std::endl;
+}
+
 void CarCTRLClient::send_req(std::vector<vsomeip::byte_t> data,
                              vsomeip::service_t serv,
                              vsomeip::instance_t inst,
@@ -204,10 +216,6 @@ void CarCTRLClient::send_req(std::vector<vsomeip::byte_t> data,
 void CarCTRLClient::on_state(vsomeip::state_type_e state) {
     if(state == vsomeip::state_type_e::ST_REGISTERED) {
         app_->request_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
-        app_->request_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
-        app_->request_service(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID);
-        app_->request_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
-
         std::set<vsomeip::eventgroup_t> dist_group;
         dist_group.insert(DIST_EVENTGROUP_ID);
         app_->request_event(
@@ -218,6 +226,9 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
                 false); // TODO what does this boolean do?
         app_->subscribe(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENTGROUP_ID);
 
+        app_->request_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
+
+        app_->request_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
         std::set<vsomeip::eventgroup_t> speed_group;
         dist_group.insert(SPEED_EVENTGROUP_ID);
         app_->request_event(
@@ -228,13 +239,33 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
                 false); // TODO what does this boolean do?
         app_->subscribe(SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SPEED_EVENTGROUP_ID);
 
+        app_->request_service(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID);
+        std::set<vsomeip::eventgroup_t> embreak_group;
+        dist_group.insert(EMERGENCY_BREAK_EVENTGROUP_ID);
+        app_->request_event(
+                MOTOR_SERVICE_ID,
+                MOTOR_INSTANCE_ID,
+                EMERGENCY_BREAK_EVENT_ID,
+                embreak_group,
+                false); // TODO what does this boolean do?
+        app_->subscribe(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, EMERGENCY_BREAK_EVENTGROUP_ID);
+
         update_go_status();
     }
     else if(state == vsomeip::state_type_e::ST_DEREGISTERED) {
-        app_->release_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
         app_->release_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
-        app_->release_service(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID);
+
+        app_->unsubscribe(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENTGROUP_ID);
+        app_->release_event(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENT_ID);
+        app_->release_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
+
+        app_->unsubscribe(SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SPEED_EVENTGROUP_ID);
+        app_->release_event(SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SPEED_EVENT_ID);
         app_->release_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
+
+        app_->unsubscribe(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, EMERGENCY_BREAK_EVENTGROUP_ID);
+        app_->release_event(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, EMERGENCY_BREAK_EVENT_ID);
+        app_->release_service(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID);
 
         if(go_)
             go_ = false;
