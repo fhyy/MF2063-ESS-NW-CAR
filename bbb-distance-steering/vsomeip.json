@@ -24,7 +24,7 @@
         {
             "service" : "0x0022",
             "instance" : "0x0022",
-            "unreliable": "30022"
+            "unreliable" : "30022"
         }
     ],
     "routing" : "dist_steer_service",
