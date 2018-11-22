@@ -13,6 +13,8 @@
 #include <chrono>
 #include <vsomeip/vsomeip.hpp>
 #include "vsomeip_ids.hpp"
+#include "SharedMemory.hpp"
+#include "CyclicBuffer.hpp"
 
 /**
  * @brief This class provides the speed sensor service and the motor actuator service.
