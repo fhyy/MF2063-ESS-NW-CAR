@@ -191,3 +191,50 @@ void DistSteerService::run_di() {
         std::this_thread::sleep_for(std::chrono::milliseconds(pub_di_sleep_));
     }
 }
+
+/*
+ *#################################################################################################
+ *################################# MAIN ##########################################################
+ *#################################################################################################
+ */
+
+#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+    DistSteerService *dss_ptr(nullptr);
+
+    void handle_signal(int signal) {
+        std::cout << "Interrupt signal: " << signal << std::endl;
+        if (dss_ptr != nullptr &&
+                (signal == SIGINT || signal == SIGTERM))
+            dss_ptr->stop();
+    }
+#endif
+
+int main(int argc, char** argv) {
+    uint32_t di_sleep = 50;
+
+    std::string sleep_flag("--sleep");
+
+    for (int i=1; i<argc; i++) {
+        if (sleep_flag==argv[i] && i+1<argc) {
+            i++;
+            std::stringstream conv;
+            conv << argv[i];
+            conv >> di_sleep;
+        }
+    }
+
+    DistSteerService dss(di_sleep);
+
+#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+    dss_ptr = &dss;
+    signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
+#endif
+
+    if (dss.init()) {
+        dss.start();
+        return 0;
+    }
+    else
+        return 1;
+}

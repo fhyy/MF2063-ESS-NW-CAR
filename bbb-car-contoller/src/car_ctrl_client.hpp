@@ -9,11 +9,13 @@
 #endif
 
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <queue>
 #include <vsomeip/vsomeip.hpp>
+#include "vsomeip_ids.hpp"
 
 class CarCTRLClient {
 public:

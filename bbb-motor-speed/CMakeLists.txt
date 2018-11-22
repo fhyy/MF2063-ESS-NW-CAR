@@ -9,10 +9,10 @@ find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
-file(GLOB main_SRC "./src/*.hpp" "./src/*.cpp")
+file(GLOB MoSp_SRC "./src/*.hpp" "./src/*.cpp")
 
-add_executable(main ${main_SRC})
-target_link_libraries(main vsomeip ${Boost_LIBRARIES})
+add_executable(bbb-motor-speed ${MoSp_SRC})
+target_link_libraries(bbb-motor-speed vsomeip ${Boost_LIBRARIES})
 #########################################################################################
 
 

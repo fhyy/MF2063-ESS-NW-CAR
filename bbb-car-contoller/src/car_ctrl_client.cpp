@@ -300,3 +300,37 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
     }
     update_go_status();
 }
+
+/*
+ *#################################################################################################
+ *################################# MAIN ##########################################################
+ *#################################################################################################
+ */
+
+#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+    CarCTRLClient *ccc_ptr(nullptr);
+
+    void handle_signal(int signal) {
+        std::cout << "Interrupt signal: " << signal << std::endl;
+        if (ccc_ptr != nullptr &&
+                (signal == SIGINT || signal == SIGTERM))
+            ccc_ptr->stop();
+    }
+#endif
+
+int main(int argc, char** argv) {
+    CarCTRLClient ccc;
+
+#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+    ccc_ptr = &ccc;
+    signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
+#endif
+
+    if (ccc.init()) {
+        ccc.start();
+        return 0;
+    }
+    else
+        return 1;
+}

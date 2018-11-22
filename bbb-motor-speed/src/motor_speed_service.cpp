@@ -284,45 +284,57 @@ void MotorSpeedService::run_sp() {
     }
 }
 
+/*
+ *#################################################################################################
+ *################################# MAIN ##########################################################
+ *#################################################################################################
+ */
 
+#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+    MotorSpeedService *mss_ptr(nullptr);
 
+    void handle_signal(int signal) {
+        std::cout << "Interrupt signal: " << signal << std::endl;
+        if (mss_ptr != nullptr &&
+                (signal == SIGINT || signal == SIGTERM))
+            mss_ptr->stop();
+    }
+#endif
 
+int main(int argc, char** argv) {
+    uint32_t sp_sleep = 30;
+    uint8_t min_dist = 100;
 
+    std::string sleep_flag("--sleep");
+    std::string min_dist_flag("--min-dist");
 
+    for (int i=1; i<argc; i++) {
+        if (sleep_flag==argv[i] && i+1<argc) {
+            i++;
+            std::stringstream conv;
+            conv << argv[i];
+            conv >> sp_sleep;
+        }
+        else if (min_dist_flag==argv[i] && i+1<argc) {
+            i++;
+            std::stringstream conv;
+            conv << argv[i];
+            conv >> min_dist;
+        }
+    }
 
+    MotorSpeedService mss(sp_sleep, min_dist);
 
+#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+    mss_ptr = &mss;
+    signal(SIGINT, handle_signal);
+    signal(SIGTERM, handle_signal);
+#endif
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    if (mss.init()) {
+        mss.start();
+        return 0;
+    }
+    else
+        return 1;
+}

@@ -6,11 +6,13 @@
 #endif
 
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
 #include <vsomeip/vsomeip.hpp>
+#include "vsomeip_ids.hpp"
 
 /**
  * @brief This class provides the speed sensor service and the motor actuator service.
@@ -194,34 +196,3 @@ private:
 };
 
 #endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

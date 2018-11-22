@@ -6,11 +6,13 @@
 #endif
 
 #include <iostream>
+#include <sstream>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
 #include <vsomeip/vsomeip.hpp>
+#include "vsomeip_ids.hpp"
 
 /**
  * @brief This class provides the distance sensor service and the steering actuator service.
