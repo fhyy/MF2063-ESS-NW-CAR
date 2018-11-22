@@ -114,7 +114,7 @@ void DistSteerService::on_state(vsomeip::state_type_e state) {
 
         app_->request_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
-    else if (state == vsomeip::state_type_e::ST_REGISTERED) {
+    else if (state == vsomeip::state_type_e::ST_DEREGISTERED) {
         app_->stop_offer_event(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENT_ID);
         app_->stop_offer_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
 
@@ -155,6 +155,7 @@ void DistSteerService::on_go_availability(vsomeip::service_t serv,
             go_ = false;
         }
         else if (!go_ && go) {
+	    std::cout << "GOOOOOOOOOOO!!!!!!!!!!!!!!!!" << std::endl;
             go_ = true;
         }
     }
@@ -178,18 +179,15 @@ void DistSteerService::run_di() {
 
         // TODO Replace this block with geting arduio values -------------------------------------
         std::vector<vsomeip::byte_t> data;
-        data.push_back(7);
-        data.push_back(7);
-        data.push_back(7);
-        data.push_back(7);
-        data.push_back(7);
-        data.push_back(7);
+        data.push_back(122);
+        data.push_back(133);
+        data.push_back(130);
         payload_->set_data(data);
         //------------------------------------------------------------------
-        
-        app_->notify(DIST_SERVICE_ID, STEER_INSTANCE_ID,
-                     DIST_EVENT_ID, payload_, true, true);
 
+        app_->notify(DIST_SERVICE_ID, DIST_INSTANCE_ID,
+                     DIST_EVENT_ID, payload_, true, true);
+	std::cout << "DIST EVENT SENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(pub_di_sleep_));
     }
 }

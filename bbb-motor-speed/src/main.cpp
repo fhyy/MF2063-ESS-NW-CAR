@@ -2,7 +2,7 @@
 #include <iostream>
 #include "motor_speed_service.hpp"
 
-MotorSpeedService mss(8000, 100);
+MotorSpeedService mss(1000, 100);
 
 void signalHandler(int signum);
 

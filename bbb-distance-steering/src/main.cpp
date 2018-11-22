@@ -3,7 +3,7 @@
 #include "dist_steer_service.hpp"
 
 
-DistSteerService dss(7000);
+DistSteerService dss(700);
 
 void signalHandler(int signum);
 

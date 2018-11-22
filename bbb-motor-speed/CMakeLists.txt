@@ -2,7 +2,7 @@
 cmake_minimum_required (VERSION 2.8)
 project(bbb-motor-speed)
 
-set(CMAKE_CXX_FLAGS "-g -std=c++0x")
+set(CMAKE_CXX_FLAGS "-g -std=c++0x -pthread -lrt")
 
 find_package(vsomeip 2.6.0 REQUIRED)
 find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)

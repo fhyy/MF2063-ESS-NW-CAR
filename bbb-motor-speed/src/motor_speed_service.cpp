@@ -169,12 +169,26 @@ void MotorSpeedService::on_state(vsomeip::state_type_e state) {
 
 /*
  *-------------------------------------------------------------------------------------------------
- *--------------------------------- on_dist_eve --------------------------------------------------
+ *--------------------------------- on_dist_eve ---------------------------------------------------
  *-------------------------------------------------------------------------------------------------
  */
 void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
-    //TODO if dist<min_dist_ && use_dist_
-    //            app_->notify();
+    vsomeip::byte_t *data = msg->get_payload()->get_data();
+    std::cout << "DIST EVENT!!!!!!!!!! Data is: (" << (int) data[0] << ", " << (int) data[1]
+              << ", " << (int) data[2] << ")" << std::endl;
+
+    if (data[0]<min_dist_ || data[1]<min_dist_ || data[2]<min_dist_) {
+        std::shared_ptr<vsomeip::payload> payload = vsomeip::runtime::get()->create_payload();
+        std::vector<vsomeip::byte_t> data;
+        data.push_back(13);
+        payload->set_data(data); // TODO empty payload or use payload_?
+	app_->notify(MOTOR_SERVICE_ID,
+                    MOTOR_INSTANCE_ID,
+                    EMERGENCY_BREAK_EVENT_ID,
+                    payload,
+                    true, true);
+	std::cout << "EMBREAK EVENT SENT!!!!!" << std::endl;
+    }
 }
 
 /*
@@ -218,6 +232,7 @@ void MotorSpeedService::on_go_availability(vsomeip::service_t serv,
         }
         else if (!go_ && go) {
             go_ = true;
+	    std::cout << "GOOOOOOOOOOOOOOOOOOOOOO!!!!!!!!!!!" << std::endl;
         }
     }
 }
@@ -258,15 +273,13 @@ void MotorSpeedService::run_sp() {
 
         // TODO Replace this block with geting arduio values -------------------------------------
         std::vector<vsomeip::byte_t> data;
-        data.push_back(7);
-        data.push_back(11);
         data.push_back(23);
         payload_->set_data(data);
         //------------------------------------------------------------------
         
         app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
                      SPEED_EVENT_ID, payload_, true, true);
-
+	std::cout << "SPEED EVENT SENT!!!!!!!!" << std::endl;
         std::this_thread::sleep_for(std::chrono::milliseconds(pub_sp_sleep_));
     }
 }
