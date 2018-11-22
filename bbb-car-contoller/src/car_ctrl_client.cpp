@@ -1,8 +1,6 @@
 #include "car_ctrl_client.hpp"
 
-CarCTRLClient::CarCTRLClient(uint32_t n) :
-    services_tot_(n),
-    services_disc_(0),
+CarCTRLClient::CarCTRLClient() :
     is_init_(false),
     go_(false),
     is_ava_di_(false),
@@ -32,12 +30,12 @@ bool CarCTRLClient::init() {
                                                   std::placeholders::_2,
                                                   std::placeholders::_3));
 
-    /* TODO app_->register_message_handler(
+    app_->register_message_handler(
         DIST_SERVICE_ID,
         DIST_INSTANCE_ID,
         DIST_EVENT_ID,
         std::bind(&CarCTRLClient::on_dist_eve, this,
-                  std::placeholders::_1));*/
+                  std::placeholders::_1));
 
     app_->register_message_handler(
         SPEED_SERVICE_ID,
@@ -61,6 +59,11 @@ void CarCTRLClient::start() {
     app_->start();
 }
 
+void CarCTRLClient::stop() {
+    app_->stop();
+    go_ = false;
+}
+
 bool CarCTRLClient::check_availability(vsomeip::service_t serv, vsomeip::instance_t inst) {
     if (!is_init_)
         return false;
@@ -76,8 +79,8 @@ bool CarCTRLClient::check_availability(vsomeip::service_t serv, vsomeip::instanc
 
 bool CarCTRLClient::update_go_status() {
     if (!is_init_)
-        return false;        
-    else if (services_disc_ == services_tot_) {
+        return false;
+    else if (is_ava_di_ && is_ava_st_ && is_ava_mo_ && is_ava_sp_) {
         go_ = true;
         app_->offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
@@ -85,6 +88,8 @@ bool CarCTRLClient::update_go_status() {
         go_ = false;
         app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
+    std::cout << "Distance: " << is_ava_di_ << ", Steer: " << is_ava_st_
+	      << ", Motor: " << is_ava_mo_ << ", Speed: " << is_ava_sp_ << std::endl;
     return go_;
 }
 
@@ -150,6 +155,7 @@ void CarCTRLClient::send_steer_req(char d, bool prio) {
 }
 
 char CarCTRLClient::pop_speed() {
+	std::cout << "POPPING SPEED!!!!!!!!!!!!!!!" << std::endl;
     char data;
     std::unique_lock<std::mutex> q_lk(mu_di_q_);
     while (speed_q_.empty())
@@ -157,6 +163,7 @@ char CarCTRLClient::pop_speed() {
     data = speed_q_.front();
     speed_q_.pop();
     q_lk.unlock();
+    std::cout << "Speed popped!!!!!!!!!" << std::endl;
     return data;
 }
 
@@ -170,33 +177,20 @@ char CarCTRLClient::pop_speed() {
  *-------------------------------------------------------------------------------------------------
  */
 
-/*void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &_msg) {
-    //TODO extract sensor data from msg
-    char data[3] = {7, 7, 7};
-    std::unique_lock<std::mutex> q_lk(mu_di_q_);
-    if (dist_q_.size() == DIST_Q_DEPTH) // Pop oldest data if queue is full
-        dist_q_.pop();
-    dist_q_.push(data);
-
-    q_lk.unlock();
-    cond_di_q_.notify_one();
-}*/
+void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
+    vsomeip::byte_t *data = msg->get_payload()->get_data();
+    std::cout << "DIST EVENT!!!!!!!!!! Data is: (" << (int) data[0] << ", "
+              << (int) data[1] << ", " << (int) data[2] << ")" << std::endl;
+}
 
 void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &msg) {
-    //TODO extract sensor data from msg
-    char data = 7;
-    std::unique_lock<std::mutex> q_lk(mu_sp_q_);
-    if (speed_q_.size() == SPEED_Q_DEPTH) // Pop oldest data if queue is full
-        speed_q_.pop();
-    speed_q_.pop();
-
-    q_lk.unlock();
-    cond_sp_q_.notify_one();
+    vsomeip::byte_t *data = msg->get_payload()->get_data();
+    std::cout << "SPEED EVENT!!!!!!!!!!!!!! Data is: " << (int) data[0] << std::endl;
 }
 
 void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg) {
-    //TODO extract sensor data from msg
-    std::cout << "EMERGENCY BREAK EVENT!!!!!!!!!!" << std::endl;
+    vsomeip::byte_t *data = msg->get_payload()->get_data();
+    std::cout << "EMBREAK EVENT!!!!!!!!!! Data is: " << (int) data[0]  << std::endl;
 }
 
 void CarCTRLClient::send_req(std::vector<vsomeip::byte_t> data,
@@ -230,7 +224,7 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
 
         app_->request_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
         std::set<vsomeip::eventgroup_t> speed_group;
-        dist_group.insert(SPEED_EVENTGROUP_ID);
+        speed_group.insert(SPEED_EVENTGROUP_ID);
         app_->request_event(
                 SPEED_SERVICE_ID,
                 SPEED_INSTANCE_ID,
@@ -241,7 +235,7 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
 
         app_->request_service(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID);
         std::set<vsomeip::eventgroup_t> embreak_group;
-        dist_group.insert(EMERGENCY_BREAK_EVENTGROUP_ID);
+        embreak_group.insert(EMERGENCY_BREAK_EVENTGROUP_ID);
         app_->request_event(
                 MOTOR_SERVICE_ID,
                 MOTOR_INSTANCE_ID,
@@ -249,8 +243,6 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
                 embreak_group,
                 false); // TODO what does this boolean do?
         app_->subscribe(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, EMERGENCY_BREAK_EVENTGROUP_ID);
-
-        update_go_status();
     }
     else if(state == vsomeip::state_type_e::ST_DEREGISTERED) {
         app_->release_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
@@ -277,42 +269,34 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
     if (DIST_SERVICE_ID == serv && DIST_INSTANCE_ID == inst) {
         if (is_ava_di_ && !is_ava) {
             is_ava_di_ = false;
-            services_disc_--;
         }
         else if (!is_ava_di_ && is_ava) {
-
             is_ava_di_ = true;
-            services_disc_++;
         }
     }
     else if (STEER_SERVICE_ID == serv && STEER_INSTANCE_ID == inst) {
         if (is_ava_st_ && !is_ava) {
             is_ava_st_ = false;
-            services_disc_--;
         }
         else if (!is_ava_st_ && is_ava) {
             is_ava_st_ = true;
-            services_disc_++;
         }
     }
     else if (MOTOR_SERVICE_ID == serv && MOTOR_INSTANCE_ID == inst) {
         if (is_ava_mo_ && !is_ava) {
             is_ava_mo_ = false;
-            services_disc_--;
         }
         else if (!is_ava_mo_ && is_ava) {
             is_ava_mo_ = true;
-            services_disc_++;
         }
     }
     else if (SPEED_SERVICE_ID == serv && SPEED_INSTANCE_ID == inst) {
         if (is_ava_sp_ && !is_ava) {
             is_ava_sp_ = false;
-            services_disc_--;
         }
         else if (!is_ava_sp_ && is_ava) {
             is_ava_sp_ = true;
-            services_disc_++;
         }
     }
+    update_go_status();
 }

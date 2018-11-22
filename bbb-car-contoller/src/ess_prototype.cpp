@@ -52,6 +52,7 @@ bool ESSPrototype::setDirection(char d, bool prio) {
 }
 
 char ESSPrototype::getSpeed() {
+	std::cout << "checking speeeeed from essp" << std::endl;
     if (!checkSpeedSensor()) {
         return 0;
     } else {

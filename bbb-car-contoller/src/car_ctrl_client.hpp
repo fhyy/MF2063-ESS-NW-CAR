@@ -19,8 +19,8 @@
 #define MOTOR_INSTANCE_ID 0x0003
 #define MOTOR_METHOD_ID 0x0003
 #define SETMIN_METHOD_ID 0x0103
-#define EMERGENCY_BREAK_EVENT_ID 0xE133
-#define EMERGENCY_BREAK_EVENTGROUP_ID 0xE133
+#define EMERGENCY_BREAK_EVENT_ID 0xE103
+#define EMERGENCY_BREAK_EVENTGROUP_ID 0xE103
 
 #define SPEED_SERVICE_ID 0x0033
 #define SPEED_INSTANCE_ID 0x0033
@@ -39,9 +39,10 @@
 
 class CarCTRLClient {
 public:
-    CarCTRLClient(uint32_t n);
+    CarCTRLClient();
     bool init();
     void start();
+    void stop();
     bool check_availability(vsomeip::service_t serv, vsomeip::instance_t inst);
     bool update_go_status();
     void send_motor_req(char s, bool prio);
@@ -58,8 +59,6 @@ private:
     bool is_ava_st_;
     bool is_ava_mo_;
     bool is_ava_sp_;
-    uint32_t services_tot_;
-    uint32_t services_disc_;
 
     std::queue<char> speed_q_;
     //std::queue<char*> dist_q_;
@@ -77,6 +76,7 @@ private:
 
     void on_dist_eve(const std::shared_ptr<vsomeip::message>&);
     void on_speed_eve(const std::shared_ptr<vsomeip::message>&);
+    void on_embreak_eve(const std::shared_ptr<vsomeip::message>&);
     void send_req(std::vector<vsomeip::byte_t> data,
                   vsomeip::service_t serv,
                   vsomeip::instance_t inst,
