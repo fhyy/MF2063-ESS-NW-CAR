@@ -1,19 +1,9 @@
 #ifndef DIST_STEER_SERVICE_HPP
 #define DIST_STEER_SERVICE_HPP
 
-#define GO_SERVICE_ID 0x0001
-#define GO_INSTANCE_ID 0x0001
-
-#define SHUTDOWN_METHOD_ID 0x0666
-
-#define STEER_SERVICE_ID 0x0002 
-#define STEER_INSTANCE_ID 0x0002
-#define STEER_METHOD_ID 0x0002
-
-#define DIST_SERVICE_ID 0x0022
-#define DIST_INSTANCE_ID 0x0022
-#define DIST_EVENT_ID 0xE022
-#define DIST_EVENTGROUP_ID 0xE022
+#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+    #include <csignal>
+#endif
 
 #include <iostream>
 #include <thread>
