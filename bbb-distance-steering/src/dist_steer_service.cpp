@@ -9,7 +9,19 @@ DistSteerService::DistSteerService(uint32_t di_sleep) :
     run_(false),
     go_(false),
     pub_di_sleep_(di_sleep)
-    {}
+{
+    CSharedMemory shmMemory_in("/testSharedmemory1");
+    shmMemory_in.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_in.Attach(PROT_WRITE);
+    circBufferP_in = (int*) shmMemory_in.GetData();
+    Buffer circBuffer_in(BUFFER_SIZE, circBufferP_in, B_CONSUMER);
+
+    CSharedMemory shmMemory_out("/testSharedmemory2");
+    shmMemory_out.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_out.Attach(PROT_WRITE);
+    circBufferP_out = (int*) shmMemory_out.GetData();
+    Buffer circBuffer_out(BUFFER_SIZE, circBufferP_out, B_PRODUCER);
+}
 
 /*
  *-------------------------------------------------------------------------------------------------
@@ -130,7 +142,14 @@ void DistSteerService::on_state(vsomeip::state_type_e state) {
  *-------------------------------------------------------------------------------------------------
  */
 void DistSteerService::on_steer_req(const std::shared_ptr<vsomeip::message> &msg) {
-    // TODO unpack message and write to shared variable
+    vsomeip::byte_t *data = msg->get_payload()->get_data();
+    vsomeip::length_t datalength = msg->get_payload()->get_length();
+
+    shmMemory_out.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
+    for(int i=0; i<datalength; i++) {
+        circBuffer_out.write(data[i]);
+    }
+    shmMemory_out.UnLock();
 }
 
 /*
@@ -177,17 +196,20 @@ void DistSteerService::run_di() {
     while(run_) {
         while(!go_);
 
-        // TODO Replace this block with geting arduio values -------------------------------------
-        std::vector<vsomeip::byte_t> data;
-        data.push_back(122);
-        data.push_back(133);
-        data.push_back(130);
-        payload_->set_data(data);
-        //------------------------------------------------------------------
+        std::vector<vsomeip::byte_t> sensor_data;
 
-        app_->notify(DIST_SERVICE_ID, DIST_INSTANCE_ID,
-                     DIST_EVENT_ID, payload_, true, true);
-	std::cout << "DIST EVENT SENT!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+        shmMemory_in.Lock();
+        int unreadValues = circBuffer_in.getUnreadValues();
+        for (int i=0; i<unreadValues; i++)
+            sensor_data.push_back((vsomeip::byte_t) circBuffer_in.read());
+        shmMemory_in.UnLock();
+
+        if (sensor_data.size() > 0) {
+		    payload_->set_data(sensor_data);
+            app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
+                         SPEED_EVENT_ID, payload_, true, true);
+    	    std::cout << "SPEED EVENT SENT!!!!!!!!" << std::endl;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(pub_di_sleep_));
     }
 }

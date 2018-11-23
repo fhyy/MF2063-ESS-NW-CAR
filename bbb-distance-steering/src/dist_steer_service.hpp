@@ -13,6 +13,8 @@
 #include <chrono>
 #include <vsomeip/vsomeip.hpp>
 #include "vsomeip_ids.hpp"
+#include "SharedMemory.hpp"
+#include "CyclicBuffer.hpp"
 
 /**
  * @brief This class provides the distance sensor service and the steering actuator service.
@@ -62,6 +64,15 @@ public:
      */
     bool is_running();
 private:
+
+    CSharedMemory shmMemory_in;
+    int* circBufferP_in;
+    Buffer circBuffer_in;
+
+    CSharedMemory shmMemory_out;
+    int* circBufferP_out;
+    Buffer circBuffer_out;
+
     /**
      * @brief Main on/off switch for application.
      *
