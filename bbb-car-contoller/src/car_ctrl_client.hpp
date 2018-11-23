@@ -1,9 +1,6 @@
 #ifndef CAR_CTRL_CLIENT_HPP
 #define CAR_CTRL_CLIENT_HPP
 
-#define DIST_Q_DEPTH 10
-#define SPEED_Q_DEPTH 10
-
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     #include <csignal>
 #endif
@@ -13,26 +10,19 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
-#include <queue>
 #include <vsomeip/vsomeip.hpp>
 #include "vsomeip_ids.hpp"
+#include "SharedMemory.hpp"
+#include "CyclicBuffer.hpp"
 
 class CarCTRLClient {
 public:
-    CarCTRLClient();
+    CarCTRLClient(uint32_t mo_sleep, uint32_t di_sleep);
     bool init();
     void start();
     void stop();
-    bool check_availability(vsomeip::service_t serv, vsomeip::instance_t inst);
-    bool update_go_status();
-    void send_motor_req(char s, bool prio);
-    void send_motor_req(char s, char a, bool prio);
-    void send_steer_req(char d, bool prio);
-    char pop_speed();
-    //char* pop_distance(); // TODO consider using vector type instead
-
 private:
-    bool is_init_;
+    bool run_;
     bool go_;
     bool app_busy_;
     bool is_ava_di_;
@@ -40,20 +30,39 @@ private:
     bool is_ava_mo_;
     bool is_ava_sp_;
 
-    std::queue<char> speed_q_;
-    //std::queue<char*> dist_q_;
+    uint32_t req_mo_sleep_;
+    uint32_t req_st_sleep_;
 
+    std::thread req_mo_thread_;
+    std::thread req_st_thread_;
+
+    std::mutex mu_run_;
+    std::condition_variable cond_run_;
     std::mutex mu_app_;
     std::condition_variable cond_app_;
-    std::mutex mu_sp_q_;
-    std::condition_variable cond_sp_q_;
-    std::mutex mu_di_q_;
-    std::condition_variable cond_di_q_;
 
     std::shared_ptr<vsomeip::application> app_;
     std::shared_ptr<vsomeip::payload> payload_;
     std::shared_ptr<vsomeip::message> request_;
 
+    CSharedMemory shmMemory_mo;
+    Buffer circBuffer_mo;
+
+    CSharedMemory shmMemory_st;
+    Buffer circBuffer_st;
+
+    CSharedMemory shmMemory_sp;
+    Buffer circBuffer_sp;
+
+    CSharedMemory shmMemory_di;
+    Buffer circBuffer_di;
+
+    CSharedMemory shmMemory_go;
+    Buffer circBuffer_go;
+
+    void update_go_status();
+    void send_motor_req();
+    void send_steer_req();
     void on_dist_eve(const std::shared_ptr<vsomeip::message>&);
     void on_speed_eve(const std::shared_ptr<vsomeip::message>&);
     void on_embreak_eve(const std::shared_ptr<vsomeip::message>&);

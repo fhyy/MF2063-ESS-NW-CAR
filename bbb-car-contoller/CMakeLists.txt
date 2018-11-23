@@ -2,17 +2,19 @@
 cmake_minimum_required (VERSION 2.8)
 project(bbb-car-controller)
 
-set(CMAKE_CXX_FLAGS "-g -std=c++0x -pthread -lrt")
+set(CMAKE_CXX_FLAGS "-g -std=c++0x")
 
 find_package(vsomeip 2.6.0 REQUIRED)
 find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
-file(GLOB CaCo_SRC "./src/*.hpp" "./src/*.cpp")
+include_directories("${PROJECT_SOURCE_DIR}/shared")
+add_subdirectory(shared) 
 
-add_executable(bbb-car-controller ${CaCo_SRC})
-target_link_libraries(bbb-car-controller vsomeip ${Boost_LIBRARIES})
+add_executable(bbb-car-controller "${PROJECT_SOURCE_DIR}/src/car_ctrl_client.cpp")
+target_link_libraries(bbb-car-controller vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
+install(TARGETS bbb-car-controller DESTINATION bin)
 #########################################################################################
 
 

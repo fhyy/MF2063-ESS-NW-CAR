@@ -1,16 +1,55 @@
 #include "car_ctrl_client.hpp"
 
-CarCTRLClient::CarCTRLClient() :
-    is_init_(false),
+CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep) :
+    run_(false),
     go_(false),
     is_ava_di_(false),
     is_ava_st_(false),
     is_ava_mo_(false),
     is_ava_sp_(false),
-    app_busy_(false)
-    {}
+    app_busy_(false),
+    req_mo_sleep_(mo_sleep),
+    req_st_sleep_(st_sleep)
+{
+    int *p;
+
+    CSharedMemory shmMemory_mo("/testSharedmemory1");
+    shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_mo.Attach(PROT_WRITE);
+    p = (int*) shmMemory_mo.GetData();
+    Buffer circBuffer_mo(BUFFER_SIZE, p, B_CONSUMER);
+
+    CSharedMemory shmMemory_st("/testSharedmemory2");
+    shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_st.Attach(PROT_WRITE);
+    p = (int*) shmMemory_st.GetData();
+    Buffer circBuffer_st(BUFFER_SIZE, p, B_CONSUMER);
+
+    CSharedMemory shmMemory_in("/testSharedmemory3");
+    shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_sp.Attach(PROT_WRITE);
+    p = (int*) shmMemory_sp.GetData();
+    Buffer circBuffer_sp(BUFFER_SIZE, p, B_PRODUCER);
+
+    CSharedMemory shmMemory_di("/testSharedmemory4");
+    shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_di.Attach(PROT_WRITE);
+    p = (int*) shmMemory_di.GetData();
+    Buffer circBuffer_di(BUFFER_SIZE, p, B_PRODUCER);
+
+    CSharedMemory shmMemory_go("/testSharedmemory5");
+    shmMemory_go.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_go.Attach(PROT_WRITE);
+    p = (int*) shmMemory_go.GetData();
+    Buffer circBuffer_go(BUFFER_SIZE, p, B_PRODUCER);
+}
 
 bool CarCTRLClient::init() {
+    std::lock_guard<std::mutex> run_lock(mu_run_);
+
+    req_mo_thread_ = std::thread(std::bind(&CarCTRLClient::send_motor_req, this));
+    req_st_thread_ = std::thread(std::bind(&CarCTRLClient::send_steer_req, this));
+
     app_ = vsomeip::runtime::get()->create_application("car_ctrl_client");
     if (!app_->init()) {
         return false;
@@ -51,7 +90,8 @@ bool CarCTRLClient::init() {
         std::bind(&CarCTRLClient::on_embreak_eve, this,
                   std::placeholders::_1));
 
-    is_init_ = true;
+    run_ = true;
+    cond_run_.notify_all();
     return true;
 }
 
@@ -64,22 +104,15 @@ void CarCTRLClient::stop() {
     go_ = false;
 }
 
-bool CarCTRLClient::check_availability(vsomeip::service_t serv, vsomeip::instance_t inst) {
-    if (!is_init_)
-        return false;
-    else if (DIST_SERVICE_ID == serv && DIST_INSTANCE_ID == inst)
-        return is_ava_di_;
-    else if (STEER_SERVICE_ID == serv && STEER_INSTANCE_ID == inst)
-        return is_ava_st_;
-    else if (MOTOR_SERVICE_ID == serv && MOTOR_INSTANCE_ID == inst)
-        return is_ava_mo_;
-    else if (SPEED_SERVICE_ID == serv && SPEED_INSTANCE_ID == inst)
-        return is_ava_sp_;
-}
+/*
+ *-------------------------------------------------------------------------------------------------
+ *                                  HERE BE PRIVATE MEMBER FUNCTIONS
+ *-------------------------------------------------------------------------------------------------
+ */
 
-bool CarCTRLClient::update_go_status() {
-    if (!is_init_)
-        return false;
+void CarCTRLClient::update_go_status() {
+    if (!run_)
+        return;
     else if (is_ava_di_ && is_ava_st_ && is_ava_mo_ && is_ava_sp_) {
         go_ = true;
         app_->offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
@@ -88,104 +121,113 @@ bool CarCTRLClient::update_go_status() {
         go_ = false;
         app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
-    std::cout << "Distance: " << is_ava_di_ << ", Steer: " << is_ava_st_
-	      << ", Motor: " << is_ava_mo_ << ", Speed: " << is_ava_sp_ << std::endl;
-    return go_;
+
+
+    int mo_onehot = 0x00000001;
+    int st_onehot = 0x00000010;
+    int sp_onehot = 0x00000100;
+    int di_onehot = 0x00001000;
+    int service_status = mo_onehot && is_ava_mo_ ||
+                         st_onehot && is_ava_st_ ||
+                         sp_onehot && is_ava_sp_ ||
+                         di_onehot && is_ava_mo_;
+    shmMemory_go.Lock();
+    circBuffer_go.write(service_status);
+    shmMemory_go.UnLock();
 }
-
-void CarCTRLClient::send_motor_req(char s, bool prio) {
-    std::vector<vsomeip::byte_t> data;
-    if (prio)
-        data.push_back(0xF0);
-    else
-        data.push_back(0x00);
-    data.push_back(s);
-
-    std::unique_lock<std::mutex> req_lk(mu_app_);
-    while (app_busy_)
-        cond_app_.wait(req_lk);
-    app_busy_ = true;
-
-    send_req(data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, MOTOR_METHOD_ID);
-
-    app_busy_ = false;
-    req_lk.unlock();
-    cond_app_.notify_one();
-}
-
-void CarCTRLClient::send_motor_req(char s, char a, bool prio) {
-    std::vector<vsomeip::byte_t> data;
-    if (prio)
-        data.push_back(0xFF);
-    else
-        data.push_back(0x00);
-    data.push_back(s);
-    data.push_back(a);
-
-    std::unique_lock<std::mutex> req_lk(mu_app_);
-    while (app_busy_)
-        cond_app_.wait(req_lk);
-    app_busy_ = true;
-
-    send_req(data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, MOTOR_METHOD_ID);
-
-    app_busy_ = false;
-    req_lk.unlock();
-    cond_app_.notify_one();
-}
-
-void CarCTRLClient::send_steer_req(char d, bool prio) {
-    std::vector<vsomeip::byte_t> data;
-    if (prio)
-        data.push_back(0xF0);
-    else
-        data.push_back(0x00);
-    data.push_back(d);
-
-    std::unique_lock<std::mutex> req_lk(mu_app_);
-    while (app_busy_)
-        cond_app_.wait(req_lk);
-    app_busy_ = true;
-
-    send_req(data, STEER_SERVICE_ID, STEER_INSTANCE_ID, STEER_METHOD_ID);
-
-    app_busy_ = false;
-    req_lk.unlock();
-    cond_app_.notify_one();
-}
-
-char CarCTRLClient::pop_speed() {
-	std::cout << "POPPING SPEED!!!!!!!!!!!!!!!" << std::endl;
-    char data;
-    std::unique_lock<std::mutex> q_lk(mu_di_q_);
-    while (speed_q_.empty())
-        cond_sp_q_.wait(q_lk);
-    data = speed_q_.front();
-    speed_q_.pop();
-    q_lk.unlock();
-    std::cout << "Speed popped!!!!!!!!!" << std::endl;
-    return data;
-}
-
-/*char* CarCTRLClient::pop_distance() {
-
-}*/
 
 /*
- *-------------------------------------------------------------------------------------------------
- *                                  HERE BE PRIVATE MEMBER FUNCTIONS
- *-------------------------------------------------------------------------------------------------
+ * This is a thread!
  */
+void CarCTRLClient::send_motor_req() {
+    {
+        std::unique_lock<std::mutex> run_lk(mu_run_);
+        while (!run_)
+            cond_run_.wait(run_lk);
+    }
+
+    while(run_) {
+        while(!go_);
+
+        std::vector<vsomeip::byte_t> req_data;
+
+        shmMemory_mo.Lock();
+        int unreadValues = circBuffer_mo.getUnreadValues();
+        for (int i=0; i<unreadValues; i++)
+            req_data.push_back((vsomeip::byte_t) circBuffer_mo.read());
+        shmMemory_mo.UnLock();
+
+        std::unique_lock<std::mutex> app_lk(mu_app_);
+        while (app_busy_)
+            cond_app_.wait(app_lk);
+        app_busy_ = true;
+
+        send_req(req_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, MOTOR_METHOD_ID);
+
+        app_busy_ = false;
+        app_lk.unlock();
+        cond_app_.notify_one();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(req_mo_sleep_));
+    }
+}
+
+/*
+ * This is a thread!
+ */
+void CarCTRLClient::send_steer_req() {
+    {
+        std::unique_lock<std::mutex> run_lk(mu_run_);
+        while (!run_)
+            cond_run_.wait(run_lk);
+    }
+
+    while(run_) {
+        while(!go_);
+
+        std::vector<vsomeip::byte_t> req_data;
+
+        shmMemory_st.Lock();
+        int unreadValues = circBuffer_st.getUnreadValues();
+        for (int i=0; i<unreadValues; i++)
+            req_data.push_back((vsomeip::byte_t) circBuffer_st.read());
+        shmMemory_st.UnLock();
+
+        std::unique_lock<std::mutex> app_lk(mu_app_);
+        while (app_busy_)
+            cond_app_.wait(app_lk);
+        app_busy_ = true;
+
+        send_req(req_data, STEER_SERVICE_ID, STEER_INSTANCE_ID, STEER_METHOD_ID);
+
+        app_busy_ = false;
+        app_lk.unlock();
+        cond_app_.notify_one();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(req_st_sleep_));
+    }
+}
 
 void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
-    std::cout << "DIST EVENT!!!!!!!!!! Data is: (" << (int) data[0] << ", "
-              << (int) data[1] << ", " << (int) data[2] << ")" << std::endl;
+    vsomeip::length_t datalength = msg->get_payload()->get_length();
+
+    shmMemory_di.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
+    for(int i=0; i<datalength; i++) {
+        circBuffer_di.write(data[i]);
+    }
+    shmMemory_di.UnLock();
 }
 
 void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
-    std::cout << "SPEED EVENT!!!!!!!!!!!!!! Data is: " << (int) data[0] << std::endl;
+    vsomeip::length_t datalength = msg->get_payload()->get_length();
+
+    shmMemory_sp.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
+    for(int i=0; i<datalength; i++) {
+        circBuffer_sp.write(data[i]);
+    }
+    shmMemory_sp.UnLock();
 }
 
 void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg) {
@@ -319,7 +361,29 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
 #endif
 
 int main(int argc, char** argv) {
-    CarCTRLClient ccc;
+
+    uint32_t mo_sleep = 33;
+    uint8_t st_sleep = 47;
+
+    std::string motor_flag("--motor-sleep");
+    std::string steer_flag("--steer-sleep");
+
+    for (int i=1; i<argc; i++) {
+        if (steer_flag==argv[i] && i+1<argc) {
+            i++;
+            std::stringstream conv;
+            conv << argv[i];
+            conv >> mo_sleep;
+        }
+        else if (motor_flag==argv[i] && i+1<argc) {
+            i++;
+            std::stringstream conv;
+            conv << argv[i];
+            conv >> st_sleep;
+        }
+    }
+
+    CarCTRLClient ccc(mo_sleep, st_sleep);
 
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     ccc_ptr = &ccc;
