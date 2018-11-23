@@ -213,12 +213,11 @@ void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &ms
     vsomeip::byte_t *data = msg->get_payload()->get_data();
     vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shmMemory_out.Lock();
+    shmMemory_out.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
     for(int i=0; i<datalength; i++) {
         circBuffer_out.write(data[i]);
     }
     shmMemory_out.UnLock();
-
 }
 
 /*
@@ -300,10 +299,12 @@ void MotorSpeedService::run_sp() {
             sensor_data.push_back((vsomeip::byte_t) circBuffer_in.read());
         shmMemory_in.UnLock();
 
-		payload_->set_data(sensor_data);
-        app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
-                     SPEED_EVENT_ID, payload_, true, true);
-	std::cout << "SPEED EVENT SENT!!!!!!!!" << std::endl;
+        if (sensor_data.size() > 0) {
+		    payload_->set_data(sensor_data);
+            app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
+                         SPEED_EVENT_ID, payload_, true, true);
+    	    std::cout << "SPEED EVENT SENT!!!!!!!!" << std::endl;
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(pub_sp_sleep_));
     }
 }
