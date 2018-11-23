@@ -6,18 +6,25 @@
  *-------------------------------------------------------------------------------------------------
  */
 MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist) :
-    shmMemory_in(CSharedMemory("/testSharedmemory1")),
-    circBufferP_in((int*)shmMemory_in.GetData()),
-    circBuffer_in(Buffer(BUFFER_SIZE, circBufferP_in, B_CONSUMER)),
-    shmMemory_out(CSharedMemory("/testSharedmemory2")), // TODO maybe another file?
-    circBufferP_out((int*)shmMemory_in.GetData()),
-    circBuffer_out(Buffer(BUFFER_SIZE, circBufferP_in, B_CONSUMER)),
     run_(false),
     go_(false),
     use_dist_(false),
     pub_sp_sleep_(sp_sleep),
     min_dist_(min_dist)
-    {}
+{
+    CSharedMemory shmMemory_in("/testSharedmemory1");
+    shmMemory_in.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_in.Attach(PROT_WRITE);
+    circBufferP_in = (int*) shmMemory_in.GetData();
+    Buffer circBuffer_in(BUFFER_SIZE, circBufferP_in, B_CONSUMER);
+
+    CSharedMemory shmMemory_out("/testSharedmemory2");
+    shmMemory_out.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_out.Attach(PROT_WRITE);
+    circBufferP_out = (int*) shmMemory_out.GetData();
+    Buffer circBuffer_out(BUFFER_SIZE, circBufferP_out, B_PRODUCER);
+
+}
 
 /*
  *-------------------------------------------------------------------------------------------------
