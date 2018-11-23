@@ -1,7 +1,9 @@
 #ifndef ESS_PROTOTYPE_HPP
 #define ESS_PROTOTYPE_HPP
 
-#include "car_ctrl_client.hpp"
+#include <vector>
+#include "SharedMemory.hpp"
+#include "CyclicBuffer.hpp"
 
 class ESSPrototype {
 public:
@@ -11,7 +13,7 @@ public:
      *
      *
      */
-    ESSPrototype(CarCTRLClient& ccc);
+    ESSPrototype();
 
     //TODO bool boot();
 
@@ -102,14 +104,37 @@ public:
      *
      *
      */
-    //TODO char* getDistance();
+    char getDistance();
+
+    /**
+     * @brief
+     * @return
+     *
+     *
+     */
+    bool getGoStatus();
 
     //TODO Flag getFlag();
 
     //TODO NetStatus getNetStatus();
 
 private:
-    CarCTRLClient& carCTRL_;
+    int service_status_;
+
+    CSharedMemory shmMemory_mo;
+    Buffer circBuffer_mo;
+
+    CSharedMemory shmMemory_st;
+    Buffer circBuffer_st;
+
+    CSharedMemory shmMemory_sp;
+    Buffer circBuffer_sp;
+
+    CSharedMemory shmMemory_di;
+    Buffer circBuffer_di;
+
+    CSharedMemory shmMemory_go;
+    Buffer circBuffer_go;
 };
 
 #endif
