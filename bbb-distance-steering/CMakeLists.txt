@@ -12,7 +12,7 @@ include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/shared")
 add_subdirectory(shared) 
 
-add_executable(bbb-distance-steering "${PROJECT_SOURCE_DIR}/src/distance_steer_service.cpp")
+add_executable(bbb-distance-steering "${PROJECT_SOURCE_DIR}/src/dist_steer_service.cpp")
 target_link_libraries(bbb-distance-steering vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
 install(TARGETS bbb-distance-steering DESTINATION bin)
 #########################################################################################
