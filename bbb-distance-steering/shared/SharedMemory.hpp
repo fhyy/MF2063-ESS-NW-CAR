@@ -64,6 +64,7 @@ public:
  
    static const string sLockSemaphoreName;
 public:
+   CSharedMemory() {};
    CSharedMemory(const string& sName );
    ~CSharedMemory();
  

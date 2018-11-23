@@ -20,6 +20,7 @@
 class Buffer
 {
 public:
+    Buffer() {};
     Buffer(unsigned int size, int* circBuffP, int permission);
     void write(int input);
     int read();
