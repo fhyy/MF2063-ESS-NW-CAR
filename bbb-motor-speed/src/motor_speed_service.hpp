@@ -26,7 +26,7 @@
  * this class also subscribes to distance events published by another application.
  * If the value of a distance event falls below a certain threshold, the motor service
  * publishes an "emergency break" event that other vsomeip applications may subscribe to.
- * @author Leon Fernandez
+ * @author Leon Fernandez & Jacob Kimblad
  */
 class MotorSpeedService {
 public:
@@ -36,7 +36,7 @@ public:
      *        during each cycle.
      * @param min_dist The threshold value that determines when an emergency break
      *        event gets published
-     * @author Leon Fernandez
+     * @author Leon Fernandez & Jacob Kimblad
      */
     MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist);
 
@@ -47,7 +47,7 @@ public:
      * Initializes the MotorSpeed app by registering @ref on_state, @ref on_steer_req,
      * @ref on_setmin_req, @ref on_go_availability, @ref on_dist_availability and @on_shutdown
      * as handlers for different vsomeip events. It also initializes @ref pub_sp_thread_.
-     * @author Leon Fernandez
+     * @author Leon Fernandez & Jacob Kimblad
      */
     bool init();
 
@@ -70,6 +70,14 @@ public:
     bool is_running();
 
 private:
+
+    CSharedMemory shmMemory_in;
+    int* circBufferP_in;
+    Buffer circBuffer_in;
+
+    CSharedMemory shmMemory_out;
+    int* circBufferP_out;
+    Buffer circBuffer_out;
 
     /**
      * @brief Main on/off switch for application.
@@ -141,7 +149,7 @@ private:
      * eternal loop. If the go-service is unavailable it spins around doing nothing.
      * If the go-service is available it publishes some data (preferably sensor data) and
      * then goes to sleep for a set amount of time.
-     * @author Leon Fernandez
+     * @author Leon Fernandez & Jacob Kimblad
      */
     void run_sp();
 

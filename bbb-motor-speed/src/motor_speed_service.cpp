@@ -6,6 +6,12 @@
  *-------------------------------------------------------------------------------------------------
  */
 MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist) :
+    shmMemory_in(CSharedMemory("/testSharedmemory1")),
+    circBufferP_in((int*)shmMemory_in.GetData()),
+    circBuffer_in(Buffer(BUFFER_SIZE, circBufferP_in, B_CONSUMER)),
+    shmMemory_out(CSharedMemory("/testSharedmemory2")), // TODO maybe another file?
+    circBufferP_out((int*)shmMemory_in.GetData()),
+    circBuffer_out(Buffer(BUFFER_SIZE, circBufferP_in, B_CONSUMER)),
     run_(false),
     go_(false),
     use_dist_(false),
@@ -197,7 +203,15 @@ void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg
  *-------------------------------------------------------------------------------------------------
  */
 void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &msg) {
-    // TODO unpack message and write to shared variable
+    vsomeip::byte_t *data = msg->get_payload()->get_data();
+    vsomeip::length_t datalength = msg->get_payload()->get_length();
+
+    shmMemory_out.Lock();
+    for(int i=0; i<datalength; i++) {
+        circBuffer_out.write(data[i]);
+    }
+    shmMemory_out.UnLock();
+
 }
 
 /*
@@ -271,12 +285,15 @@ void MotorSpeedService::run_sp() {
     while(run_) {
         while(!go_);
 
-        // TODO Replace this block with geting arduio values -------------------------------------
-        std::vector<vsomeip::byte_t> data;
-        data.push_back(23);
-        payload_->set_data(data);
-        //------------------------------------------------------------------
-        
+        std::vector<vsomeip::byte_t> sensor_data;
+
+        shmMemory_in.Lock();
+        int unreadValues = circBuffer_in.getUnreadValues();
+        for (int i=0; i<unreadValues; i++)
+            sensor_data.push_back((vsomeip::byte_t) circBuffer_in.read());
+        shmMemory_in.UnLock();
+
+		payload_->set_data(sensor_data);
         app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
                      SPEED_EVENT_ID, payload_, true, true);
 	std::cout << "SPEED EVENT SENT!!!!!!!!" << std::endl;
@@ -302,6 +319,8 @@ void MotorSpeedService::run_sp() {
 #endif
 
 int main(int argc, char** argv) {
+    // TODO start by sleeping, let producer get a head start
+
     uint32_t sp_sleep = 30;
     uint8_t min_dist = 100;
 

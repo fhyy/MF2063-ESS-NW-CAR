@@ -13,6 +13,8 @@
 #define B_PRODUCER 1
 #define B_CONSUMER 0
 #define OVERHEAD_SIZE 3 
+#define BUFFER_SIZE 4 + OVERHEAD_SIZE //ask jacob 
+
 
 //Class that implements a circular buffer
 class Buffer

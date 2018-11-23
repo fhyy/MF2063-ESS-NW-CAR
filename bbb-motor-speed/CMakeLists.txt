@@ -2,17 +2,19 @@
 cmake_minimum_required (VERSION 2.8)
 project(bbb-motor-speed)
 
-set(CMAKE_CXX_FLAGS "-g -std=c++0x -pthread -lrt")
+set(CMAKE_CXX_FLAGS "-g -std=c++0x")
 
 find_package(vsomeip 2.6.0 REQUIRED)
 find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
-file(GLOB MoSp_SRC "./src/*.hpp" "./src/*.cpp")
+include_directories("${PROJECT_SOURCE_DIR}/shared")
+add_subdirectory(shared) 
 
-add_executable(bbb-motor-speed ${MoSp_SRC})
-target_link_libraries(bbb-motor-speed vsomeip ${Boost_LIBRARIES})
+add_executable(bbb-motor-speed "${PROJECT_SOURCE_DIR}/src/motor_speed_service.cpp")
+target_link_libraries(bbb-motor-speed vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
+install(TARGETS bbb-motor-speed DESTINATION bin)
 #########################################################################################
 
 
