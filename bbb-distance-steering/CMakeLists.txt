@@ -2,17 +2,19 @@
 cmake_minimum_required (VERSION 2.8)
 project(bbb-distance-steering)
 
-set(CMAKE_CXX_FLAGS "-g -std=c++0x -pthread -lrt")
+set(CMAKE_CXX_FLAGS "-g -std=c++0x")
 
 find_package(vsomeip 2.6.0 REQUIRED)
 find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
-file(GLOB DiSt_SRC "./src/*.hpp" "./src/*.cpp")
+include_directories("${PROJECT_SOURCE_DIR}/shared")
+add_subdirectory(shared) 
 
-add_executable(bbb-distance-steering ${DiSt_SRC})
-target_link_libraries(bbb-distance-steering vsomeip ${Boost_LIBRARIES})
+add_executable(bbb-distance-steering "${PROJECT_SOURCE_DIR}/src/distance_steer_service.cpp")
+target_link_libraries(bbb-distance-steering vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
+install(TARGETS bbb-distance-steering DESTINATION bin)
 #########################################################################################
 
 
