@@ -14,17 +14,18 @@
 #define SPI_PATH "/dev/spidev1.0"
 
 // get distance from distance Arduino, performance/interrupt issues
-int compareDistance(unsigned int fd){
+char* compareDistance(unsigned int fd){
         char a[3],startByte;
         // SPI transaction starts with a zero
         read(fd,&startByte,1);
         if(startByte==0x0){
                 read(fd,&a,3);
-                //fflush(stdout);
+                fflush(stdout);
+                return a;
         }
         else
                 return -1;// no data get
-        if (a[1] < 5 ){
+        /*if (a[1] < 5 ){
                 return 50;// obstacle in front of the car, d
         }else if ((a[1]-a[0]) > 20){
                 return 100;// obstacle on the left, turn right
@@ -32,6 +33,8 @@ int compareDistance(unsigned int fd){
                  return 0;// obstacle on the right, turn left
         }else
                 return 50;
+        */
+
 }
 
 // SS init, all SS pins are ouput and high at the start point 
@@ -53,8 +56,8 @@ int main(){
 
         uint8_t bits=8, mode=0;
         uint32_t speed=1000000;
-        int result;
-
+        char* result;
+        int sentObject;
         spiSSInit(60, 48);
 
         fd = open(SPI_PATH, O_RDWR);
@@ -71,13 +74,13 @@ int main(){
                 result = compareDistance(fd);
 //              printf("%d\n",result);
                 gpio_set_value(48, HIGH);
-                // if get the distance, send signal to steering arduino
-                if(result >= 0 ){
-                        gpio_set_value(60, LOW);
-                        write(fd, &result, 1);
-                        gpio_set_value(60,HIGH);
-                }
-                printf("%d \n",result);
+                sentObject = (char)1 << 24 | a[0] << 16 | a[1] << 8 | a[3];
+                
+                // some other works need to be done.
+
+
+
+
                 usleep(500000); // half seconds
 
         }
