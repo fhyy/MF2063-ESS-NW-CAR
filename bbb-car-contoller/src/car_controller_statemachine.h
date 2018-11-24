@@ -15,6 +15,11 @@
 #define DIRECTION_PRIO 2
 #define SPEED_PRIO 1 // just set for test currrently
 
+#define DIRECTION_LEFT -1
+#define DIRECTION_STRAIGHT 0
+#define DIRCTION_RIGHT 1
+
+
 // Enumeraiion of states
 typedef enum
 {
@@ -50,7 +55,8 @@ typedef struct{
     evCarEvent distance;
     evCarEvent speed;
     evCameraEvent camera;
-    uint32_t targetSpeed;
+    uint8_t targetSpeed;
+    uint8_t direction; // -1 - left, 0 - straight, 1 - right
 } stCarStatemachine;
 
 // used for state transformation

@@ -5,7 +5,9 @@ stCarStatemachine *sm = 0x0;
 
 void stopping(){
     sm->targetSpeed = TARGET_SPEED_STOP;
-    
+    sm->direction = DIRECTION_STRAIGHT;
+
+    setDirection(sm->direction, DIRECTION_PRIO);
     setSpeed(sm->targetSpeed, SPEED_PRIO);
 }
 
@@ -14,11 +16,18 @@ void accelerating(){
     if(sm->targetSpeed > TARGET_SPEED_MAX){
         sm->targetSpeed = TARGET_SPEED_MAX;
     }
+    sm->direction = DIRECTION_STRAIGHT;
 
+    setDirection(sm->direction, DIRECTION_PRIO);
     setSpeed(sm->targetSpeed, SPEED_PRIO);
 }
 
-void constantSpeed(){}
+void constantSpeed(){
+    sm->direction = DIRECTION_STRAIGHT;
+
+    setDirection(sm->direction, DIRECTION_PRIO);
+    setSpeed(sm->targetSpeed, SPEED_PRIO);
+}
 
 void retarding(){
     sm->targetSpeed -= TARGET_SPEED_STEP;
@@ -26,8 +35,21 @@ void retarding(){
         sm->targetSpeed = TARGET_SPEED_STOP;
         sm->state = stateStandingStill;
     }
-
+    sm->direction = DIRECTION_STRAIGHT;
+    
+    setDirection(sm->direction, DIRECTION_PRIO);
     setSpeed(sm->targetSpeed, SPEED_PRIO);
+
+}
+
+void steeringLeft(){
+    sm->direction = DIRECTION_STRAIGHT;
+    setDirection(sm->direction, DIRECTION_PRIO);
+}
+
+void steeringRight(){
+    sm->direction = DIRECTION_STRAIGHT;
+    setDirection(sm->direction, DIRECTION_PRIO);
 }
 
 typedef void (*func)(void);
@@ -35,11 +57,12 @@ static func stateFunctionAry[] = {
     &stopping,
     &accelerating,
     &constantSpeed,
-    &retarding
+    &retarding,
+    &steeringLeft,
+    &steeringRight
     };
 
-//currently put the steering flag in the camera,
-//  may put it in distance node later
+//currently put the steering flag in the camera
 static stStateTransfor stateMatrix[] = {
     //currentState  distanceFlag   speedFlag  cameraFlag nextState
     {stateAny, evAny, evAny, evStop, stateStandingStill},
@@ -71,13 +94,12 @@ void statemachineInit(stCarStatemachine* statemachine){
     statemachine->distance = evHigh;
     statemachine->camera = evStop;
     statemachine->targetSpeed = TARGET_SPEED_STOP;
+    statemachine->direction = DIRECTION_STRAIGHT;
 }
 // call self-defined library functions to get current car events
 void statemachineGetEvents(){
     int speed, cameraFlag, averDistance;
     int *p;
-
-
 
     // read data from different places
     speed = getSpeed();
@@ -99,7 +121,7 @@ void statemachineGetEvents(){
     }else{
         sm->distance = evLow;
     }
-    // camera setup
+    // camera setup, don't have detailed definitions of flags now
     if(cameraFlag == 1){
         sm->camera = evRun;
     }else{
