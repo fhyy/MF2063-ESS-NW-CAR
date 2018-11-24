@@ -67,7 +67,7 @@ public:
      *
      *
      */
-    bool setSpeed(char d, bool prio);
+    bool setSpeed(char s, bool prio);
 
     /**
      * @brief
@@ -96,7 +96,7 @@ public:
      *
      *
      */
-    char getSpeed();
+    int getSpeed();
 
     /**
      * @brief
@@ -104,7 +104,7 @@ public:
      *
      *
      */
-    char getDistance();
+    int getDistance();
 
     /**
      * @brief

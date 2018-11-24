@@ -71,13 +71,11 @@ public:
 
 private:
 
-    CSharedMemory shmMemory_in;
-    int* circBufferP_in;
-    Buffer circBuffer_in;
+    CSharedMemory shmMemory_sp;
+    Buffer circBuffer_sp;
 
-    CSharedMemory shmMemory_out;
-    int* circBufferP_out;
-    Buffer circBuffer_out;
+    CSharedMemory shmMemory_mo;
+    Buffer circBuffer_mo;
 
     /**
      * @brief Main on/off switch for application.

@@ -12,17 +12,19 @@ MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist) :
     pub_sp_sleep_(sp_sleep),
     min_dist_(min_dist)
 {
-    CSharedMemory shmMemory_in("/testSharedmemory1");
-    shmMemory_in.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_in.Attach(PROT_WRITE);
-    circBufferP_in = (int*) shmMemory_in.GetData();
-    Buffer circBuffer_in(BUFFER_SIZE, circBufferP_in, B_CONSUMER);
+    int *p;
 
-    CSharedMemory shmMemory_out("/testSharedmemory2");
-    shmMemory_out.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_out.Attach(PROT_WRITE);
-    circBufferP_out = (int*) shmMemory_out.GetData();
-    Buffer circBuffer_out(BUFFER_SIZE, circBufferP_out, B_PRODUCER);
+    shmMemory_sp = CSharedMemory("/testSharedmemory1");
+    shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_sp.Attach(PROT_WRITE);
+    p = (int*) shmMemory_sp.GetData();
+    circBuffer_sp = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+
+    shmMemory_mo = CSharedMemory("/testSharedmemory2");
+    shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_mo.Attach(PROT_WRITE);
+    p = (int*) shmMemory_mo.GetData();
+    circBuffer_mo = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
 }
 
@@ -213,11 +215,11 @@ void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &ms
     vsomeip::byte_t *data = msg->get_payload()->get_data();
     vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shmMemory_out.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
+    shmMemory_mo.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
     for(int i=0; i<datalength; i++) {
-        circBuffer_out.write(data[i]);
+        circBuffer_mo.write(data[i]);
     }
-    shmMemory_out.UnLock();
+    shmMemory_mo.UnLock();
 }
 
 /*
@@ -293,11 +295,11 @@ void MotorSpeedService::run_sp() {
 
         std::vector<vsomeip::byte_t> sensor_data;
 
-        shmMemory_in.Lock();
-        int unreadValues = circBuffer_in.getUnreadValues();
+        shmMemory_sp.Lock();
+        int unreadValues = circBuffer_sp.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            sensor_data.push_back((vsomeip::byte_t) circBuffer_in.read());
-        shmMemory_in.UnLock();
+            sensor_data.push_back((vsomeip::byte_t) circBuffer_sp.read());
+        shmMemory_sp.UnLock();
 
         if (sensor_data.size() > 0) {
 		    payload_->set_data(sensor_data);

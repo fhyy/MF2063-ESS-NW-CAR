@@ -65,13 +65,11 @@ public:
     bool is_running();
 private:
 
-    CSharedMemory shmMemory_in;
-    int* circBufferP_in;
-    Buffer circBuffer_in;
+    CSharedMemory shmMemory_di;
+    Buffer circBuffer_di;
 
-    CSharedMemory shmMemory_out;
-    int* circBufferP_out;
-    Buffer circBuffer_out;
+    CSharedMemory shmMemory_st;
+    Buffer circBuffer_st;
 
     /**
      * @brief Main on/off switch for application.

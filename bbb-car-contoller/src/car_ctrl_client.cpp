@@ -13,35 +13,35 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep) :
 {
     int *p;
 
-    CSharedMemory shmMemory_mo("/testSharedmemory1");
+    shmMemory_mo = CSharedMemory("/testSharedmemory1");
     shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_mo.Attach(PROT_WRITE);
     p = (int*) shmMemory_mo.GetData();
-    Buffer circBuffer_mo(BUFFER_SIZE, p, B_CONSUMER);
+    circBuffer_mo = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    CSharedMemory shmMemory_st("/testSharedmemory2");
+    shmMemory_st = CSharedMemory("/testSharedmemory2");
     shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_st.Attach(PROT_WRITE);
     p = (int*) shmMemory_st.GetData();
-    Buffer circBuffer_st(BUFFER_SIZE, p, B_CONSUMER);
+    circBuffer_st = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    CSharedMemory shmMemory_in("/testSharedmemory3");
+    shmMemory_in = CSharedMemory("/testSharedmemory3");
     shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_sp.Attach(PROT_WRITE);
     p = (int*) shmMemory_sp.GetData();
-    Buffer circBuffer_sp(BUFFER_SIZE, p, B_PRODUCER);
+    circBuffer_sp = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
-    CSharedMemory shmMemory_di("/testSharedmemory4");
+    shmMemory_di = CSharedMemory("/testSharedmemory4");
     shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_di.Attach(PROT_WRITE);
     p = (int*) shmMemory_di.GetData();
-    Buffer circBuffer_di(BUFFER_SIZE, p, B_PRODUCER);
+    circBuffer_di = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
-    CSharedMemory shmMemory_go("/testSharedmemory5");
+    shmMemory_go = CSharedMemory("/testSharedmemory5");
     shmMemory_go.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_go.Attach(PROT_WRITE);
     p = (int*) shmMemory_go.GetData();
-    Buffer circBuffer_go(BUFFER_SIZE, p, B_PRODUCER);
+    circBuffer_go = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 }
 
 bool CarCTRLClient::init() {
