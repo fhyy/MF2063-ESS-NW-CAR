@@ -10,18 +10,20 @@
 #include <sys/time.h>
 #include "SimpleGPIO.h"
 #include <getopt.h>
+#include "SharedMemory.hpp"
+#include "CyclicBuffer.hpp"
 
 #define SPI_PATH "/dev/spidev1.0"
 
 // get distance from distance Arduino, performance/interrupt issues
-char* compareDistance(unsigned int fd){
+int compareDistance(unsigned int fd){
         char a[3],startByte;
         // SPI transaction starts with a zero
         read(fd,&startByte,1);
         if(startByte==0x0){
                 read(fd,&a,3);
                 fflush(stdout);
-                return a;
+                return (int)(0 << 24 | a[0] << 16 | a[1] << 8 | a[2]);
         }
         else
                 return -1;// no data get
@@ -56,9 +58,24 @@ int main(){
 
         uint8_t bits=8, mode=0;
         uint32_t speed=1000000;
-        char* result;
         int sentObject;
         spiSSInit(60, 48);
+
+
+
+//---------------- Ask Jacob if this is ok ---------------------------------------------
+           CSharedMemory shmMemory_di("/testSharedmemory1");
+           shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
+           shmMemory_di.Attach(PROT_WRITE);
+           int* circBufferP_di = (int*)shmMemory_di.GetData();
+           Buffer circBuffer_di(BUFFER_SIZE, circBufferP_di, B_PRODUCER);
+
+           CSharedMemory shmMemory_st("/testSharedmemory2");
+           shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
+           shmMemory_st.Attach(PROT_WRITE);
+           int* circBufferP_st = (int*)shmMemory_st.GetData();
+           Buffer circBuffer_st(BUFFER_SIZE, circBufferP_st, B_CONSUMER);
+//-------------------------------------------------------------------------------------
 
         fd = open(SPI_PATH, O_RDWR);
         // SPI parameter setup
@@ -71,11 +88,16 @@ int main(){
         while (1){
                 // get the value from distancce arduino
                 gpio_set_value(48, LOW);
-                result = compareDistance(fd);
-//              printf("%d\n",result);
+                sentObject = compareDistance(fd);
                 gpio_set_value(48, HIGH);
-                sentObject = (char)1 << 24 | a[0] << 16 | a[1] << 8 | a[3];
-                
+
+		if (sentObject != -1) {
+                    // lock shared memory and write packet
+                    shmMemory_di.Lock();
+                    circBuffer_di.write(sentObject);
+                    shmMemory_di.UnLock();
+		}
+
                 // some other works need to be done.
 
 
