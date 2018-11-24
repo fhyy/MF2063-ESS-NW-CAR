@@ -17,7 +17,7 @@
 
 class CarCTRLClient {
 public:
-    CarCTRLClient(uint32_t mo_sleep, uint32_t di_sleep);
+    CarCTRLClient(uint32_t mo_sleep, uint32_t di_sleep, uint32_t setmin_sleep);
     bool init();
     void start();
     void stop();
@@ -29,12 +29,15 @@ private:
     bool is_ava_st_;
     bool is_ava_mo_;
     bool is_ava_sp_;
+    bool is_ava_cam_;
 
     uint32_t req_mo_sleep_;
     uint32_t req_st_sleep_;
+    uint32_t req_setmin_sleep_;
 
     std::thread req_mo_thread_;
     std::thread req_st_thread_;
+    std::thread req_setmin_thread_;
 
     std::mutex mu_run_;
     std::condition_variable cond_run_;
@@ -60,11 +63,19 @@ private:
     CSharedMemory shmMemory_go;
     Buffer circBuffer_go;
 
+    CSharedMemory shmMemory_setmin;
+    Buffer circBuffer_setmin;
+
+    CSharedMemory shmMemory_cam;
+    Buffer circBuffer_cam;
+
     void update_go_status();
     void send_motor_req();
     void send_steer_req();
+    void send_setmin_req();
     void on_dist_eve(const std::shared_ptr<vsomeip::message>&);
     void on_speed_eve(const std::shared_ptr<vsomeip::message>&);
+    void on_cam_eve(const std::shared_ptr<vsomeip::message>&);
     void on_embreak_eve(const std::shared_ptr<vsomeip::message>&);
     void send_req(std::vector<vsomeip::byte_t> data,
                   vsomeip::service_t serv,
