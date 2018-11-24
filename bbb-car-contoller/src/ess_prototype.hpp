@@ -5,6 +5,12 @@
 #include "SharedMemory.hpp"
 #include "CyclicBuffer.hpp"
 
+class Flag {
+public:
+    std::string color;
+    std::string position;
+};
+
 class ESSPrototype {
 public:
     /**
@@ -17,7 +23,7 @@ public:
 
     //TODO bool boot();
 
-    //TODO bool shutdown();
+    void shutdown();
 
     /**
      * @brief
@@ -57,7 +63,7 @@ public:
      *
      *
      */
-    bool setMinDistance(char d, bool prio);
+    void setMinDistance(char d, bool prio);
 
     /**
      * @brief
@@ -67,7 +73,7 @@ public:
      *
      *
      */
-    bool setSpeed(char s, bool prio);
+    void setSpeed(char s, bool prio);
 
     /**
      * @brief
@@ -78,7 +84,7 @@ public:
      *
      *
      */
-    bool setSpeed(char s, char a, bool prio);
+    void setSpeed(char s, char a, bool prio);
 
     /**
      * @brief
@@ -88,7 +94,7 @@ public:
      *
      *
      */
-    bool setDirection(char d, bool prio);
+    void setDirection(char d, bool prio);
 
     /**
      * @brief
@@ -96,7 +102,7 @@ public:
      *
      *
      */
-    int getSpeed();
+    char getSpeed();
 
     /**
      * @brief
@@ -104,7 +110,7 @@ public:
      *
      *
      */
-    int getDistance();
+    char getDistance();
 
     /**
      * @brief
@@ -114,9 +120,14 @@ public:
      */
     bool getGoStatus();
 
-    //TODO Flag getFlag();
 
-    //TODO NetStatus getNetStatus();
+    /**
+     * @brief
+     * @return
+     *
+     *
+     */
+    Flag getFlag();
 
 private:
     int service_status_;
@@ -133,8 +144,17 @@ private:
     CSharedMemory shmMemory_di;
     Buffer circBuffer_di;
 
+    CSharedMemory shmMemory_setmin;
+    Buffer circBuffer_setmin;
+
     CSharedMemory shmMemory_go;
     Buffer circBuffer_go;
+
+    CSharedMemory shmMemory_cam;
+    Buffer circBuffer_cam;
+
+    CSharedMemory shmMemory_shutdown;
+    Buffer circBuffer_shutdown;
 };
 
 #endif

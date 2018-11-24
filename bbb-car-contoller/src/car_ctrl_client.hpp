@@ -34,6 +34,7 @@ private:
     uint32_t req_mo_sleep_;
     uint32_t req_st_sleep_;
     uint32_t req_setmin_sleep_;
+    uint32_t req_shutdown_sleep_;
 
     std::thread req_mo_thread_;
     std::thread req_st_thread_;
@@ -69,10 +70,14 @@ private:
     CSharedMemory shmMemory_cam;
     Buffer circBuffer_cam;
 
+    CSharedMemory shmMemory_shutdown;
+    Buffer circBuffer_shutdown;
+
     void update_go_status();
     void send_motor_req();
     void send_steer_req();
     void send_setmin_req();
+    void send_shutdown_req();
     void on_dist_eve(const std::shared_ptr<vsomeip::message>&);
     void on_speed_eve(const std::shared_ptr<vsomeip::message>&);
     void on_cam_eve(const std::shared_ptr<vsomeip::message>&);

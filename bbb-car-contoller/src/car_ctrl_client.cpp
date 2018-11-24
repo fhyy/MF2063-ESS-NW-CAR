@@ -11,7 +11,8 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     app_busy_(false),
     req_mo_sleep_(mo_sleep),
     req_st_sleep_(st_sleep),
-    req_setmin_sleep_(setmin_sleep)
+    req_setmin_sleep_(setmin_sleep),
+    req_shutdown_sleep_(103) // TODO make settable through CTR?
 {
     int *p;
 
@@ -56,6 +57,12 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     shmMemory_cam.Attach(PROT_WRITE);
     p = (int*) shmMemory_cam.GetData();
     circBuffer_cam = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+
+    shmMemory_shutdown = CSharedMemory("/testSharedmemory8");
+    shmMemory_shutdown.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_shutdown.Attach(PROT_WRITE);
+    p = (int*) shmMemory_shutdown.GetData();
+    circBuffer_shutdown = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 }
 
 bool CarCTRLClient::init() {
@@ -269,6 +276,49 @@ void CarCTRLClient::send_setmin_req() {
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(req_setmin_sleep_));
+    }
+}
+
+/*
+ * This is a thread!
+ */
+void CarCTRLClient::send_shutdown_req() {
+    {
+        std::unique_lock<std::mutex> run_lk(mu_run_);
+        while (!run_)
+            cond_run_.wait(run_lk);
+    }
+
+    while(run_) {
+        while(!go_);
+
+        std::vector<vsomeip::byte_t> req_data;
+
+        shmMemory_shutdown.Lock();
+        int unreadValues = circBuffer_shutdown.getUnreadValues();
+        for (int i=0; i<unreadValues; i++)
+            req_data.push_back((vsomeip::byte_t) circBuffer_shutdown.read());
+        shmMemory_shutdown.UnLock();
+
+        if (req_data.size() > 0 && req_data.back() == 1) {
+            std::unique_lock<std::mutex> app_lk(mu_app_);
+            while (app_busy_)
+                cond_app_.wait(app_lk);
+            app_busy_ = true;
+
+            send_req(req_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            send_req(req_data, STEER_SERVICE_ID, STEER_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            send_req(req_data, SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            send_req(req_data, DIST_SERVICE_ID, DIST_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            send_req(req_data, CAM_SERVICE_ID, CAM_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+
+
+            app_busy_ = false;
+            app_lk.unlock();
+            cond_app_.notify_one();
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(req_shutdown_sleep_));
     }
 }
 
