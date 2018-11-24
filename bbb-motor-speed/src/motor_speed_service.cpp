@@ -319,10 +319,10 @@ void MotorSpeedService::run_sp() {
             // turn int into std::vector of four vsomeip::byte_t
             std::vector<vsomeip::byte_t> sensor_data_formatted;
             char byte;
-            for (int j=3; j>=0; j--) {
+            for (int j=0; j<4; j++) {
                 // first element of of vector is lowest 8 bits and so on
                 byte = (sensor_data_latest >> j*8);
-                sensor_data_formatted.push((byte));
+                sensor_data_formatted.push_back(byte);
             }
 
             // Priority (0x0000=low, other=high) could be set here in a future implementation
