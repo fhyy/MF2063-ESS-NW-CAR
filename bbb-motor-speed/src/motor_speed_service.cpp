@@ -188,20 +188,22 @@ void MotorSpeedService::on_state(vsomeip::state_type_e state) {
  *-------------------------------------------------------------------------------------------------
  */
 void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
+    // Store received packet, should always have a length of 4
     vsomeip::byte_t *data = msg->get_payload()->get_data();
     std::cout << "DIST EVENT!!!!!!!!!! Data is: (" << (int) data[0] << ", " << (int) data[1]
               << ", " << (int) data[2] << ")" << std::endl;
 
+    // If any sensor value falls below distance threshold create and send an embreak packet
     if (data[0]<min_dist_ || data[1]<min_dist_ || data[2]<min_dist_) {
         std::shared_ptr<vsomeip::payload> payload = vsomeip::runtime::get()->create_payload();
         std::vector<vsomeip::byte_t> data;
-        data.push_back(13);
-        payload->set_data(data); // TODO empty payload or use payload_?
-	app_->notify(MOTOR_SERVICE_ID,
-                    MOTOR_INSTANCE_ID,
-                    EMERGENCY_BREAK_EVENT_ID,
-                    payload,
-                    true, true);
+        data.push_back(13);  // TODO empty payload?
+        payload->set_data(data);
+	    app_->notify(MOTOR_SERVICE_ID,
+                        MOTOR_INSTANCE_ID,
+                        EMERGENCY_BREAK_EVENT_ID,
+                        payload,
+                        true, true);
 	std::cout << "EMBREAK EVENT SENT!!!!!" << std::endl;
     }
 }
@@ -212,13 +214,15 @@ void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg
  *-------------------------------------------------------------------------------------------------
  */
 void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &msg) {
+    // Store received packet, should always have a length of 4
     vsomeip::byte_t *data = msg->get_payload()->get_data();
-    vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shmMemory_mo.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
-    for(int i=0; i<datalength; i++) {
-        circBuffer_mo.write(data[i]);
-    }
+    // Turn the four-element data packet into an int before writing
+    int req = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
+
+    // Write to shared memory
+    shmMemory_mo.Lock();
+    circBuffer_mo.write(req);
     shmMemory_mo.UnLock();
 }
 
@@ -228,7 +232,8 @@ void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &ms
  *-------------------------------------------------------------------------------------------------
  */
 void MotorSpeedService::on_setmin_req(const std::shared_ptr<vsomeip::message> &msg) {
-    min_dist_ = *(msg->get_payload()->get_data());
+    // first element of a setmin packet will always be what we are looking for
+    min_dist_ = msg->get_payload()->get_data()[0];
 }
 
 /*
@@ -284,29 +289,52 @@ void MotorSpeedService::on_dist_availability(vsomeip::service_t serv,
  *-------------------------------------------------------------------------------------------------
  */
 void MotorSpeedService::run_sp() {
-    {
+    { // Synchronization lock upon initialization
         std::unique_lock<std::mutex> run_lk(mu_run_);
         while (!run_)
             cond_run_.wait(run_lk);
     }
 
+    // Thread loop
     while(run_) {
+
+        // Pause here if !go_
         while(!go_);
 
-        std::vector<vsomeip::byte_t> sensor_data;
-
+        // Store values from shared memory in sensor_data
+        std::vector<int> sensor_data;
         shmMemory_sp.Lock();
         int unreadValues = circBuffer_sp.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            sensor_data.push_back((vsomeip::byte_t) circBuffer_sp.read());
+            sensor_data.push_back(circBuffer_sp.read());
         shmMemory_sp.UnLock();
 
+        // prepare and send transmission if data was read from shared memory
         if (sensor_data.size() > 0) {
-		    payload_->set_data(sensor_data);
+
+            
+            // Use only newest sensor value for transmission
+            int sensor_data_latest = sensor_data.back();
+
+            // turn int into std::vector of four vsomeip::byte_t
+            std::vector<vsomeip::byte_t> sensor_data_formatted;
+            char byte;
+            for (int j=3; j>=0; j--)
+                // first element of of vector is lowest 8 bits and so on
+                byte = (sensor_data_latest >> j*8);
+                sensor_data_formatted.push((byte));
+
+            // Priority (0x0000=low, other=high) could be set here in a future implementation
+            // sensor_data_formatted[3] = priority;
+
+            // set data and publish it on the network TODO protect app with mutex
+		    payload_->set_data(sensor_data_formatted);
             app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
                          SPEED_EVENT_ID, payload_, true, true);
     	    std::cout << "SPEED EVENT SENT!!!!!!!!" << std::endl;
         }
+
+        //sleep before repeating the thread loop
         std::this_thread::sleep_for(std::chrono::milliseconds(pub_sp_sleep_));
     }
 }
