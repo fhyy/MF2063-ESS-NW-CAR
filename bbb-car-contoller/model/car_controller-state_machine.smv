@@ -1,0 +1,95 @@
+MODULE main
+
+-- ACTIVITIES
+-- Execute this file as it is with the command NuSMV -bmc.
+--  (-bmc enables BMC instead of BDD checking)
+
+
+VAR
+-- system output (internal states)
+        state : {standing_still, accelerating, constant_speed, retarding, steering_left, sttering_right};
+        --state : {stop, slow, fast};
+
+IVAR
+-- system inputs (state vector)
+        -- Distance parameters
+        distance_high: boolean;
+        distance_blind: boolean;
+
+        -- Camera parameters
+        camera_run: boolean;
+        camera_blind: boolean;
+
+        -- Speed parameters
+        speed_high: boolean;
+        speed_ok: boolean;
+        speed_blind: boolean;
+
+
+ASSIGN
+-- Constraints for state transitions
+        init(state) := standing_still;
+        next(state) := case
+                    -- state = standing_still    
+                    distance_high & !speed_high & camera_run & state = standing_still : accelerating;
+                    -- state = accelerating    
+                    distance_high & !speed_high & camera_run & state = accelerating : accelerating;
+                    distance_high & speed_ok & camera_run & state = accelerating : constant_speed;
+                    distance_high & speed_high & camera_run & state = accelerating : retarding;
+                    -- state = constant_speed    
+                    distance_high & speed_ok & camera run & state = constant_speed: constant_speed;
+                    distance_high & !speed_high & camera_run & state = constant_speed : accelerating;
+                    distance_high & speed_high & camera_run & state = constant_speed : retarding;
+                    -- state = retarding    
+                    distance_high & !speed_high & camera_run & state = retarding : accelerating;
+                    distance_high & speed_ok & camera_run & state = retarding : constant_speed;
+                    distance_high & speed_high & camera_run & state = retarding : retarding;
+                    -- state = steering_left    
+                    -- state = steering_right    
+        esac;
+
+
+
+
+-- EXAMPLE CODE FOR COVERAGE TESTING
+
+
+-- Coverage tests
+
+-- 1 trap property for node coverage (which node?)
+--LTLSPEC 
+        --G(!(state = stop))
+
+-- Question 1. Write down the remaining 2 NC trap properties yourself
+
+--LTLSPEC
+        --G(!(state = fast))
+
+--LTLSPEC
+        --G(!(state = slow))
+
+
+
+
+-- 1 trap property for edge coverage (which edge?)
+--LTLSPEC 
+        --G(state=stop & accelerate -> X(!(state=slow)))
+
+---- Question 2. Write down the remaining 5 EC trap properties yourself
+--LTLSPEC
+        --G(state = slow & brake -> X(state != stop))
+
+--LTLSPEC
+        --G(state = slow & !accelerate & !brake -> X(state != stop))
+
+--LTLSPEC
+        --G(state = slow & accelerate & !brake -> X(state != fast))
+
+--LTLSPEC
+        --G(state = fast & !accelerate & !brake -> X(state != slow))
+
+--LTLSPEC
+        --G(state = fast & brake & accelerate -> X(state != stop))
+
+
+
