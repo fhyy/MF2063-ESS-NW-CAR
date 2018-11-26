@@ -1,35 +1,35 @@
 #include "car_controller_statemachine.h"
 #include <stdint.h>
-#include <ess_prototype.hpp>
+
 stCarStatemachine *sm = 0x0;
 
-void stopping(){
+void stopping(ESSPrototype* pty){
     sm->targetSpeed = TARGET_SPEED_STOP;
     sm->direction = DIRECTION_STRAIGHT;
 
-    setDirection(sm->direction, DIRECTION_PRIO);
-    setSpeed(sm->targetSpeed, SPEED_PRIO);
+    pty->setDirection(sm->direction, DIRECTION_PRIO);
+    pty->setSpeed(sm->targetSpeed, SPEED_PRIO);
 }
 
-void accelerating(){
+void accelerating(ESSPrototype* pty){
     sm->targetSpeed += TARGET_SPEED_STEP;
     if(sm->targetSpeed > TARGET_SPEED_MAX){
         sm->targetSpeed = TARGET_SPEED_MAX;
     }
     sm->direction = DIRECTION_STRAIGHT;
 
-    setDirection(sm->direction, DIRECTION_PRIO);
-    setSpeed(sm->targetSpeed, SPEED_PRIO);
+    pty->setDirection(sm->direction, DIRECTION_PRIO);
+    pty->setSpeed(sm->targetSpeed, SPEED_PRIO);
 }
 
-void constantSpeed(){
+void constantSpeed(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
 
-    setDirection(sm->direction, DIRECTION_PRIO);
-    setSpeed(sm->targetSpeed, SPEED_PRIO);
+    pty->setDirection(sm->direction, DIRECTION_PRIO);
+    pty->setSpeed(sm->targetSpeed, SPEED_PRIO);
 }
 
-void retarding(){
+void retarding(ESSPrototype* pty){
     sm->targetSpeed -= TARGET_SPEED_STEP;
     if(sm->targetSpeed < TARGET_SPEED_STOP){
         sm->targetSpeed = TARGET_SPEED_STOP;
@@ -37,19 +37,19 @@ void retarding(){
     }
     sm->direction = DIRECTION_STRAIGHT;
     
-    setDirection(sm->direction, DIRECTION_PRIO);
-    setSpeed(sm->targetSpeed, SPEED_PRIO);
+    pty->setDirection(sm->direction, DIRECTION_PRIO);
+    pty->setSpeed(sm->targetSpeed, SPEED_PRIO);
 
 }
 
-void steeringLeft(){
+void steeringLeft(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
-    setDirection(sm->direction, DIRECTION_PRIO);
+    pty->setDirection(sm->direction, DIRECTION_PRIO);
 }
 
-void steeringRight(){
+void steeringRight(ESSPrototype pty){
     sm->direction = DIRECTION_STRAIGHT;
-    setDirection(sm->direction, DIRECTION_PRIO);
+    pty->setDirection(sm->direction, DIRECTION_PRIO);
 }
 
 typedef void (*func)(void);
@@ -92,19 +92,19 @@ void statemachineInit(stCarStatemachine* statemachine){
 
     statemachine->speed = evLow;
     statemachine->distance = evHigh;
-    statemachine->camera = evStop;
+    statemah*ine->camera  =  evStop;
     statemachine->targetSpeed = TARGET_SPEED_STOP;
     statemachine->direction = DIRECTION_STRAIGHT;
 }
-// call self-defined library functions to get current car events
-void statemachineGetEvents(){
+// call sel
+void statemachineGetEvents(ESSPrototype* pty){
     char speed, camera, distance;
     
 
     // read data from different places
-    speed = getSpeed();
-    camera = getFlag();
-    distance = getDistance();
+    speed = pty->getSpeed();
+    camera = pty->getFlag();
+    distance = pty->getDistance();
     
     // speed setup
    if(speed == SPEED_OK){
@@ -135,20 +135,25 @@ void statemachineGetEvents(){
     }
 }
 
-void statemachineIteration(){
+void statemachineIteration(ESSPrototype* pty){
     int i = 0;
-    statemachineGetEvents();
+    statemachineGetEvents(pty);
     for (i = 0; i < sizeof(stateMatrix) / sizeof(stateMatrix[0]);i++){
         if(sm->state == stateMatrix[i].currentState || stateMatrix[i].currentState==stateAny){
             if(sm->speed == stateMatrix[i].currentSpeedEvent || stateMatrix[i].currentSpeedEvent == evAny){
                 if(sm->distance == stateMatrix[i].currentDistanceEvent || stateMatrix[i].currentDistanceEvent == evAny){
                     if(sm->camera == stateMatrix[i].currentCameraEvent ){
                         sm->state = stateMatrix[i].nextState;
-                        (stateFunctionAry[sm->state])();
+                        (stateFunctionAry[sm->state])(pty);
                         break;
                     }
                 }
             }
         }
     }
+}
+
+void printState(){
+    printf("\n state: %s, distance: %s, speed: %s, camera: %s\n", 
+        stateText[sm->state],eventText[sm->distance],eventText[sm->speed],cameraText[sm->camera]);
 }

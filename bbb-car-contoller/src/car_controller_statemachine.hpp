@@ -1,7 +1,8 @@
-#ifndef __car_controller_statemachine__
+chi#ifndef __car_controller_statemachine__
 #define __car_controller_statemachine__
 
 #include <stdint.h>
+#include <ess_prototype.hpp>
 
 #define TARGET_SPEED_STEP 1
 #define TARGET_SPEED_STOP 0
@@ -77,10 +78,34 @@ typedef struct{
     uint32_t camera;
 } stControllerInput;
 
-void statemachineInit(stCarStatemachine *statemachine);
-void statemachineGetEvents();
-void statemachineIteration();
+static char* stateText[]={
+    "STANDING_STILL",
+    "ACCELERATING",
+    "CONSTANT_SPEED",
+    "RETARDING",
+    "STEERING_LEFT",
+    "STEERINF_RIGHT"
+};
 
+static char* eventText[]={
+    "HIGH",
+    "LOW",
+    "OK"
+};
+
+static char* cameraText[]={
+    "STOP",
+    "RUN",
+    "LEFT",
+    "RIGHT"
+};
+
+
+
+void statemachineInit(stCarStatemachine *statemachine);
+void statemachineGetEvents(ESSPrototype* pty);
+void statemachineIteration(ESSPrototype* pty);
+void printState();
 // functions below are waitting for 
 //  detailed library
 
