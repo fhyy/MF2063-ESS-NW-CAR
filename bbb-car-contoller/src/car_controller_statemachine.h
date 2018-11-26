@@ -11,14 +11,18 @@
 
 #define SPEED_OK 50 // just set for test currently 
 
-#define DISTANCE_PRIO 3
-#define DIRECTION_PRIO 2
-#define SPEED_PRIO 1 // just set for test currrently
+#define DISTANCE_PRIO 0
+#define DIRECTION_PRIO 0
+#define SPEED_PRIO 0 // just set for test currrently
 
 #define DIRECTION_LEFT -1
 #define DIRECTION_STRAIGHT 0
 #define DIRCTION_RIGHT 1
 
+#define CAMERA_RUN 1
+#define CAMERA_STOP 0
+#define CAMERA_LEFT 3
+#define CAMERA_RIGHT 4
 
 // Enumeraiion of states
 typedef enum
@@ -79,7 +83,8 @@ void statemachineIteration();
 
 // functions below are waitting for 
 //  detailed library
-int getFlag();
+
+/* int getFlag();
 int* getDistance();
 int getSpeed();
 bool start();
@@ -87,8 +92,6 @@ bool start();
 void setMinDistance(int distance); // in cm
 void setDistance(int distance, int prio);
 void setDirection(int direction, int prio);
-void setSpeed(int Speed, int prio);
-
-
+void setSpeed(int Speed, int prio); */
 
 #endif

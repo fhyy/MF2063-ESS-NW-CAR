@@ -1,6 +1,6 @@
 #include "car_controller_statemachine.h"
 #include <stdint.h>
-
+#include <ess_prototype.hpp>
 stCarStatemachine *sm = 0x0;
 
 void stopping(){
@@ -90,7 +90,6 @@ void statemachineInit(stCarStatemachine* statemachine){
     sm = statemachine;
     statemachine->state = stateStandingStill;
 
-
     statemachine->speed = evLow;
     statemachine->distance = evHigh;
     statemachine->camera = evStop;
@@ -99,15 +98,14 @@ void statemachineInit(stCarStatemachine* statemachine){
 }
 // call self-defined library functions to get current car events
 void statemachineGetEvents(){
-    int speed, cameraFlag, averDistance;
-    int *p;
+    char speed, camera, distance;
+    
 
     // read data from different places
     speed = getSpeed();
-    cameraFlag = getFlag();
-    p = getDistance();
-    averDistance = (*p + *(p + 1) + *(p + 2)) / 3;
-
+    camera = getFlag();
+    distance = getDistance();
+    
     // speed setup
    if(speed == SPEED_OK){
         sm->speed = evOk;
@@ -117,15 +115,22 @@ void statemachineGetEvents(){
         sm->speed = evLow;
     } 
     // distance setup
-    if(averDistance > DISTANCE_STOP){
+    if(distance > DISTANCE_STOP){
         sm->distance = evHigh;
     }else{
         sm->distance = evLow;
     }
-    // camera setup, don't have detailed definitions of flags now
-    if(cameraFlag == 1){
+    // camera setup
+    if(camera == CAMERA_STOP)
+        sm->camera = evStop;
+    }else if (camera == CAMERA_RUN){
         sm->camera = evRun;
-    }else{
+    }else if(camera == CAMERA_LEFT){
+        sm->camera = evLeft;
+    }else if (camera == CAMERA_RIGHT){
+        sm->camera == CAMERA_RIGHT;
+    }else {
+        // if wired msg is received, stop the car
         sm->camera = evStop;
     }
 }
