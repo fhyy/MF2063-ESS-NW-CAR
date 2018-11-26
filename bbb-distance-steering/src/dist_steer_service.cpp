@@ -5,9 +5,10 @@
  *--------------------------------- constructor ---------------------------------------------------
  *-------------------------------------------------------------------------------------------------
  */
-DistSteerService::DistSteerService(uint32_t di_sleep) :
+DistSteerService::DistSteerService(uint32_t di_sleep, bool skip_go) :
     run_(false),
     go_(false),
+    skip_go_(skip_go),
     pub_di_sleep_(di_sleep)
 {
     int *p;
@@ -89,6 +90,7 @@ void DistSteerService::stop() {
     app_->stop();
     run_ = false;
     go_ = false;
+    skip_go_ = false;
     pub_di_thread_.join();
 }
 
@@ -202,8 +204,8 @@ void DistSteerService::run_di() {
     while(run_) {
 
         // Pause here if !go_
-        while(!go_);
-
+        while(!(go_ || skip_go_));
+        std::cout << "SKIPPED GOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
         // Store values from shared memory in sensor_data
         std::vector<vsomeip::byte_t> sensor_data;
         shmMemory_di.Lock();
@@ -232,9 +234,9 @@ void DistSteerService::run_di() {
 
             // set data and publish it on the network TODO protect app with mutex
             payload_->set_data(sensor_data_formatted);
-            app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
-                         SPEED_EVENT_ID, payload_, true, true);
-    	    std::cout << "SPEED EVENT SENT!!!!!!!!" << std::endl;
+            app_->notify(DIST_SERVICE_ID, DIST_INSTANCE_ID,
+                         DIST_EVENT_ID, payload_, true, true);
+    	    std::cout << "DIST EVENT SENT!!!!!!!!" << std::endl;
         }
 
         //sleep before repeating the thread loop
@@ -260,9 +262,11 @@ void DistSteerService::run_di() {
 #endif
 
 int main(int argc, char** argv) {
-    uint32_t di_sleep = 50;
+    uint32_t di_sleep = 1000;
+    bool skip_go;
 
     std::string sleep_flag("--sleep");
+    std::string skip_go_flag("--skip-go"); // should only be used for testing and debugging
 
     for (int i=1; i<argc; i++) {
         if (sleep_flag==argv[i] && i+1<argc) {
@@ -271,9 +275,12 @@ int main(int argc, char** argv) {
             conv << argv[i];
             conv >> di_sleep;
         }
+        else if (skip_go_flag==argv[i]) {
+            skip_go = true;
+        }
     }
 
-    DistSteerService dss(di_sleep);
+    DistSteerService dss(di_sleep, skip_go);
 
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     dss_ptr = &dss;

@@ -33,7 +33,7 @@ public:
      *        during each cycle.
      * @author Leon Fernandez
      */
-    DistSteerService(uint32_t di_sleep);
+    DistSteerService(uint32_t di_sleep, bool skip_go_);
 
     /**
      * @brief Initializer for a DistSteerService app/instance.
@@ -87,6 +87,13 @@ private:
      * if the go-server goes offline or if @ref stop is called. Initial value is set to false.
      */
     bool go_;
+
+    /**
+     * @brief Disables pause switch (@ref go_) for all threads.
+     *
+     * Can only be set by passing an argument at the cmd line when starting the program.
+     */
+    bool skip_go_;
 
     /**
      * @brief Time (in milliseconds) that the distance publisher thread will sleep between cycles.
