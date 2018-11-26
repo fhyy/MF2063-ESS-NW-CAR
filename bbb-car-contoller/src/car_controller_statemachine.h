@@ -84,6 +84,7 @@ int* getDistance();
 int getSpeed();
 bool start();
 
+void setMinDistance(int distance); // in cm
 void setDistance(int distance, int prio);
 void setDirection(int direction, int prio);
 void setSpeed(int Speed, int prio);

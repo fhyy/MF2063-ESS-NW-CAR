@@ -76,7 +76,6 @@ static stStateTransfor stateMatrix[] = {
     {stateAccelerating, evHigh, evLow, evRun, stateAccelerating},
     {stateAccelerating, evHigh, evHigh, evRun, stateRetarding},
     {stateAccelerating, evHigh, evOk, evRun, stateConstantSpeed},
-
  
     {stateConstantSpeed, evHigh, evOk, evRun, stateConstantSpeed},
     {stateConstantSpeed, evHigh, evHigh, evRun, stateRetarding},
@@ -90,6 +89,8 @@ static stStateTransfor stateMatrix[] = {
 void statemachineInit(stCarStatemachine* statemachine){
     sm = statemachine;
     statemachine->state = stateStandingStill;
+
+
     statemachine->speed = evLow;
     statemachine->distance = evHigh;
     statemachine->camera = evStop;
