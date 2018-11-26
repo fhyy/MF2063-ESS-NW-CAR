@@ -39,6 +39,7 @@ private:
     std::thread req_mo_thread_;
     std::thread req_st_thread_;
     std::thread req_setmin_thread_;
+    std::thread req_shutdown_thread_;
 
     std::mutex mu_run_;
     std::condition_variable cond_run_;

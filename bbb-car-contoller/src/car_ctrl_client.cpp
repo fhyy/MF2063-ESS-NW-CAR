@@ -16,53 +16,55 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
 {
     int *p;
 
-    shmMemory_mo = CSharedMemory("/testSharedmemory1");
+    shmMemory_mo = CSharedMemory("/shm_motor_cons");
     shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_mo.Attach(PROT_WRITE);
     p = (int*) shmMemory_mo.GetData();
     circBuffer_mo = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    shmMemory_st = CSharedMemory("/testSharedmemory2");
+    shmMemory_st = CSharedMemory("/shm_steer_cons");
     shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_st.Attach(PROT_WRITE);
     p = (int*) shmMemory_st.GetData();
     circBuffer_st = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    shmMemory_sp = CSharedMemory("/testSharedmemory3");
-    shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_sp.Attach(PROT_WRITE);
-    p = (int*) shmMemory_sp.GetData();
-    circBuffer_sp = Buffer(BUFFER_SIZE, p, B_PRODUCER);
-
-    shmMemory_di = CSharedMemory("/testSharedmemory4");
-    shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_di.Attach(PROT_WRITE);
-    p = (int*) shmMemory_di.GetData();
-    circBuffer_di = Buffer(BUFFER_SIZE, p, B_PRODUCER);
-
-    shmMemory_go = CSharedMemory("/testSharedmemory5");
-    shmMemory_go.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_go.Attach(PROT_WRITE);
-    p = (int*) shmMemory_go.GetData();
-    circBuffer_go = Buffer(BUFFER_SIZE, p, B_PRODUCER);
-
-    shmMemory_setmin = CSharedMemory("/testSharedmemory6");
+    shmMemory_setmin = CSharedMemory("/shm_setmin_cons");
     shmMemory_setmin.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_setmin.Attach(PROT_WRITE);
     p = (int*) shmMemory_setmin.GetData();
     circBuffer_setmin = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    shmMemory_cam = CSharedMemory("/testSharedmemory7");
-    shmMemory_cam.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_cam.Attach(PROT_WRITE);
-    p = (int*) shmMemory_cam.GetData();
-    circBuffer_cam = Buffer(BUFFER_SIZE, p, B_PRODUCER);
-
-    shmMemory_shutdown = CSharedMemory("/testSharedmemory8");
+    shmMemory_shutdown = CSharedMemory("/shm_shutdown_cons");
     shmMemory_shutdown.Create(BUFFER_SIZE, O_RDWR);
     shmMemory_shutdown.Attach(PROT_WRITE);
     p = (int*) shmMemory_shutdown.GetData();
     circBuffer_shutdown = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+
+    // sleep while other process finishes consumer init
+
+    shmMemory_sp = CSharedMemory("/shm_speed_prod");
+    shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_sp.Attach(PROT_WRITE);
+    p = (int*) shmMemory_sp.GetData();
+    circBuffer_sp = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+
+    shmMemory_di = CSharedMemory("/shm_dist_prod");
+    shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_di.Attach(PROT_WRITE);
+    p = (int*) shmMemory_di.GetData();
+    circBuffer_di = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+
+    shmMemory_go = CSharedMemory("/shm_go_prod");
+    shmMemory_go.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_go.Attach(PROT_WRITE);
+    p = (int*) shmMemory_go.GetData();
+    circBuffer_go = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+
+    shmMemory_cam = CSharedMemory("/shm_cam_prod");
+    shmMemory_cam.Create(BUFFER_SIZE, O_RDWR);
+    shmMemory_cam.Attach(PROT_WRITE);
+    p = (int*) shmMemory_cam.GetData();
+    circBuffer_cam = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 }
 
 bool CarCTRLClient::init() {
@@ -70,7 +72,8 @@ bool CarCTRLClient::init() {
 
     req_mo_thread_ = std::thread(std::bind(&CarCTRLClient::send_motor_req, this));
     req_st_thread_ = std::thread(std::bind(&CarCTRLClient::send_steer_req, this));
-    req_st_thread_ = std::thread(std::bind(&CarCTRLClient::send_setmin_req, this));
+    req_setmin_thread_ = std::thread(std::bind(&CarCTRLClient::send_setmin_req, this));
+    req_shutdown_thread_ = std::thread(std::bind(&CarCTRLClient::send_shutdown_req, this));
 
     app_ = vsomeip::runtime::get()->create_application("car_ctrl_client");
     if (!app_->init()) {
@@ -121,16 +124,22 @@ bool CarCTRLClient::init() {
 
     run_ = true;
     cond_run_.notify_all();
+
     return true;
 }
 
 void CarCTRLClient::start() {
     app_->start();
+
 }
 
 void CarCTRLClient::stop() {
-    app_->stop();
+    req_mo_thread_.join();
+    req_st_thread_.join();
+    req_setmin_thread_.join();
+    req_shutdown_thread_.join();
     go_ = false;
+    app_->stop();
 }
 
 /*
@@ -151,7 +160,7 @@ void CarCTRLClient::update_go_status() {
         app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
 
-
+    // error here
     int mo_onehot = 0x00000001;
     int st_onehot = 0x00000010;
     int sp_onehot = 0x00000100;
@@ -159,10 +168,12 @@ void CarCTRLClient::update_go_status() {
     int service_status = mo_onehot && is_ava_mo_ ||
                          st_onehot && is_ava_st_ ||
                          sp_onehot && is_ava_sp_ ||
-                         di_onehot && is_ava_mo_;
-    shmMemory_go.Lock();
+                         di_onehot && is_ava_mo_; // TODO add camera
+
+    // TODO fix error caused by these lines
+    /*shmMemory_go.Lock();
     circBuffer_go.write(service_status);
-    shmMemory_go.UnLock();
+    shmMemory_go.UnLock();*/
 }
 
 /*
@@ -311,7 +322,6 @@ void CarCTRLClient::send_shutdown_req() {
             send_req(req_data, SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SHUTDOWN_METHOD_ID);
             send_req(req_data, DIST_SERVICE_ID, DIST_INSTANCE_ID, SHUTDOWN_METHOD_ID);
             send_req(req_data, CAM_SERVICE_ID, CAM_INSTANCE_ID, SHUTDOWN_METHOD_ID);
-
 
             app_busy_ = false;
             app_lk.unlock();
