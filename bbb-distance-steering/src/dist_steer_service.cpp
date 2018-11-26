@@ -207,11 +207,11 @@ void DistSteerService::run_di() {
         while(!(go_ || skip_go_));
         std::cout << "SKIPPED GOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
         // Store values from shared memory in sensor_data
-        std::vector<vsomeip::byte_t> sensor_data;
+        std::vector<int> sensor_data;
         shmMemory_di.Lock();
         int unreadValues = circBuffer_di.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            sensor_data.push_back((vsomeip::byte_t) circBuffer_di.read());
+            sensor_data.push_back(circBuffer_di.read());
         shmMemory_di.UnLock();
 
         // prepare and send transmission if data was read from shared memory
