@@ -11,8 +11,34 @@ public:
     std::string position;
 };
 
+// TODO overload methods so that prio does not have to be passed
 class ESSPrototype {
 public:
+
+    CSharedMemory shm_sp;
+    Buffer buf_sp;
+
+    CSharedMemory shm_di;
+    Buffer buf_di;
+
+    CSharedMemory shm_go;
+    Buffer buf_go;
+
+    CSharedMemory shm_cam;
+    Buffer buf_cam;
+
+    CSharedMemory shm_mo;
+    Buffer buf_mo;
+
+    CSharedMemory shm_st;
+    Buffer buf_st;
+
+    CSharedMemory shm_setmin;
+    Buffer buf_setmin;
+
+    CSharedMemory shm_shutdown;
+    Buffer buf_shutdown;
+
     /**
      * @brief
      * @param ccc
@@ -130,31 +156,9 @@ public:
     Flag getFlag();
 
 private:
+
     int service_status_;
 
-    CSharedMemory shmMemory_mo;
-    Buffer circBuffer_mo;
-
-    CSharedMemory shmMemory_st;
-    Buffer circBuffer_st;
-
-    CSharedMemory shmMemory_sp;
-    Buffer circBuffer_sp;
-
-    CSharedMemory shmMemory_di;
-    Buffer circBuffer_di;
-
-    CSharedMemory shmMemory_setmin;
-    Buffer circBuffer_setmin;
-
-    CSharedMemory shmMemory_go;
-    Buffer circBuffer_go;
-
-    CSharedMemory shmMemory_cam;
-    Buffer circBuffer_cam;
-
-    CSharedMemory shmMemory_shutdown;
-    Buffer circBuffer_shutdown;
 };
 
 #endif

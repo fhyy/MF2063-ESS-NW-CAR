@@ -12,13 +12,13 @@ include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 include_directories("${PROJECT_SOURCE_DIR}/shared")
 add_subdirectory(shared) 
 
-add_executable(bbb-car-controller "${PROJECT_SOURCE_DIR}/src/car_ctrl_client.cpp")
-target_link_libraries(bbb-car-controller vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
-install(TARGETS bbb-car-controller DESTINATION bin)
+add_executable(car-ctrl-client "${PROJECT_SOURCE_DIR}/src/car_ctrl_client.cpp")
+target_link_libraries(car-ctrl-client vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
+install(TARGETS car-ctrl-client DESTINATION bin)
 
-add_executable(main "${PROJECT_SOURCE_DIR}/src/main.cpp")
-target_link_libraries(main cbuf shm pthread rt)
-install(TARGETS main DESTINATION bin)
+add_executable(prototype-test "${PROJECT_SOURCE_DIR}/src/prototype_test.cpp")
+target_link_libraries(prototype-test cbuf shm pthread rt)
+install(TARGETS prototype-test DESTINATION bin)
 #########################################################################################
 
 

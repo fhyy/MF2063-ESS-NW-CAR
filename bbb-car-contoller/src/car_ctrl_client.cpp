@@ -20,7 +20,7 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     req_mo_sleep_(mo_sleep),
     req_st_sleep_(st_sleep),
     req_setmin_sleep_(setmin_sleep),
-    req_shutdown_sleep_(103) // TODO make settable through CTR?
+    req_shutdown_sleep_(2000) // TODO make settable through CTR?
 {
     int *p;
 
@@ -44,7 +44,7 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     p = (int*) shm_shutdown.GetData();
     buf_shutdown = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    sleep(3);
+    sleep(4);
 
     shm_sp.Create(BUFFER_SIZE, O_RDWR);
     shm_sp.Attach(PROT_WRITE);
@@ -187,7 +187,7 @@ void CarCTRLClient::send_motor_req() {
     }
 
     while(run_) {
-        while(!go_);
+        //while(!go_); // TODO uncomment
 
         std::vector<vsomeip::byte_t> req_data;
 
@@ -225,27 +225,48 @@ void CarCTRLClient::send_steer_req() {
     }
 
     while(run_) {
-        while(!go_);
+        //while(!go_); // TODO uncomment
 
-        std::vector<vsomeip::byte_t> req_data;
+
+        std::vector<int> req_data;
 
         shm_st.Lock();
         int unreadValues = buf_st.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            req_data.push_back((vsomeip::byte_t) buf_st.read());
+            req_data.push_back(buf_st.read());
         shm_st.UnLock();
 
+
         if (req_data.size() > 0) {
+
+            // Use only newest req values for transmission
+            int req_data_latest = req_data.back();
+
+            // turn int into std::vector of four vsomeip::byte_t
+            std::vector<vsomeip::byte_t> req_data_formatted;
+            char byte;
+            for (int j=0; j<4; j++) {
+                // first element of of vector is lowest 8 bits and so on
+                byte = (req_data_latest >> j*8);
+                req_data_formatted.push_back(byte);
+
+                // Priority (0x0000=low, other=high) could be set here in a future implementation
+                // sensor_data_formatted[3] = priority;
+            }
+
+
+
             std::unique_lock<std::mutex> app_lk(mu_app_);
             while (app_busy_)
                 cond_app_.wait(app_lk);
             app_busy_ = true;
 
-            send_req(req_data, STEER_SERVICE_ID, STEER_INSTANCE_ID, STEER_METHOD_ID);
+            send_req(req_data_formatted, STEER_SERVICE_ID, STEER_INSTANCE_ID, STEER_METHOD_ID);
 
             app_busy_ = false;
             app_lk.unlock();
             cond_app_.notify_one();
+
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(req_st_sleep_));
@@ -520,9 +541,9 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
 
 int main(int argc, char** argv) {
 
-    uint32_t mo_sleep = 33;
-    uint32_t st_sleep = 47;
-    uint32_t setmin_sleep = 93;
+    uint32_t mo_sleep = 1000;
+    uint32_t st_sleep = 1500;
+    uint32_t setmin_sleep = 1750;
 
     std::string motor_flag("--motor-sleep");
     std::string steer_flag("--steer-sleep");

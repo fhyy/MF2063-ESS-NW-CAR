@@ -2,10 +2,13 @@
 #include "ess_prototype.cpp"
 
 int main() {
-	int a = 260;
-	char b = a;
-	std::cout << "B: " << (int)b << std::endl;
 
 	ESSPrototype prototype;
+
+    sleep(3);
+    for (char i=0; true; i++) {
+        prototype.setDirection(i, false);
+        sleep(3);
+    }
 	return 0;
 }

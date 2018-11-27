@@ -1,75 +1,78 @@
 #include "ess_prototype.hpp"
 
-ESSPrototype::ESSPrototype() {
+ESSPrototype::ESSPrototype() :
+    shm_sp(CSharedMemory("/shm_sp")),
+    shm_di(CSharedMemory("/shm_di")),
+    shm_go(CSharedMemory("/shm_go")),
+    shm_cam(CSharedMemory("/shm_cam")),
+    shm_mo(CSharedMemory("/shm_mo")),
+    shm_st(CSharedMemory("/shm_st")),
+    shm_setmin(CSharedMemory("/shm_setmin")),
+    shm_shutdown(CSharedMemory("/shm_shutdown"))
+{
     int *p;
 
-    CSharedMemory shmMemory_in("/testSharedmemory3");
-    shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_sp.Attach(PROT_WRITE);
-    p = (int*) shmMemory_sp.GetData();
-    Buffer circBuffer_sp(BUFFER_SIZE, p, B_CONSUMER);
+    shm_sp.Create(BUFFER_SIZE, O_RDWR);
+    shm_sp.Attach(PROT_WRITE);
+    p = (int*) shm_sp.GetData();
+    buf_sp = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    CSharedMemory shmMemory_di("/testSharedmemory4");
-    shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_di.Attach(PROT_WRITE);
-    p = (int*) shmMemory_di.GetData();
-    Buffer circBuffer_di(BUFFER_SIZE, p, B_CONSUMER);
+    shm_di.Create(BUFFER_SIZE, O_RDWR);
+    shm_di.Attach(PROT_WRITE);
+    p = (int*) shm_di.GetData();
+    buf_di = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    CSharedMemory shmMemory_go("/testSharedmemory5");
-    shmMemory_go.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_go.Attach(PROT_WRITE);
-    p = (int*) shmMemory_go.GetData();
-    Buffer circBuffer_go(BUFFER_SIZE, p, B_CONSUMER);
+    shm_go.Create(BUFFER_SIZE, O_RDWR);
+    shm_go.Attach(PROT_WRITE);
+    p = (int*) shm_go.GetData();
+    buf_go = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    CSharedMemory shmMemory_mo("/testSharedmemory1");
-    shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_mo.Attach(PROT_WRITE);
-    p = (int*) shmMemory_mo.GetData();
-    Buffer circBuffer_mo(BUFFER_SIZE, p, B_PRODUCER);
+    shm_cam.Create(BUFFER_SIZE, O_RDWR);
+    shm_cam.Attach(PROT_WRITE);
+    p = (int*) shm_cam.GetData();
+    buf_cam = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    CSharedMemory shmMemory_st("/testSharedmemory2");
-    shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_st.Attach(PROT_WRITE);
-    p = (int*) shmMemory_st.GetData();
-    Buffer circBuffer_st(BUFFER_SIZE, p, B_PRODUCER);
+    sleep(3);
 
-    shmMemory_setmin = CSharedMemory("/testSharedmemory6");
-    shmMemory_setmin.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_setmin.Attach(PROT_WRITE);
-    p = (int*) shmMemory_setmin.GetData();
-    circBuffer_setmin = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    shm_mo.Create(BUFFER_SIZE, O_RDWR);
+    shm_mo.Attach(PROT_WRITE);
+    p = (int*) shm_mo.GetData();
+    buf_mo = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
-    shmMemory_cam = CSharedMemory("/testSharedmemory7");
-    shmMemory_cam.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_cam.Attach(PROT_WRITE);
-    p = (int*) shmMemory_cam.GetData();
-    circBuffer_cam = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    shm_st.Create(BUFFER_SIZE, O_RDWR);
+    shm_st.Attach(PROT_WRITE);
+    p = (int*) shm_st.GetData();
+    buf_st = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
-    shmMemory_shutdown = CSharedMemory("/testSharedmemory8");
-    shmMemory_shutdown.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_shutdown.Attach(PROT_WRITE);
-    p = (int*) shmMemory_shutdown.GetData();
-    circBuffer_shutdown = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    shm_setmin.Create(BUFFER_SIZE, O_RDWR);
+    shm_setmin.Attach(PROT_WRITE);
+    p = (int*) shm_setmin.GetData();
+    buf_setmin = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+
+    shm_shutdown.Create(BUFFER_SIZE, O_RDWR);
+    shm_shutdown.Attach(PROT_WRITE);
+    p = (int*) shm_shutdown.GetData();
+    buf_shutdown = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 }
 
 //TODO bool EssPrototype::boot() {}
 
 void ESSPrototype::shutdown() {
     int data = 1;
-    shmMemory_shutdown.Lock();
-    circBuffer_shutdown.write(data);
-    shmMemory_shutdown.UnLock();
+    shm_shutdown.Lock();
+    buf_shutdown.write(data);
+    shm_shutdown.UnLock();
 }
 
 bool ESSPrototype::checkMotor() {
     int mo_mask = 0x00000001;
     std::vector<int> data;
 
-    shmMemory_go.Lock();
-    int unreadValues = circBuffer_go.getUnreadValues();
+    shm_go.Lock();
+    int unreadValues = buf_go.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
-        data.push_back(circBuffer_go.read());
-    shmMemory_go.UnLock();
+        data.push_back(buf_go.read());
+    shm_go.UnLock();
 
     service_status_ = data.back();
 
@@ -81,11 +84,11 @@ bool ESSPrototype::checkSpeedSensor() {
     int sp_mask = 0x00000100;
     std::vector<int> data;
 
-    shmMemory_go.Lock();
-    int unreadValues = circBuffer_go.getUnreadValues();
+    shm_go.Lock();
+    int unreadValues = buf_go.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
-        data.push_back(circBuffer_go.read());
-    shmMemory_go.UnLock();
+        data.push_back(buf_go.read());
+    shm_go.UnLock();
 
     service_status_ = data.back();
 
@@ -97,11 +100,11 @@ bool ESSPrototype::checkSteering() {
     int st_mask = 0x00000010;
     std::vector<int> data;
 
-    shmMemory_go.Lock();
-    int unreadValues = circBuffer_go.getUnreadValues();
+    shm_go.Lock();
+    int unreadValues = buf_go.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
-        data.push_back(circBuffer_go.read());
-    shmMemory_go.UnLock();
+        data.push_back(buf_go.read());
+    shm_go.UnLock();
 
     service_status_ = data.back();
 
@@ -113,11 +116,11 @@ bool ESSPrototype::checkDistanceSensor() {
     int di_mask = 0x00001000;
     std::vector<int> data;
 
-    shmMemory_go.Lock();
-    int unreadValues = circBuffer_go.getUnreadValues();
+    shm_go.Lock();
+    int unreadValues = buf_go.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
-        data.push_back(circBuffer_go.read());
-    shmMemory_go.UnLock();
+        data.push_back(buf_go.read());
+    shm_go.UnLock();
 
     service_status_ = data.back();
 
@@ -131,42 +134,46 @@ void ESSPrototype::setSpeed(char s, bool prio) {
 
 void ESSPrototype::setSpeed(char s, char a, bool prio) {
     int data = s || (a<<8) || (prio<<24);
-    shmMemory_di.Lock();
-    circBuffer_di.write(data);
-    shmMemory_di.UnLock();
+    shm_mo.Lock();
+    buf_mo.write(data);
+    shm_mo.UnLock();
 }
 
 void ESSPrototype::setDirection(char d, bool prio) {
     int data = d || (prio<<24);
-    shmMemory_di.Lock();
-    circBuffer_di.write(data);
-    shmMemory_di.UnLock();
+    std::cout << "########## ESSPROTO Attempting to lock!!!!!!!!!!!!!!!" << std::endl;
+    shm_st.Lock();
+    std::cout << " ########## ESSPROTOTYPE GOT THE LOCK!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+    buf_st.write(data);
+    std::cout << " ########## ESSPROTOTYPE WROTE THE DATA!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
+    shm_st.UnLock();
+    std::cout << "########## ESSPROTO RELEASED THE LOCK!" << std::endl;
 }
 
 void ESSPrototype::setMinDistance(char d, bool prio) {
     int data = d || (prio<<24);
-    shmMemory_setmin.Lock();
-    circBuffer_setmin.write(data);
-    shmMemory_setmin.UnLock();
+    shm_setmin.Lock();
+    buf_setmin.write(data);
+    shm_setmin.UnLock();
 }
 
 char ESSPrototype::getSpeed() {
     std::vector<int> data;
-    shmMemory_sp.Lock();
-    int unreadValues = circBuffer_sp.getUnreadValues();
+    shm_sp.Lock();
+    int unreadValues = buf_sp.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
-        data.push_back(circBuffer_sp.read());
-    shmMemory_sp.UnLock();
+        data.push_back(buf_sp.read());
+    shm_sp.UnLock();
     return (char) data.back(); // TODO make sure last element is the latest
 }
 
 char ESSPrototype::getDistance() {
     std::vector<int> data;
-    shmMemory_di.Lock();
-    int unreadValues = circBuffer_di.getUnreadValues();
+    shm_di.Lock();
+    int unreadValues = buf_di.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
-        data.push_back(circBuffer_di.read());
-    shmMemory_di.UnLock();
+        data.push_back(buf_di.read());
+    shm_di.UnLock();
 
     int latest_i = data.back();
     char *latest = (char*) &latest_i; //TODO does this work?
@@ -180,11 +187,11 @@ char ESSPrototype::getDistance() {
 
 /*Flag ESSPrototype::getFlag() {
     std::vector<int> data;
-    shmMemory_di.Lock();
-    int unreadValues = circBuffer_di.getUnreadValues();
+    shm_di.Lock();
+    int unreadValues = buf_di.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
-        data.push_back(circBuffer_di.read());
-    shmMemory_di.UnLock();
+        data.push_back(buf_di.read());
+    shm_di.UnLock();
 
     int latest = data.back();
 
@@ -194,5 +201,10 @@ char ESSPrototype::getDistance() {
 }*/
 
 bool ESSPrototype::getGoStatus() {
-    return service_status_ == 0x00001111;
+    checkMotor();
+    checkSpeedSensor();
+    checkSteering();
+    checkDistanceSensor();
+    // TODO check camera
+    return service_status_ == 0x00001111; // TODO take camera into account
 }
