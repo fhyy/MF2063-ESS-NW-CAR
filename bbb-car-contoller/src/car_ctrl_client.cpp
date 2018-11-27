@@ -9,6 +9,14 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     is_ava_sp_(false),
     is_ava_cam_(false),
     app_busy_(false),
+    shm_mo(CSharedMemory("/shm_mo")),
+    shm_st(CSharedMemory("/shm_st")),
+    shm_setmin(CSharedMemory("/shm_setmin")),
+    shm_shutdown(CSharedMemory("/shm_shutdown")),
+    shm_sp(CSharedMemory("/shm_sp")),
+    shm_di(CSharedMemory("/shm_di")),
+    shm_go(CSharedMemory("/shm_go")),
+    shm_cam(CSharedMemory("/shm_cam")),
     req_mo_sleep_(mo_sleep),
     req_st_sleep_(st_sleep),
     req_setmin_sleep_(setmin_sleep),
@@ -16,55 +24,47 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
 {
     int *p;
 
-    shmMemory_mo = CSharedMemory("/shm_motor_cons");
-    shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_mo.Attach(PROT_WRITE);
-    p = (int*) shmMemory_mo.GetData();
-    circBuffer_mo = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    shm_mo.Create(BUFFER_SIZE, O_RDWR);
+    shm_mo.Attach(PROT_WRITE);
+    p = (int*) shm_mo.GetData();
+    buf_mo = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    shmMemory_st = CSharedMemory("/shm_steer_cons");
-    shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_st.Attach(PROT_WRITE);
-    p = (int*) shmMemory_st.GetData();
-    circBuffer_st = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    shm_st.Create(BUFFER_SIZE, O_RDWR);
+    shm_st.Attach(PROT_WRITE);
+    p = (int*) shm_st.GetData();
+    buf_st = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    shmMemory_setmin = CSharedMemory("/shm_setmin_cons");
-    shmMemory_setmin.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_setmin.Attach(PROT_WRITE);
-    p = (int*) shmMemory_setmin.GetData();
-    circBuffer_setmin = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    shm_setmin.Create(BUFFER_SIZE, O_RDWR);
+    shm_setmin.Attach(PROT_WRITE);
+    p = (int*) shm_setmin.GetData();
+    buf_setmin = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    shmMemory_shutdown = CSharedMemory("/shm_shutdown_cons");
-    shmMemory_shutdown.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_shutdown.Attach(PROT_WRITE);
-    p = (int*) shmMemory_shutdown.GetData();
-    circBuffer_shutdown = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    shm_shutdown.Create(BUFFER_SIZE, O_RDWR);
+    shm_shutdown.Attach(PROT_WRITE);
+    p = (int*) shm_shutdown.GetData();
+    buf_shutdown = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    // sleep while other process finishes consumer init
+    sleep(3);
 
-    shmMemory_sp = CSharedMemory("/shm_speed_prod");
-    shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_sp.Attach(PROT_WRITE);
-    p = (int*) shmMemory_sp.GetData();
-    circBuffer_sp = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    shm_sp.Create(BUFFER_SIZE, O_RDWR);
+    shm_sp.Attach(PROT_WRITE);
+    p = (int*) shm_sp.GetData();
+    buf_sp = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
-    shmMemory_di = CSharedMemory("/shm_dist_prod");
-    shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_di.Attach(PROT_WRITE);
-    p = (int*) shmMemory_di.GetData();
-    circBuffer_di = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    shm_di.Create(BUFFER_SIZE, O_RDWR);
+    shm_di.Attach(PROT_WRITE);
+    p = (int*) shm_di.GetData();
+    buf_di = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
-    shmMemory_go = CSharedMemory("/shm_go_prod");
-    shmMemory_go.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_go.Attach(PROT_WRITE);
-    p = (int*) shmMemory_go.GetData();
-    circBuffer_go = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    shm_go.Create(BUFFER_SIZE, O_RDWR);
+    shm_go.Attach(PROT_WRITE);
+    p = (int*) shm_go.GetData();
+    buf_go = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
-    shmMemory_cam = CSharedMemory("/shm_cam_prod");
-    shmMemory_cam.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_cam.Attach(PROT_WRITE);
-    p = (int*) shmMemory_cam.GetData();
-    circBuffer_cam = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    shm_cam.Create(BUFFER_SIZE, O_RDWR);
+    shm_cam.Attach(PROT_WRITE);
+    p = (int*) shm_cam.GetData();
+    buf_cam = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 }
 
 bool CarCTRLClient::init() {
@@ -171,9 +171,9 @@ void CarCTRLClient::update_go_status() {
                          di_onehot && is_ava_mo_; // TODO add camera
 
     // TODO fix error caused by these lines
-    /*shmMemory_go.Lock();
-    circBuffer_go.write(service_status);
-    shmMemory_go.UnLock();*/
+    /*shm_go.Lock();
+    buf_go.write(service_status);
+    shm_go.UnLock();*/
 }
 
 /*
@@ -191,11 +191,11 @@ void CarCTRLClient::send_motor_req() {
 
         std::vector<vsomeip::byte_t> req_data;
 
-        shmMemory_mo.Lock();
-        int unreadValues = circBuffer_mo.getUnreadValues();
+        shm_mo.Lock();
+        int unreadValues = buf_mo.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            req_data.push_back((vsomeip::byte_t) circBuffer_mo.read());
-        shmMemory_mo.UnLock();
+            req_data.push_back((vsomeip::byte_t) buf_mo.read());
+        shm_mo.UnLock();
 
         if (req_data.size() > 0) {
             std::unique_lock<std::mutex> app_lk(mu_app_);
@@ -229,11 +229,11 @@ void CarCTRLClient::send_steer_req() {
 
         std::vector<vsomeip::byte_t> req_data;
 
-        shmMemory_st.Lock();
-        int unreadValues = circBuffer_st.getUnreadValues();
+        shm_st.Lock();
+        int unreadValues = buf_st.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            req_data.push_back((vsomeip::byte_t) circBuffer_st.read());
-        shmMemory_st.UnLock();
+            req_data.push_back((vsomeip::byte_t) buf_st.read());
+        shm_st.UnLock();
 
         if (req_data.size() > 0) {
             std::unique_lock<std::mutex> app_lk(mu_app_);
@@ -267,11 +267,11 @@ void CarCTRLClient::send_setmin_req() {
 
         std::vector<vsomeip::byte_t> req_data;
 
-        shmMemory_setmin.Lock();
-        int unreadValues = circBuffer_setmin.getUnreadValues();
+        shm_setmin.Lock();
+        int unreadValues = buf_setmin.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            req_data.push_back((vsomeip::byte_t) circBuffer_setmin.read());
-        shmMemory_setmin.UnLock();
+            req_data.push_back((vsomeip::byte_t) buf_setmin.read());
+        shm_setmin.UnLock();
 
         if (req_data.size() > 0) {
             std::unique_lock<std::mutex> app_lk(mu_app_);
@@ -305,11 +305,11 @@ void CarCTRLClient::send_shutdown_req() {
 
         std::vector<vsomeip::byte_t> req_data;
 
-        shmMemory_shutdown.Lock();
-        int unreadValues = circBuffer_shutdown.getUnreadValues();
+        shm_shutdown.Lock();
+        int unreadValues = buf_shutdown.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            req_data.push_back((vsomeip::byte_t) circBuffer_shutdown.read());
-        shmMemory_shutdown.UnLock();
+            req_data.push_back((vsomeip::byte_t) buf_shutdown.read());
+        shm_shutdown.UnLock();
 
         if (req_data.size() > 0 && req_data.back() == 1) {
             std::unique_lock<std::mutex> app_lk(mu_app_);
@@ -336,33 +336,33 @@ void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
     vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shmMemory_di.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
+    shm_di.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
     for(int i=0; i<datalength; i++) {
-        circBuffer_di.write(data[i]);
+        buf_di.write(data[i]);
     }
-    shmMemory_di.UnLock();
+    shm_di.UnLock();
 }
 
 void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
     vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shmMemory_sp.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
+    shm_sp.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
     for(int i=0; i<datalength; i++) {
-        circBuffer_sp.write(data[i]);
+        buf_sp.write(data[i]);
     }
-    shmMemory_sp.UnLock();
+    shm_sp.UnLock();
 }
 
 void CarCTRLClient::on_cam_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
     vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shmMemory_cam.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
+    shm_cam.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
     for(int i=0; i<datalength; i++) {
-        circBuffer_cam.write(data[i]);
+        buf_cam.write(data[i]);
     }
-    shmMemory_cam.UnLock();
+    shm_cam.UnLock();
 }
 
 void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg) {

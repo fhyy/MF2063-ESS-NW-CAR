@@ -50,29 +50,29 @@ private:
     std::shared_ptr<vsomeip::payload> payload_;
     std::shared_ptr<vsomeip::message> request_;
 
-    CSharedMemory shmMemory_mo;
-    Buffer circBuffer_mo;
+    CSharedMemory shm_mo;
+    Buffer buf_mo;
 
-    CSharedMemory shmMemory_st;
-    Buffer circBuffer_st;
+    CSharedMemory shm_st;
+    Buffer buf_st;
 
-    CSharedMemory shmMemory_sp;
-    Buffer circBuffer_sp;
+    CSharedMemory shm_sp;
+    Buffer buf_sp;
 
-    CSharedMemory shmMemory_di;
-    Buffer circBuffer_di;
+    CSharedMemory shm_di;
+    Buffer buf_di;
 
-    CSharedMemory shmMemory_go;
-    Buffer circBuffer_go;
+    CSharedMemory shm_go;
+    Buffer buf_go;
 
-    CSharedMemory shmMemory_setmin;
-    Buffer circBuffer_setmin;
+    CSharedMemory shm_setmin;
+    Buffer buf_setmin;
 
-    CSharedMemory shmMemory_cam;
-    Buffer circBuffer_cam;
+    CSharedMemory shm_cam;
+    Buffer buf_cam;
 
-    CSharedMemory shmMemory_shutdown;
-    Buffer circBuffer_shutdown;
+    CSharedMemory shm_shutdown;
+    Buffer buf_shutdown;
 
     void update_go_status();
     void send_motor_req();
