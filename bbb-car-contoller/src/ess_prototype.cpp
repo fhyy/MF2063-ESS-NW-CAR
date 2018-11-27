@@ -141,13 +141,9 @@ void ESSPrototype::setSpeed(char s, char a, bool prio) {
 
 void ESSPrototype::setDirection(char d, bool prio) {
     int data = d || (prio<<24);
-    std::cout << "########## ESSPROTO Attempting to lock!!!!!!!!!!!!!!!" << std::endl;
     shm_st.Lock();
-    std::cout << " ########## ESSPROTOTYPE GOT THE LOCK!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
     buf_st.write(data);
-    std::cout << " ########## ESSPROTOTYPE WROTE THE DATA!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
     shm_st.UnLock();
-    std::cout << "########## ESSPROTO RELEASED THE LOCK!" << std::endl;
 }
 
 void ESSPrototype::setMinDistance(char d, bool prio) {

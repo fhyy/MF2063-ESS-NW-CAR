@@ -225,7 +225,7 @@ void CarCTRLClient::send_steer_req() {
     }
 
     while(run_) {
-        //while(!go_); // TODO uncomment
+        while(!go_);
 
 
         std::vector<int> req_data;
@@ -262,6 +262,8 @@ void CarCTRLClient::send_steer_req() {
             app_busy_ = true;
 
             send_req(req_data_formatted, STEER_SERVICE_ID, STEER_INSTANCE_ID, STEER_METHOD_ID);
+
+	    std::cout << "Sent steer request!!! Data: " << req_data_latest << std::endl;
 
             app_busy_ = false;
             app_lk.unlock();
@@ -388,7 +390,7 @@ void CarCTRLClient::on_cam_eve(const std::shared_ptr<vsomeip::message> &msg) {
 
 void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
-    std::cout << "EMBREAK EVENT!!!!!!!!!! Data is: " << (int) data[0]  << std::endl;
+    std::cout << "EMBREAK EVENT!!!!!!!!!! Data is: " << (int) data[0]<< std::endl;
 }
 
 void CarCTRLClient::send_req(std::vector<vsomeip::byte_t> data,

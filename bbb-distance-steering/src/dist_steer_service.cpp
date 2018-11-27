@@ -153,7 +153,7 @@ void DistSteerService::on_steer_req(const std::shared_ptr<vsomeip::message> &msg
 
     // Turn the four-element data packet into an int before writing
     int req = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
-
+    std::cout << "Got steer request!! Data: " << req << std::endl;
     // Write to shared memory
     shm_st.Lock();
     buf_st.write(req);
