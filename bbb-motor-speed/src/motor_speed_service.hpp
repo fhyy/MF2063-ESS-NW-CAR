@@ -30,6 +30,13 @@
  */
 class MotorSpeedService {
 public:
+
+    CSharedMemory shm_sp;
+    Buffer buf_sp;
+
+    CSharedMemory shm_mo;
+    Buffer buf_mo;
+
     /**
      * @brief Constructor for the MotorSpeedService class.
      * @param sp_sleep Time (in millisec) that the speed notifier thread will sleep
@@ -38,7 +45,7 @@ public:
      *        event gets published
      * @author Leon Fernandez & Jacob Kimblad
      */
-    MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist);
+    MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist, bool skip_go);
 
     /**
      * @brief Initializer for a MotorSpeedService app/instance.
@@ -71,12 +78,6 @@ public:
 
 private:
 
-    CSharedMemory shmMemory_sp;
-    Buffer circBuffer_sp;
-
-    CSharedMemory shmMemory_mo;
-    Buffer circBuffer_mo;
-
     /**
      * @brief Main on/off switch for application.
      *
@@ -93,6 +94,13 @@ private:
      * if the go-server goes offline or if @ref stop is called. Initial value is set to false.
      */
     bool go_;
+
+    /**
+     * @brief Disables pause switch (@ref go_) for all threads.
+     *
+     * Can only be set by passing an argument at the cmd line when starting the program.
+     */
+    bool skip_go_;
 
     /**
      * @brief Set to true if the distance service is up and can be used for emergency break events.

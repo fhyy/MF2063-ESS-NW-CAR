@@ -5,26 +5,29 @@
  *--------------------------------- constructor ---------------------------------------------------
  *-------------------------------------------------------------------------------------------------
  */
-MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist) :
+MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist, bool skip_go) :
     run_(false),
     go_(false),
     use_dist_(false),
+    shm_sp(CSharedMemory("/shm_sp")),
+    shm_mo(CSharedMemory("/shm_mo")),
     pub_sp_sleep_(sp_sleep),
-    min_dist_(min_dist)
+    min_dist_(min_dist),
+    skip_go_(skip_go)
 {
     int *p;
 
-    shmMemory_sp = CSharedMemory("/testSharedmemory1");
-    shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_sp.Attach(PROT_WRITE);
-    p = (int*) shmMemory_sp.GetData();
-    circBuffer_sp = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    shm_sp.Create(BUFFER_SIZE, O_RDWR);
+    shm_sp.Attach(PROT_WRITE);
+    p = (int*) shm_sp.GetData();
+    buf_sp = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    shmMemory_mo = CSharedMemory("/testSharedmemory2");
-    shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_mo.Attach(PROT_WRITE);
-    p = (int*) shmMemory_mo.GetData();
-    circBuffer_mo = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    sleep(2);
+
+    shm_mo.Create(BUFFER_SIZE, O_RDWR);
+    shm_mo.Attach(PROT_WRITE);
+    p = (int*) shm_mo.GetData();
+    buf_mo = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 
 }
 
@@ -111,6 +114,7 @@ void MotorSpeedService::stop() {
     app_->stop();
     run_ = false;
     go_ = false;
+    skip_go_ = false;
     pub_sp_thread_.join();
 }
 
@@ -221,9 +225,9 @@ void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &ms
     int req = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
 
     // Write to shared memory
-    shmMemory_mo.Lock();
-    circBuffer_mo.write(req);
-    shmMemory_mo.UnLock();
+    shm_mo.Lock();
+    buf_mo.write(req);
+    shm_mo.UnLock();
 }
 
 /*
@@ -299,15 +303,15 @@ void MotorSpeedService::run_sp() {
     while(run_) {
 
         // Pause here if !go_
-        while(!go_);
+        while(!(go_ || skip_go_));
 
         // Store values from shared memory in sensor_data
         std::vector<int> sensor_data;
-        shmMemory_sp.Lock();
-        int unreadValues = circBuffer_sp.getUnreadValues();
+        shm_sp.Lock();
+        int unreadValues = buf_sp.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            sensor_data.push_back(circBuffer_sp.read());
-        shmMemory_sp.UnLock();
+            sensor_data.push_back(buf_sp.read());
+        shm_sp.UnLock();
 
         // prepare and send transmission if data was read from shared memory
         if (sensor_data.size() > 0) {
@@ -332,7 +336,9 @@ void MotorSpeedService::run_sp() {
 		    payload_->set_data(sensor_data_formatted);
             app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
                          SPEED_EVENT_ID, payload_, true, true);
-    	    std::cout << "SPEED EVENT SENT!!!!!!!!" << std::endl;
+    	    std::cout << "SPEED EVENT SENT! Data: (" << sensor_data_formatted[0] << ", "
+                      << sensor_data_formatted[1] << ", " << sensor_data_formatted[2] << ", "
+                      << sensor_data_formatted[4] << ")" << std::endl;
         }
 
         //sleep before repeating the thread loop
@@ -362,9 +368,11 @@ int main(int argc, char** argv) {
 
     uint32_t sp_sleep = 30;
     uint8_t min_dist = 100;
+    bool skip_go = false;
 
     std::string sleep_flag("--sleep");
     std::string min_dist_flag("--min-dist");
+    std::string skip_go_flag("--skip-go");
 
     for (int i=1; i<argc; i++) {
         if (sleep_flag==argv[i] && i+1<argc) {
@@ -379,9 +387,12 @@ int main(int argc, char** argv) {
             conv << argv[i];
             conv >> min_dist;
         }
+        else if (skip_go_flag==argv[i]) {
+            skip_go = true;
+        }
     }
 
-    MotorSpeedService mss(sp_sleep, min_dist);
+    MotorSpeedService mss(sp_sleep, min_dist, skip_go);
 
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     mss_ptr = &mss;
