@@ -338,7 +338,7 @@ void MotorSpeedService::run_sp() {
                          SPEED_EVENT_ID, payload_, true, true);
     	    std::cout << "SPEED EVENT SENT! Data: (" << sensor_data_formatted[0] << ", "
                       << sensor_data_formatted[1] << ", " << sensor_data_formatted[2] << ", "
-                      << sensor_data_formatted[4] << ")" << std::endl;
+                      << sensor_data_formatted[3] << ")" << std::endl;
         }
 
         //sleep before repeating the thread loop
