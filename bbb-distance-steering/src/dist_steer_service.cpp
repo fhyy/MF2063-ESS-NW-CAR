@@ -8,22 +8,24 @@
 DistSteerService::DistSteerService(uint32_t di_sleep, bool skip_go) :
     run_(false),
     go_(false),
+    shm_di(CSharedMemory("/shm_di")),
+    shm_st(CSharedMemory("/shm_st")),
     skip_go_(skip_go),
     pub_di_sleep_(di_sleep)
 {
     int *p;
 
-    shmMemory_di = CSharedMemory("/testSharedmemory1");
-    shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_di.Attach(PROT_WRITE);
-    p = (int*) shmMemory_di.GetData();
-    circBuffer_di = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    shm_di.Create(BUFFER_SIZE, O_RDWR);
+    shm_di.Attach(PROT_WRITE);
+    p = (int*) shm_di.GetData();
+    buf_di = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    shmMemory_st = CSharedMemory("/testSharedmemory2");
-    shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
-    shmMemory_st.Attach(PROT_WRITE);
-    p = (int*) shmMemory_st.GetData();
-    circBuffer_st = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    sleep(2);
+
+    shm_st.Create(BUFFER_SIZE, O_RDWR);
+    shm_st.Attach(PROT_WRITE);
+    p = (int*) shm_st.GetData();
+    buf_st = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 }
 
 /*
@@ -153,9 +155,9 @@ void DistSteerService::on_steer_req(const std::shared_ptr<vsomeip::message> &msg
     int req = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
 
     // Write to shared memory
-    shmMemory_st.Lock();
-    circBuffer_st.write(req);
-    shmMemory_st.UnLock();
+    shm_st.Lock();
+    buf_st.write(req);
+    shm_st.UnLock();
 }
 
 /*
@@ -205,14 +207,15 @@ void DistSteerService::run_di() {
 
         // Pause here if !go_
         while(!(go_ || skip_go_));
-        std::cout << "SKIPPED GOOOOOOOOOOOOOOOOOOOOOO" << std::endl;
+
         // Store values from shared memory in sensor_data
         std::vector<int> sensor_data;
-        shmMemory_di.Lock();
-        int unreadValues = circBuffer_di.getUnreadValues();
+
+        shm_di.Lock(); //Lock the shared memory
+        int unreadValues = buf_di.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            sensor_data.push_back(circBuffer_di.read());
-        shmMemory_di.UnLock();
+            sensor_data.push_back(buf_di.read());
+        shm_di.UnLock(); //Unlock the shared memory
 
         // prepare and send transmission if data was read from shared memory
         if (sensor_data.size() > 0) {
@@ -236,7 +239,9 @@ void DistSteerService::run_di() {
             payload_->set_data(sensor_data_formatted);
             app_->notify(DIST_SERVICE_ID, DIST_INSTANCE_ID,
                          DIST_EVENT_ID, payload_, true, true);
-    	    std::cout << "DIST EVENT SENT!!!!!!!!" << std::endl;
+    	    std::cout << "DIST EVENT SENT! Data: (" << sensor_data_formatted[0] << ", "
+                      << sensor_data_formatted[1] << ", " << sensor_data_formatted[2] << ", "
+                      << sensor_data_formatted[4] << ")" << std::endl;
         }
 
         //sleep before repeating the thread loop
@@ -262,7 +267,7 @@ void DistSteerService::run_di() {
 #endif
 
 int main(int argc, char** argv) {
-    uint32_t di_sleep = 1000;
+    uint32_t di_sleep = 3000;
     bool skip_go;
 
     std::string sleep_flag("--sleep");

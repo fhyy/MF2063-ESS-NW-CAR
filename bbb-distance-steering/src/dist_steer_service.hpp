@@ -27,6 +27,13 @@
  */
 class DistSteerService {
 public:
+
+    CSharedMemory shm_di;
+    Buffer buf_di;
+
+    CSharedMemory shm_st;
+    Buffer buf_st;
+
     /**
      * @brief Constructor for the DistSteerService class.
      * @param di_sleep Time (in millisec) that the distance notifier thread will sleep
@@ -64,12 +71,6 @@ public:
      */
     bool is_running();
 private:
-
-    CSharedMemory shmMemory_di;
-    Buffer circBuffer_di;
-
-    CSharedMemory shmMemory_st;
-    Buffer circBuffer_st;
 
     /**
      * @brief Main on/off switch for application.

@@ -1,114 +1,74 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <linux/types.h>
-#include <sys/ioctl.h>
-#include <stdint.h>
-#include <linux/spi/spidev.h>
-#include <time.h>
-#include <sys/time.h>
-#include "SimpleGPIO.h"
-#include <getopt.h>
 #include "SharedMemory.hpp"
 #include "CyclicBuffer.hpp"
+#include <iostream>
+#include <string>
+#include <unistd.h>
+#include <cstring>
+#include <cstdlib>
+#include <cstdio>
 
-#define SPI_PATH "/dev/spidev1.0"
+#define OVERHEAD_SIZE 3 
+#define BUFFER_SIZE 4 + OVERHEAD_SIZE
 
-// get distance from distance Arduino, performance/interrupt issues
-int compareDistance(unsigned int fd){
-        char a[3],startByte;
-        // SPI transaction starts with a zero
-        read(fd,&startByte,1);
-        if(startByte==0x0){
-                read(fd,&a,3);
-                fflush(stdout);
-                return (int)(0 << 24 | a[0] << 16 | a[1] << 8 | a[2]);
+
+using namespace std;
+
+
+int main(int argc, char* argv[])
+{
+
+    //Create circular buffer
+    try {
+
+        //Write data to shared mem if CLI argument1 is a 1
+        if(std::string(argv[1]) =="1") {
+            sleep(2);
+
+            //init shared memory
+            CSharedMemory shmMemory("/shm_di");
+            shmMemory.Create(BUFFER_SIZE, O_RDWR);
+            shmMemory.Attach(PROT_WRITE);
+            int* circBufferP = (int*)shmMemory.GetData();
+            Buffer circBuffer(BUFFER_SIZE, circBufferP, B_PRODUCER);
+
+            //Test shared mem
+            for(;;) {
+                char sTemp[10];
+                //If the program preivously have crashed this semaphore is not unlocked and the program hangs. To fix, remove file /shm/sem.semaphoreInit and run again
+                shmMemory.Lock();
+                int temp = rand()%100;
+                //printf("Writing: %d\n", temp);
+                circBuffer.write(temp);
+                shmMemory.UnLock();
+                sleep(2);
+            }
+
+
+        } else {
+            //init shared memory
+            CSharedMemory shmMemory("/shm_st");
+            shmMemory.Create(BUFFER_SIZE, O_RDWR);
+            shmMemory.Attach(PROT_WRITE);
+            int* circBufferP = (int*)shmMemory.GetData();
+            Buffer circBuffer(BUFFER_SIZE, circBufferP, B_CONSUMER);
+
+            for(;;) {
+                char sTemp[10];
+                shmMemory.Lock();
+                int values = circBuffer.getUnreadValues();
+                if (values > 0) {
+                    //printf("Reading");
+                    int value = circBuffer.read();
+                    //printf("---> %d\n",value);
+                }
+                shmMemory.UnLock();
+                sleep(4);
+            }
         }
-        else
-                return -1;// no data get
-        /*if (a[1] < 5 ){
-                return 50;// obstacle in front of the car, d
-        }else if ((a[1]-a[0]) > 20){
-                return 100;// obstacle on the left, turn right
-        }else if ((a[1]-a[2]) > 20){
-                 return 0;// obstacle on the right, turn left
-        }else
-                return 50;
-        */
+
+    }
+    catch (std::exception& ex) {
+        cout<<"Exception:"<<ex.what();
+    }
 
 }
-
-// SS init, all SS pins are ouput and high at the start point 
-void spiSSInit(int gpio1, int gpio2){
-        gpio_export(gpio1);
-        gpio_export(gpio2);
-
-        gpio_set_dir(gpio1, OUTPUT_PIN);
-        gpio_set_dir(gpio2, OUTPUT_PIN);
-
-        gpio_set_value(gpio1, HIGH);
-        gpio_set_value(gpio2, HIGH);
-}
-
-
-
-int main(){
-        unsigned int fd,i;
-
-        uint8_t bits=8, mode=0;
-        uint32_t speed=1000000;
-        int sentObject;
-        spiSSInit(60, 48);
-
-
-
-//---------------- Ask Jacob if this is ok ---------------------------------------------
-           CSharedMemory shmMemory_di("/testSharedmemory1");
-           shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
-           shmMemory_di.Attach(PROT_WRITE);
-           int* circBufferP_di = (int*)shmMemory_di.GetData();
-           Buffer circBuffer_di(BUFFER_SIZE, circBufferP_di, B_PRODUCER);
-
-           CSharedMemory shmMemory_st("/testSharedmemory2");
-           shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
-           shmMemory_st.Attach(PROT_WRITE);
-           int* circBufferP_st = (int*)shmMemory_st.GetData();
-           Buffer circBuffer_st(BUFFER_SIZE, circBufferP_st, B_CONSUMER);
-//-------------------------------------------------------------------------------------
-
-        fd = open(SPI_PATH, O_RDWR);
-        // SPI parameter setup
-        ioctl(fd, SPI_IOC_WR_MODE, &mode);
-        ioctl(fd, SPI_IOC_RD_MODE, &mode);
-        ioctl(fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
-        ioctl(fd, SPI_IOC_RD_BITS_PER_WORD, &bits);
-        ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
-        ioctl(fd, SPI_IOC_RD_MAX_SPEED_HZ, &speed);
-        while (1){
-                // get the value from distancce arduino
-                gpio_set_value(48, LOW);
-                sentObject = compareDistance(fd);
-                gpio_set_value(48, HIGH);
-
-		if (sentObject != -1) {
-                    // lock shared memory and write packet
-                    shmMemory_di.Lock();
-                    circBuffer_di.write(sentObject);
-                    shmMemory_di.UnLock();
-		}
-
-                // some other works need to be done.
-
-
-
-
-                usleep(500000); // half seconds
-
-        }
-        close(fd);
-        return 0;
-}
-
-
-
