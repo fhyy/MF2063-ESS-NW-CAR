@@ -26,15 +26,29 @@
  * this class also subscribes to distance events published by another application.
  * If the value of a distance event falls below a certain threshold, the motor service
  * publishes an "emergency break" event that other vsomeip applications may subscribe to.
- * @author Leon Fernandez & Jacob Kimblad
+ * @author Leon Fernandez 
  */
 class MotorSpeedService {
 public:
 
+    /**
+     * @brief Shared memory used for IPC between the speed sensor reader program and this class.
+     */
     CSharedMemory shm_sp;
+
+    /**
+     * @brief Cyclic buffer for keeping track of speed values in the shared memory.
+     */
     Buffer buf_sp;
 
+    /**
+     * @brief Shared memory used for IPC between this class and the motor control program.
+     */
     CSharedMemory shm_mo;
+
+    /**
+     * @brief Cyclic buffer for keeping track of requested motor values in the shared memory.
+     */
     Buffer buf_mo;
 
     /**
@@ -43,7 +57,7 @@ public:
      *        during each cycle.
      * @param min_dist The threshold value that determines when an emergency break
      *        event gets published
-     * @author Leon Fernandez & Jacob Kimblad
+     * @param skip_go Allows threads to ignore the value @ref go_. Only for testing purposes!
      */
     MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist, bool skip_go);
 
@@ -51,28 +65,24 @@ public:
      * @brief Initializer for a MotorSpeedService app/instance.
      * @return Returns true if the initialization was succesful, false otherwise
      *
-     * Initializes the MotorSpeed app by registering @ref on_state, @ref on_steer_req,
-     * @ref on_setmin_req, @ref on_go_availability, @ref on_dist_availability and @on_shutdown
+     * Initializes the MotorSpeed app by registering @ref on_state, @ref on_motor_req,
+     * @ref on_setmin_req, @ref on_go_availability, @ref on_dist_availability and @ref on_shutdown
      * as handlers for different vsomeip events. It also initializes @ref pub_sp_thread_.
-     * @author Leon Fernandez & Jacob Kimblad
      */
     bool init();
 
     /**
      * @brief Starts the application by registering it to the vsomeip runtime environment.
-     * @author Leon Fernandez
      */
     void start();
 
     /**
      * @brief Stops the application by joining all threads and deregistering from the vsomeip RTE
-     * @author Leon Fernandez
      */
     void stop();
 
     /**
      * @brief Getter so external entities can read the run_ member.
-     * @author Leon Fernandez
      */
     bool is_running();
 
@@ -155,12 +165,36 @@ private:
      * eternal loop. If the go-service is unavailable it spins around doing nothing.
      * If the go-service is available it publishes some data (preferably sensor data) and
      * then goes to sleep for a set amount of time.
-     * @author Leon Fernandez & Jacob Kimblad
      */
     void run_sp();
 
+    /**
+     * @brief Function that is called when a distance event is detected.
+     * @param msg vsomeip notification with distance sensor data
+     *
+     * Receives and analyzes distance sensor data. If the data is lower than
+     * @ref min_dist_ it publishes an embreak event.
+     */
     void on_dist_eve(const std::shared_ptr<vsomeip::message>& msg);
+
+    /**
+     * @brief Function that is called when a message with MOTOR_METHOD_ID arrives.
+     * @param msg vsomeip message with MOTOR_METHOD_ID and a payload representing the
+     *            desired speed.
+     *
+     * Unpacks and writes the received request data to a shared memory, which can then be
+     * read by the process controlling the motor.
+     */
     void on_motor_req(const std::shared_ptr<vsomeip::message>& msg);
+
+    /**
+     * @brief Function that is called when a message with SETMIN_METHOD_ID arrives.
+     * @param msg vsomeip message with SETMIN_METHOD_ID and a payload representing the
+     *            minimum distance before embreak events get published.
+     *
+     * Unpacks and sets @ref min_dist_ to the value of the payload. This allows the
+     * minimum distance threshold to be set remotely by another service.
+     */
     void on_setmin_req(const std::shared_ptr<vsomeip::message>& msg);
 
     /**
@@ -168,7 +202,6 @@ private:
      * @param msg vsomeip message with SHUTDOWN_METHOD_ID
      *
      * Shuts down the application and the entire program by calling @ref stop.
-     * @author Leon Fernandez
      */
     void on_shutdown(const std::shared_ptr<vsomeip::message>& msg);
 
@@ -181,7 +214,6 @@ private:
      * The go-service is a service made available by the central node (bbb-car-controller)
      * when that node has a preset number of services (ie when it has discovered all actuators).
      * The availability of the go-service basically works as a pause/play switch for this Class.
-     * @author Leon Fernandez
      */
     void on_go_availability(vsomeip::service_t serv, vsomeip::instance_t inst, bool go);
 
@@ -189,14 +221,12 @@ private:
      * @brief Function that is called when the availability of the distance-service changes.
      * @param serv ID of the service, should always be ==DIST_SERVICE_ID
      * @param inst ID of the specific service instance, should always be ==DIST_INSTANCE_ID
-     * @param go True if the service is available, false otherwise
+     * @param use_dist True if the service is available, false otherwise
      *
      * Sets @ref use_dist_ to true if the dist service is available. This allows the motor
      * service to get sensor data directly from the distance service and thereby raise
      * emergency break events.
-     * @author Leon Fernandez
      */
-
     void on_dist_availability(vsomeip::service_t serv, vsomeip::instance_t inst, bool use_dist);
 
     /**
@@ -206,7 +236,6 @@ private:
      * Upon succesful registration within the vsomeip runtime it offers the speed and
      * motor services (makes them available) and requests association with the go-server
      * and with the distance server.
-     * @author Leon Fernandez
      */
     void on_state(vsomeip::state_type_e state);
 };
