@@ -15,7 +15,7 @@ DistSteerService::DistSteerService(uint32_t di_sleep, bool skip_go) :
     skip_go_(skip_go),
     pub_di_sleep_(di_sleep)
 {
-    #if(DEBUG)
+    #if (DEBUG)
         std::cout << "## DEBUG ## dist_steer_service initializing consumer memory ## DEBUG ##"
                   << std::endl;
     #endif
@@ -31,7 +31,7 @@ DistSteerService::DistSteerService(uint32_t di_sleep, bool skip_go) :
     // gets a chance to initialize its consumers.
     sleep(2);
 
-    #if(DEBUG)
+    #if (DEBUG)
         std::cout << "## DEBUG ## dist_steer_service initializing producer memory ## DEBUG ##"
                   << std::endl;
     #endif
@@ -226,14 +226,14 @@ void DistSteerService::on_go_availability(vsomeip::service_t serv,
     if (GO_SERVICE_ID == serv && GO_INSTANCE_ID == inst) {
         if (go_ && !go) {
             go_ = false;
-            #if(DEBUG)
+            #if (DEBUG)
 	            std::cout << "## DEBUG ## dist_steer_service waiting for go-service ## DEBUG ##"
                           << std::endl;
             #endif
         }
         else if (!go_ && go) {
             go_ = true;
-            #if(DEBUG)
+            #if (DEBUG)
 	            std::cout << "## DEBUG ## dist_steer_service detected go-service ## DEBUG ##"
                           << std::endl;
             #endif
@@ -255,7 +255,7 @@ void DistSteerService::run_di() {
             cond_run_.wait(run_lk);
     }
 
-    #if(DEBUG)
+    #if (DEBUG)
         std::cout << "## DEBUG ## run_di thread entering thread loop ## DEBUG ##" << std::endl;
     #endif
 
@@ -268,7 +268,7 @@ void DistSteerService::run_di() {
         // Store values from shared memory in sensor_data.
         std::vector<int> sensor_data;
 
-        // Write to the shared memory.
+        // Read from the shared memory.
         shm_di.Lock();
         int unreadValues = buf_di.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
@@ -289,19 +289,20 @@ void DistSteerService::run_di() {
                 // First element of of vector is lowest 8 bits and so on.
                 byte = (sensor_data_latest >> j*8);
                 sensor_data_formatted.push_back(byte);
-
-                // Priority (0x0000=low, other=high) could be set here in a future implementation.
-                // sensor_data_formatted[3] = priority;
             }
+
+            // Priority (0x0000=low, other=high) could be set here in a future implementation.
+            // sensor_data_formatted[3] = priority;
 
             // Set data and publish it on the network.
             payload_->set_data(sensor_data_formatted);
             app_->notify(DIST_SERVICE_ID, DIST_INSTANCE_ID,
                          DIST_EVENT_ID, payload_, true, true);
+
             #if (DEBUG)
     	        std::cout << "## DEBUG ## Dist sensor data sent: (" << sensor_data_formatted[0] 
                           << ", " << sensor_data_formatted[1] << ", " << sensor_data_formatted[2]
-                          << ", " << sensor_data_formatted[4] << ") ## DEBUG ##" << std::endl;
+                          << ", " << sensor_data_formatted[3] << ") ## DEBUG ##" << std::endl;
             #endif
         }
 
@@ -319,7 +320,7 @@ void DistSteerService::run_di() {
  *#################################################################################################
  */
 
-// Take care of signal handling if vsomeip was built without signal handling. 
+// Take care of signal handling if vsomeip was built without signal handling.
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     DistSteerService *dss_ptr(nullptr);
 
@@ -336,7 +337,7 @@ int main(int argc, char** argv) {
     uint32_t di_sleep = 3000;
     bool skip_go = false;
 
-    // Flags for setting cmdline args.
+    // Flags for passing cmdline args.
     std::string sleep_flag("--sleep");
     std::string skip_go_flag("--skip-go"); // should only be used for testing and debugging
 

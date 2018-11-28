@@ -14,9 +14,9 @@ add_subdirectory(lib/shared_memory)
 include_directories("${PROJECT_SOURCE_DIR}/lib/simple_gpio")
 add_subdirectory(lib/simple_gpio) 
 
-add_executable(bbb-distance-steering "${PROJECT_SOURCE_DIR}/src/dist_steer_service.cpp")
-target_link_libraries(bbb-distance-steering vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
-install(TARGETS bbb-distance-steering DESTINATION bin)
+add_executable(dist-steer-service "${PROJECT_SOURCE_DIR}/src/dist_steer_service.cpp")
+target_link_libraries(dist-steer-service vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
+install(TARGETS dist-steer-service DESTINATION bin)
 
 add_executable(distance "${PROJECT_SOURCE_DIR}/src/distance.cpp")
 target_link_libraries(distance gpio cbuf shm pthread rt)
