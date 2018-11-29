@@ -37,7 +37,7 @@ ASSIGN
                     distance_high & speed_ok & camera_run & state = accelerating : constant_speed;
                     distance_high & speed_high & camera_run & state = accelerating : retarding;
                     -- state = constant_speed    
-                    distance_high & speed_ok & camera run & state = constant_speed: constant_speed;
+                    distance_high & speed_ok & camera_run & state = constant_speed: constant_speed;
                     distance_high & !speed_high & camera_run & state = constant_speed : accelerating;
                     distance_high & speed_high & camera_run & state = constant_speed : retarding;
                     -- state = retarding    
