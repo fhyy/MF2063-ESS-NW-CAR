@@ -45,10 +45,6 @@ void setMotorPWM(float dutyCycle)
 
   currentPWM = dutyCycle;
   
-  Serial.println(lastEncoderVal);
-  Serial.println(targetSpeed);
-  Serial.println(currentPWM);
-  Serial.println(errorSum);
   //Serial.println(ESC_MIN + (ESC_MAX - ESC_MIN)*dutyCycle);
 
   int pwm = (ESC_MIN + (ESC_MAX - ESC_MIN) * dutyCycle);
@@ -57,6 +53,10 @@ void setMotorPWM(float dutyCycle)
   }
   esc.writeMicroseconds(pwm);
   //Serial.println(pwm);
+  //Serial.println(lastEncoderVal);
+  //Serial.println(targetSpeed);
+  //Serial.println(currentPWM);
+  //Serial.println(errorSum);
 }
 
 bool readSpeed = 0;
@@ -69,6 +69,8 @@ void startSPI()
   SPSR |= (1 << SPIF); //SPI status register
   SPI.attachInterrupt();
   pinMode(MOSI, INPUT);
+
+  Serial.println("Spi set up!");
 }
 
 void setApproximationParameters()
@@ -79,88 +81,42 @@ void setApproximationParameters()
 
 ISR(SPI_STC_vect)
 {
-    while (!(SPSR & (1<<SPIF))){}; // Wait for the end of the transmission
-    byte spi_in = SPDR;
-    if(spi_in != 0){
-      Serial.print("Spi in: ");
-      Serial.println(spi_in);
-    }
-    if(spi_in < 0){
-      readSpeed = true;
-      readEncoder = false;
-    }else if(readSpeed){
-      
-      // Assume cm/s
-      targetSpeed = spi_in;
-      
-      readSpeed = false;
-      readEncoder = true;
-    }else if(readEncoder){
-      encoderValBeforeLast = lastEncoderVal;
+  //while (!(SPSR & (1<<SPIF))){}; // Wait for the end of the transmission
+  
+  byte spi_in = SPDR;//SPI.transfer(0);
+  Serial.print((spi_in&0x80)>>7);
+  Serial.print((spi_in&0x40)>>6);
+  Serial.print((spi_in&0x20)>>5);
+  Serial.print((spi_in&0x10)>>4);
+  Serial.print(" ");
+  Serial.print((spi_in&0x08)>>3);
+  Serial.print((spi_in&0x04)>>2);
+  Serial.print((spi_in&0x02)>>1);
+  Serial.print(spi_in&0x01);
+  Serial.println();
+  if(spi_in & 0x80){
+    // Assume cm/s
+    lastEncoderVal = spi_in;
+  }else{
+    // Assume cm/s
+    targetSpeed = spi_in;
+  }
+ 
+	Serial.print("One: ");
+  Serial.println((int)targetSpeed);
+	Serial.print("Two: ");
+  Serial.println((int)lastEncoderVal);
+	
+	// Variables used for predicting speed change
+	float timeDiff = ((float)millis()-timeLastEncoderUpdate)/1000.0;
+	timeBeforeLastEncoder = timeSinceLastEncoder;
+	timeSinceLastEncoder = timeDiff;
+	pwmBeforeLastEncoderVal = pwmLastEncoderVal;
+	pwmLastEncoderVal = currentPWM;
 
-      // Assume cm/s
-      lastEncoderVal = spi_in;
-      
-      if(timeLastEncoderUpdate == 0){
-        timeLastEncoderUpdate = millis();
-        delay(1);
-      }
-      float timeDiff = ((float)millis()-timeLastEncoderUpdate)/1000.0;
-      timeBeforeLastEncoder = timeSinceLastEncoder;
-      timeSinceLastEncoder = timeDiff;
-      pwmBeforeLastEncoderVal = pwmLastEncoderVal;
-      pwmLastEncoderVal = currentPWM;
-
-      setApproximationParameters();
-      
-      readSpeed = true;
-      readEncoder = false;
-      timeLastEncoderUpdate = millis();
-    }
-} // end of interrupt routine
-
-// simulated SPI interrupt routine
-void s_ISR(byte data) //ISR(SPI_STC_vect)
-{
-    byte spi_in = data;
-    Serial.print("Simulated Spi in: ");
-    Serial.println(spi_in);
-    if(spi_in == 0){
-      readSpeed = true;
-      readEncoder = false;
-    }else if(readSpeed){
-      
-      // Assume cm/s
-      targetSpeed = spi_in-1;
-      Serial.print("targetSpeed: ");
-      Serial.println(targetSpeed);
-      readSpeed = false;
-      readEncoder = true;
-    }else if(readEncoder){
-      encoderValBeforeLast = lastEncoderVal;
-
-      // Assume cm/s
-      lastEncoderVal = spi_in-1;
-      Serial.print("encoderVal: ");
-      Serial.println(lastEncoderVal);
-      if(timeLastEncoderUpdate == 0){
-        timeLastEncoderUpdate = millis();
-        delay(1);
-      }
-      float timeDiff = ((float)millis()-timeLastEncoderUpdate)/1000.0;
-      timeBeforeLastEncoder = timeSinceLastEncoder;
-      timeSinceLastEncoder = timeDiff;
-      pwmBeforeLastEncoderVal = pwmLastEncoderVal;
-      pwmLastEncoderVal = currentPWM;
-
-      //setApproximationParameters();
-      
-      readSpeed = false;
-      readEncoder = false;
-
-      timeLastEncoderUpdate = millis();
-    }
-} // end of interrupt routine
+	setApproximationParameters();
+	timeLastEncoderUpdate = millis();
+}
 
 char setupComplete = 0;
 void setupAndCallibrateESC()
@@ -195,9 +151,9 @@ void setup()
   delay(100);
   setMotorPWM(0.0f);
   delay(100);
-  startSPI();
-
   Serial.begin(9600);
+  Serial.println("Serial started");
+  startSPI();
 }
 
 unsigned long time_last;
@@ -214,19 +170,11 @@ void loop()
   time_new = millis();
   float timeDiffS = ((float)(time_new-time_last))/1000;
 
-  // PID controlling
+  // Forecasting speed change
   //float pwmDiffPerCycleNow = (pwmLastEncoderVal-currentPWM)/(timeSinceLastEncoder+0.01);
   byte approximateEncoderVal = lastEncoderVal; // + (timeSinceLastEncoder * encoderDiffPerPWMCycle * pwmDiffPerCycleNow);
-
-  /*Serial.println("---------------------");
-  Serial.print("encoderDiffPerPWMCycle: ");
-  Serial.println(encoderDiffPerPWMCycle);
-  Serial.print("pwmDiffPerCycleNow: ");
-  Serial.println(pwmDiffPerCycleNow);
-  Serial.print("approximateEncoderVal: ");
-  Serial.println(approximateEncoderVal);
-  Serial.println("=====================");*/
   
+  // PID controlling
   float error = ((float)(targetSpeed - approximateEncoderVal));
   errorSum += error*timeDiffS;
   currentPWM = error*PID_P + errorSum*PID_I;
@@ -234,12 +182,5 @@ void loop()
 
   time_last = time_new;
 
-  // Simulation!
-  /*if(millis()-timeLastEncoderUpdate > 3000 + random(1000)){
-    s_ISR(0);
-    s_ISR(20+random(80)+1);
-    s_ISR(targetSpeed - random(40)+1);
-    timeLastEncoderUpdate = millis();
-  }*/
   delay(10);
 }

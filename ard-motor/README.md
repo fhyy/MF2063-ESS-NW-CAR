@@ -25,13 +25,12 @@ _Note: The car can only go forwards_
 ## SPI interface
 __Stream__  
 
-|Byte 1|Byte 2|
-|:---:|:---:|
-|TargetSpeed|CurrentSpeed|
+|Byte 1|  
+|:---:|  
+|TargetSpeed or CurrentSpeed|  
 
 __Variable definition__  
 
 |Name|Range|Description|  
 |:---:|:---:|:---|  
-|TargetSpeed|(0,255)|The target speed in cm/s|  
-|CurrentSped|(0,255)|The latest encoder readings in cm/s|  
+|TargetSpeed/CurrentSped|[Bit 0 --> 7] (0,125) |(Bit 8 = 0):The target speed in cm/s / (Bit 8 = 1): The latest encoder readings in cm/s|  
