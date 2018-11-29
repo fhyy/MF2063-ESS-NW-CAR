@@ -54,6 +54,9 @@ int main() {
 
     sleep(1);
 
+    std::cout << "@@@@@@@@ Attempting to shutdown: " << (int) c << std::endl;
+    proto.setSpeed(c);
+
     std::cout << "@@@@@@@@ Ending test suite" << std::endl;
 
 	return 0;
