@@ -272,7 +272,7 @@ void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg
                         true, true);
         #if (DEBUG)
         	std::cout << "## DEBUG ## Embreak event sent! Min distance threshold: " << (int) min_dist_ 
-                      << "## DEBUG ##" << std::endl;
+                      << " ## DEBUG ##" << std::endl;
         #endif
     }
 }
