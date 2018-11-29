@@ -180,6 +180,10 @@ void ESSPrototype::setMinDistance(char d, bool prio) {
     shm_setmin.UnLock();
 }
 
+void ESSPrototype::setMinDistance(char d) {
+    setMinDistance(d, false);
+}
+
 char ESSPrototype::getSpeed() {
     std::vector<int> data;
     shm_sp.Lock();
