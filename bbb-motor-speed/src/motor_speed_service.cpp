@@ -34,7 +34,7 @@ MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist, bool s
     sleep(2);
 
     #if (DEBUG)
-        std::cout << "## DEBUG ## dist_steer_service initializing producer memory ## DEBUG ##"
+        std::cout << "## DEBUG ## motor_speed_service initializing producer memory ## DEBUG ##"
                   << std::endl;
     #endif
 
@@ -290,7 +290,9 @@ void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &ms
     int req = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
 
     #if (DEBUG)
-        std::cout << "## DEBUG ## Got motor request!! Data: " << req << "## DEBUG ##" << std::endl;
+        std::cout << "## DEBUG ## Got motor request!! Data: (" << (int) data[0]
+                  << ", " << data[1] << ", " << data[2] << ", " << data[3]
+                  << ") ## DEBUG ##" << std::endl;
     #endif
 
     // Write to shared memory
@@ -313,7 +315,7 @@ void MotorSpeedService::on_setmin_req(const std::shared_ptr<vsomeip::message> &m
     min_dist_ = msg->get_payload()->get_data()[0];
 
     #if (DEBUG)
-        std::cout << "## DEBUG ## Got setmin request!! Current distance threshold: " << min_dist_
+        std::cout << "## DEBUG ## Got setmin request!! New distance threshold: " << min_dist_
                   << "## DEBUG ##" << std::endl;
     #endif
 }
@@ -324,6 +326,9 @@ void MotorSpeedService::on_setmin_req(const std::shared_ptr<vsomeip::message> &m
  *-------------------------------------------------------------------------------------------------
  */
 void MotorSpeedService::on_shutdown(const std::shared_ptr<vsomeip::message>& msg) {
+    #if (DEBUG)
+        std::cout << "## DEBUG ## motor_speed_service shutting down! ## DEBUG ##" << std::endl;
+    #endif
     stop();
 }
 
@@ -458,7 +463,7 @@ void MotorSpeedService::run_sp() {
     MotorSpeedService *mss_ptr(nullptr);
 
     void handle_signal(int signal) {
-        std::cout << "Interrupt signal: " << signal << std::endl;
+        std::cout << " ## SIGNAL ## Interrupt signal: " << signal << " ## SIGNAL ##" <<std::endl;
         if (mss_ptr != nullptr &&
                 (signal == SIGINT || signal == SIGTERM))
             mss_ptr->stop();

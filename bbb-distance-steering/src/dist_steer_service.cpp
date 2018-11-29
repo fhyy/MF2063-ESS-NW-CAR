@@ -188,7 +188,9 @@ void DistSteerService::on_steer_req(const std::shared_ptr<vsomeip::message> &msg
     int req = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
 
     #if (DEBUG)
-        std::cout << "## DEBUG ## Got steer request!! Data: " << req << "## DEBUG ##" << std::endl;
+        std::cout << "## DEBUG ## Got steer request!! Data: (" << (int) data[0]
+                  << ", " << data[1] << ", " << data[2] << ", " << data[3]
+                  << ") ## DEBUG ##" << std::endl;
     #endif
 
     // Write to shared memory.
@@ -325,7 +327,7 @@ void DistSteerService::run_di() {
     DistSteerService *dss_ptr(nullptr);
 
     void handle_signal(int signal) {
-        std::cout << "Interrupt signal: " << signal << std::endl;
+        std::cout << " ## SIGNAL ## Interrupt signal: " << signal << " ## SIGNAL ##" <<std::endl;
         if (dss_ptr != nullptr &&
                 (signal == SIGINT || signal == SIGTERM))
             dss_ptr->stop();
