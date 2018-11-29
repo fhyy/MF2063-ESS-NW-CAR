@@ -189,7 +189,7 @@ void DistSteerService::on_steer_req(const std::shared_ptr<vsomeip::message> &msg
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Got steer request!! Data: (" << (int) data[0]
-                  << ", " << data[1] << ", " << data[2] << ", " << data[3]
+                  << ", " << (int) data[1] << ", " << (int) data[2] << ", " << (int) data[3]
                   << ") ## DEBUG ##" << std::endl;
     #endif
 
@@ -302,9 +302,12 @@ void DistSteerService::run_di() {
                          DIST_EVENT_ID, payload_, true, true);
 
             #if (DEBUG)
-    	        std::cout << "## DEBUG ## Dist sensor data sent: (" << sensor_data_formatted[0] 
-                          << ", " << sensor_data_formatted[1] << ", " << sensor_data_formatted[2]
-                          << ", " << sensor_data_formatted[3] << ") ## DEBUG ##" << std::endl;
+    	        std::cout << "## DEBUG ## Dist sensor data sent: ("
+                          << (int) sensor_data_formatted[0] 
+                          << ", " << (int) sensor_data_formatted[1]
+                          << ", " << (int) sensor_data_formatted[2]
+                          << ", " << (int) sensor_data_formatted[3]
+                          << ") ## DEBUG ##" << std::endl;
             #endif
         }
 

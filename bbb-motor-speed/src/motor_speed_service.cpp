@@ -248,9 +248,9 @@ void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg
     vsomeip::byte_t *data = msg->get_payload()->get_data();
 
     #if (DEBUG)
-        std::cout << "## DEBUG ## Dist sensor data received by motor_speed_service: (" << data[0] 
-                  << ", " << data[1] << ", " << data[2]
-                  << ", " << data[3] << ") ## DEBUG ##" << std::endl;
+        std::cout << "## DEBUG ## Dist sensor data received by motor_speed_service: (" << (int) data[0] 
+                  << ", " << (int) data[1] << ", " << (int) data[2]
+                  << ", " << (int) data[3] << ") ## DEBUG ##" << std::endl;
     #endif
 
     // If any sensor value falls below distance threshold create and send an embreak packet
@@ -271,7 +271,7 @@ void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg
                         payload,
                         true, true);
         #if (DEBUG)
-        	std::cout << "## DEBUG ## Embreak event sent! Min distance threshold: " << min_dist_ 
+        	std::cout << "## DEBUG ## Embreak event sent! Min distance threshold: " << (int) min_dist_ 
                       << "## DEBUG ##" << std::endl;
         #endif
     }
@@ -291,7 +291,7 @@ void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &ms
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Got motor request!! Data: (" << (int) data[0]
-                  << ", " << data[1] << ", " << data[2] << ", " << data[3]
+                  << ", " << (int) data[1] << ", " << (int) data[2] << ", " << (int) data[3]
                   << ") ## DEBUG ##" << std::endl;
     #endif
 
@@ -315,7 +315,7 @@ void MotorSpeedService::on_setmin_req(const std::shared_ptr<vsomeip::message> &m
     min_dist_ = msg->get_payload()->get_data()[0];
 
     #if (DEBUG)
-        std::cout << "## DEBUG ## Got setmin request!! New distance threshold: " << min_dist_
+        std::cout << "## DEBUG ## Got setmin request!! New distance threshold: " << (int) min_dist_
                   << "## DEBUG ##" << std::endl;
     #endif
 }
@@ -438,9 +438,12 @@ void MotorSpeedService::run_sp() {
                          SPEED_EVENT_ID, payload_, true, true);
 
             #if (DEBUG)
-    	        std::cout << "## DEBUG ## Speed sensor data sent: (" << sensor_data_formatted[0] 
-                          << ", " << sensor_data_formatted[1] << ", " << sensor_data_formatted[2]
-                          << ", " << sensor_data_formatted[3] << ") ## DEBUG ##" << std::endl;
+    	        std::cout << "## DEBUG ## Speed sensor data sent: ("
+                          << (int) sensor_data_formatted[0] 
+                          << ", " << (int) sensor_data_formatted[1]
+                          << ", " << (int) sensor_data_formatted[2]
+                          << ", " << (int) sensor_data_formatted[3]
+                          << ") ## DEBUG ##" << std::endl;
             #endif
         }
 
