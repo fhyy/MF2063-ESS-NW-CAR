@@ -19,12 +19,12 @@ int main() {
     sleep(1);
     std::cout << "@@@@@@@@ Checking camera sensor: " << proto.checkCameraSensor() << std::endl;
     sleep(1);
-    std::cout << "@@@@@@@@ Attempting to get speed: " << proto.getSpeed() << std::endl;
+    std::cout << "@@@@@@@@ Attempting to get speed: " << (int) proto.getSpeed() << std::endl;
     sleep(1);
-    std::cout << "@@@@@@@@ Attempting to get distance: " << proto.getDistance() << std::endl;
+    std::cout << "@@@@@@@@ Attempting to get distance: " << (int) proto.getDistance() << std::endl;
     sleep(1);
 
-    char c = 87;
+    unsigned char c = 87;
     std::cout << "@@@@@@@@ Attempting to set min distance: " << (int) c << std::endl;
     proto.setMinDistance(c);
 

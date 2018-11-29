@@ -4,6 +4,8 @@
 
 ESSPrototype::ESSPrototype() :
     service_status_(0),
+    dist_latest_(0),
+    speed_latest_(0), // TODO flag_latest_
     shm_sp(CSharedMemory("/shm_sp")),
     shm_di(CSharedMemory("/shm_di")),
     shm_go(CSharedMemory("/shm_go")),
@@ -143,12 +145,17 @@ void ESSPrototype::setMinDistance(char d) {
 
 char ESSPrototype::getSpeed() {
     std::vector<int> data;
+
     shm_sp.Lock();
     int unreadValues = buf_sp.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
         data.push_back(buf_sp.read());
     shm_sp.UnLock();
-    return (char) data.back();
+
+    if (data.size() > 0)
+        speed_latest_ = (unsigned char) data.back();
+
+    return speed_latest_;
 }
 
 char ESSPrototype::getDistance() {
@@ -159,14 +166,18 @@ char ESSPrototype::getDistance() {
         data.push_back(buf_di.read());
     shm_di.UnLock();
 
-    int latest_i = data.back();
-    char *latest = (char*) &latest_i; //TODO does this work?
-    if (latest[0] < latest[1] && latest[0] < latest[2])
-        return (char) data[0];
-    else if (latest[1] < latest[0] && latest[1] < latest[2])
-        return (char) data[1];
-    else // latest[2] is smallest
-        return (char) data[2];
+    if (data.size() > 0) {
+        int latest_i = data.back();
+        char *latest = (char*) &latest_i; //TODO does this work?
+        if (latest[0] < latest[1] && latest[0] < latest[2])
+            dist_latest_ = (char) latest[0];
+        else if (latest[1] < latest[0] && latest[1] < latest[2])
+            dist_latest_ = latest[1];
+        else // latest[2] is smallest
+            dist_latest_ = latest[2];
+    }
+
+    return dist_latest_;
 }
 
 /*Flag ESSPrototype::getFlag() {

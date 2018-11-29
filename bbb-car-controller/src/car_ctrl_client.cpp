@@ -165,7 +165,9 @@ void CarCTRLClient::stop() {
 void CarCTRLClient::update_go_status() {
     if (!run_)
         return;
-    else if (is_ava_di_ && is_ava_st_ && is_ava_mo_ && is_ava_sp_) {
+    else if (is_ava_di_ && is_ava_st_ &&
+             is_ava_mo_ && is_ava_sp_ &&
+             is_ava_cam_) {
         go_ = true;
         app_->offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
@@ -176,18 +178,19 @@ void CarCTRLClient::update_go_status() {
 
     // error here
     int mo_onehot = 0x00000001;
-    int st_onehot = 0x00000010;
-    int sp_onehot = 0x00000100;
-    int di_onehot = 0x00001000;
-    int service_status = mo_onehot && is_ava_mo_ ||
-                         st_onehot && is_ava_st_ ||
-                         sp_onehot && is_ava_sp_ ||
-                         di_onehot && is_ava_mo_; // TODO add camera
+    int st_onehot = 0x00000002;
+    int sp_onehot = 0x00000004;
+    int di_onehot = 0x00000008;
+    int cam_onehot = 0x00000010;
+    int service_status = mo_onehot & is_ava_mo_ |
+                         st_onehot & is_ava_st_ |
+                         sp_onehot & is_ava_sp_ |
+                         di_onehot & is_ava_mo_ |
+                         cam_onehot & is_ava_cam_;
 
-    // TODO fix error caused by these lines
-    /*shm_go.Lock();
+    shm_go.Lock();
     buf_go.write(service_status);
-    shm_go.UnLock();*/
+    shm_go.UnLock();
 }
 
 /*

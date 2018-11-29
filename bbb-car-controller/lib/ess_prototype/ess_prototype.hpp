@@ -213,7 +213,9 @@ public:
 private:
 
     int service_status_;
-
+    unsigned char dist_latest_;
+    unsigned char speed_latest_;
+    // TODO flag_latest_
 };
 
 #endif
