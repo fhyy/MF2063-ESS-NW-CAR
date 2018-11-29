@@ -231,7 +231,7 @@ void CarCTRLClient::send_motor_req() {
         if (req_data.size() > 0) {
 
             // Use only newest request value for transmission.
-            int req_data_latest = req_data.back();
+            unsigned int req_data_latest = req_data.back();
 
             // Turn int into std::vector of four vsomeip::byte_t.
             std::vector<vsomeip::byte_t> req_data_formatted;
@@ -239,7 +239,7 @@ void CarCTRLClient::send_motor_req() {
             for (int j=0; j<4; j++) {
 
                 // First element of of vector is lowest 8 bits and so on.
-                byte = (req_data_latest >> j*8);
+                byte = (req_data_latest >> j*8) & 0xFF;
                 req_data_formatted.push_back(byte);
             }
 
@@ -322,7 +322,7 @@ void CarCTRLClient::send_steer_req() {
             for (int j=0; j<4; j++) {
 
                 // First element of of vector is lowest 8 bits and so on.
-                byte = (req_data_latest >> j*8);
+                byte = (req_data_latest >> j*8) & 0xFF;
                 req_data_formatted.push_back(byte);
             }
 
@@ -406,7 +406,7 @@ void CarCTRLClient::send_setmin_req() {
             for (int j=0; j<4; j++) {
 
                 // First element of of vector is lowest 8 bits and so on.
-                byte = (req_data_latest >> j*8);
+                byte = (req_data_latest >> j*8) & 0xFF;
                 req_data_formatted.push_back(byte);
             }
 
@@ -532,7 +532,7 @@ void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
 
     // Turn the four-element data packet into an int before writing
-    int sensor_data = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
+    int sensor_data = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Dist sensor data received by car_ctrl_client: (" << (int) data[0] 
@@ -556,7 +556,7 @@ void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
 
     // Turn the four-element data packet into an int before writing
-    int sensor_data = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
+    int sensor_data = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Speed sensor data received by car_ctrl_client: ("
@@ -581,7 +581,7 @@ void CarCTRLClient::on_cam_eve(const std::shared_ptr<vsomeip::message> &msg) {
     vsomeip::byte_t *data = msg->get_payload()->get_data();
 
     // Turn the four-element data packet into an int before writing
-    int sensor_data = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
+    int sensor_data = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Camera data received by car_ctrl_client ## DEBUG ##"
@@ -615,7 +615,7 @@ void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg)
     send_req(dummy_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
 
     #if (DEBUG)
-        std::cout << "## DEBUG ## Shutdown requests sent to motor service! ## DEBUG ##"
+        std::cout << "## DEBUG ## Shutdown request sent to motor service! ## DEBUG ##"
                   << std::endl;
     #endif
 

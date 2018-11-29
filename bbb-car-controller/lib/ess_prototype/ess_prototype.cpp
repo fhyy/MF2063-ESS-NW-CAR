@@ -5,7 +5,8 @@
 ESSPrototype::ESSPrototype() :
     service_status_(0),
     dist_latest_(0),
-    speed_latest_(0), // TODO flag_latest_
+    speed_latest_(0),
+    flag_latest_(Flag()),
     shm_sp(CSharedMemory("/shm_sp")),
     shm_di(CSharedMemory("/shm_di")),
     shm_go(CSharedMemory("/shm_go")),
@@ -72,7 +73,7 @@ ESSPrototype::ESSPrototype() :
 }
 
 void ESSPrototype::shutdown(bool prio) {
-    int data = 1 | ((prio && 0xFF) << 24);
+    int data = 1 | (prio && 0xFF << 24);
     shm_shutdown.Lock();
     buf_shutdown.write(data);
     shm_shutdown.UnLock();
@@ -103,7 +104,7 @@ bool ESSPrototype::checkCameraSensor() {
 }
 
 void ESSPrototype::setSpeed(char s, char a, bool prio) {
-    int data = s | (a<<8) | ((prio && 0xFF) << 24);
+    int data = s | (a<<8) | (prio && 0xFF << 24);
     shm_mo.Lock();
     buf_mo.write(data);
     shm_mo.UnLock();
@@ -122,7 +123,7 @@ void ESSPrototype::setSpeed(char s) {
 }
 
 void ESSPrototype::setDirection(char d, bool prio) {
-    int data = d | ((prio && 0xFF) << 24);
+    int data = d | (prio && 0xFF << 24);
     shm_st.Lock();
     buf_st.write(data);
     shm_st.UnLock();
@@ -143,57 +144,101 @@ void ESSPrototype::setMinDistance(char d) {
     setMinDistance(d, false);
 }
 
-char ESSPrototype::getSpeed() {
+unsigned char ESSPrototype::getSpeed() {
+    // Place to store the read data.
     std::vector<int> data;
 
+    // Read all values in the buffer in the shared memory.
     shm_sp.Lock();
     int unreadValues = buf_sp.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
         data.push_back(buf_sp.read());
     shm_sp.UnLock();
 
+    // If data was read.
     if (data.size() > 0)
+        // Set the latest known speed value to the last value read in the buffer,
+        // which should also be the most recent value.
         speed_latest_ = (unsigned char) data.back();
 
+    // Return the latest known speed value
     return speed_latest_;
 }
 
-char ESSPrototype::getDistance() {
+unsigned char ESSPrototype::getDistance() {
+    // Place to store the read data.
     std::vector<int> data;
+
+    // Read all values in the buffer in the shared memory.
     shm_di.Lock();
     int unreadValues = buf_di.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
         data.push_back(buf_di.read());
     shm_di.UnLock();
 
+    // If data was read.
     if (data.size() > 0) {
-        int latest_i = data.back();
-        char *latest = (char*) &latest_i; //TODO does this work?
-        if (latest[0] < latest[1] && latest[0] < latest[2])
-            dist_latest_ = (char) latest[0];
-        else if (latest[1] < latest[0] && latest[1] < latest[2])
-            dist_latest_ = latest[1];
-        else // latest[2] is smallest
-            dist_latest_ = latest[2];
+        // Set the latest known distance values to the last values read in the buffer,
+        // which should also be the most recent values.
+        unsigned int dist_latest_ = data.back();
     }
 
-    return dist_latest_;
+    // Each value in the buffer represents three sensor values,
+    // in this function, the smallest is returned.
+    unsigned char s1 = dist_latest_ & 0xFF;
+    unsigned char s2 = (dist_latest_ >> 8) & 0xFF;
+    unsigned char s3 = (dist_latest_ >> 16) & 0xFF;
+    if (s1 < s2 && s1 < s3)
+        return s1;
+
+    else if (s2 < s1 && s2 < s3)
+        return s2;
+
+    else // s3 is smallest
+        return s3;
 }
 
-/*Flag ESSPrototype::getFlag() {
+Flag ESSPrototype::getFlag() {
+    // Place to store the read data.
     std::vector<int> data;
-    shm_di.Lock();
-    int unreadValues = buf_di.getUnreadValues();
+
+    // Read all values in the buffer in the shared memory.
+    shm_cam.Lock();
+    int unreadValues = buf_cam.getUnreadValues();
     for (int i=0; i<unreadValues; i++)
-        data.push_back(buf_di.read());
-    shm_di.UnLock();
+        data.push_back(buf_cam.read());
+    shm_cam.UnLock();
 
-    int latest = data.back();
+    // If data was read.
+    if (data.size() > 0) {
 
-    TODO decode latest and create flag object
+        // Set the latest known flag info to the last values read in the buffer,
+        // which should also be the most recent values.
+        int latest = data.back();
 
-    return flag;
-}*/
+        // Initialize the flag object that will be returned.
+        Flag f;
+
+        // Decode color of flag based on value in first position (10^0)
+        if (latest/10 == 1)
+            f.col = Flag::Red;
+        else if (latest/10 == 2)
+            f.col = Flag::Green;
+        else if (latest/10 == 3)
+            f.col = Flag::Yellow;
+
+        // Decode position of flag based on value in second position (10^1)
+        if (latest%10 == 1)
+            f.pos = Flag::Left;
+        else if (latest%10 == 2)
+            f.pos = Flag::Right;
+        else if (latest%10 == 3)
+            f.pos = Flag::Middle;
+
+        flag_latest_ = f;
+    }
+    return flag_latest_;
+}
 
 bool ESSPrototype::getGoStatus() {
     std::vector<int> data;

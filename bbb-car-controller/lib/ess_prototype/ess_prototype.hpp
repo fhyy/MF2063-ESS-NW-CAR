@@ -14,8 +14,25 @@
 
 class Flag {
 public:
-    std::string color;
-    std::string position;
+
+    Flag() : col(Null_Color), pos(Null_Position) {}
+
+    enum Color {
+        Red,
+        Green,
+        Yellow,
+        Null_Color
+    };
+
+    enum Position {
+        Left,
+        Right,
+        Middle,
+        Null_Position
+    };
+
+    Color col;
+    Position pos;    
 };
 
 // TODO overload methods so that prio does not have to be passed
@@ -183,7 +200,7 @@ public:
      *
      *
      */
-    char getSpeed();
+    unsigned char getSpeed();
 
     /**
      * @brief
@@ -191,7 +208,7 @@ public:
      *
      *
      */
-    char getDistance();
+    unsigned char getDistance();
 
     /**
      * @brief
@@ -215,7 +232,7 @@ private:
     int service_status_;
     unsigned char dist_latest_;
     unsigned char speed_latest_;
-    // TODO flag_latest_
+    Flag flag_latest_;
 };
 
 #endif

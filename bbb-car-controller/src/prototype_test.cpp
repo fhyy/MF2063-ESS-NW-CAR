@@ -24,6 +24,32 @@ int main() {
     std::cout << "@@@@@@@@ Attempting to get distance: " << (int) proto.getDistance() << std::endl;
     sleep(1);
 
+    std::cout << "@@@@@@@@ Attempting to get flag info... " << std::endl;
+    std::string msg("(");
+    Flag f = proto.getFlag();
+    switch (f.col) {
+        case Flag::Red : msg += "Red, ";
+                         break;
+        case Flag::Green : msg += "Green, ";
+                           break;
+        case Flag::Yellow : msg += "Yellow, ";
+                            break;
+        default : msg += "No color, ";
+                  break;
+    }
+    switch (f.pos) {
+        case Flag::Left : msg += "Left)";
+                          break;
+        case Flag::Green : msg += "Right)";
+                           break;
+        case Flag::Yellow : msg += "Middle)";
+                            break;
+        default : msg += "No position)";
+                  break;
+    }
+    std::cout << "@@@@@@@@ Flag info: " + msg << std::endl;
+    sleep(1);
+
     unsigned char c = 87;
     std::cout << "@@@@@@@@ Attempting to set min distance: " << (int) c << std::endl;
     proto.setMinDistance(c);
@@ -44,7 +70,7 @@ int main() {
 
     c = 200;
     std::cout << "@@@@@@@@ Attempting to set speed: " << (int) c << std::endl;
-    proto.setSpeed(c);
+    proto.setSpeed(c, (char) 70);
 
     sleep(1);
 
@@ -55,7 +81,7 @@ int main() {
     sleep(1);
 
     std::cout << "@@@@@@@@ Attempting to shutdown: " << (int) c << std::endl;
-    proto.setSpeed(c);
+    proto.shutdown();
 
     std::cout << "@@@@@@@@ Ending test suite" << std::endl;
 
