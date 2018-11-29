@@ -41,15 +41,25 @@ public:
 
     /**
      * @brief
-     * @param ccc
      *
      *
      */
     ESSPrototype();
 
-    //TODO bool boot();
-
+    /**
+     * @brief
+     *
+     *
+     */
     void shutdown();
+
+    /**
+     * @brief
+     * @param prio
+     *
+     *
+     */
+    void shutdown(bool prio);
 
     /**
      * @brief
@@ -89,13 +99,28 @@ public:
      *
      *
      */
+    bool checkCameraSensor();
+
+    /**
+     * @brief
+     * @param d
+     * @param prio
+     *
+     */
     void setMinDistance(char d, bool prio);
+
+    /**
+     * @brief
+     * @param d
+     *
+     *
+     */
+    void setMinDistance(char d);
 
     /**
      * @brief
      * @param s
      * @param prio
-     * @return
      *
      *
      */
@@ -104,9 +129,16 @@ public:
     /**
      * @brief
      * @param s
+     *
+     *
+     */
+    void setSpeed(char s);
+
+    /**
+     * @brief
+     * @param s
      * @param a
      * @param prio
-     * @return
      *
      *
      */
@@ -114,13 +146,29 @@ public:
 
     /**
      * @brief
+     * @param s
+     * @param a
+     *
+     *
+     */
+    void setSpeed(char s, char a);
+
+    /**
+     * @brief
      * @param d
      * @param prio
-     * @return
      *
      *
      */
     void setDirection(char d, bool prio);
+
+    /**
+     * @brief
+     * @param d
+     *
+     *
+     */
+    void setDirection(char d);
 
     /**
      * @brief

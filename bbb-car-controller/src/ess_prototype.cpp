@@ -57,11 +57,15 @@ ESSPrototype::ESSPrototype() :
 
 //TODO bool EssPrototype::boot() {}
 
-void ESSPrototype::shutdown() {
-    int data = 1;
+void ESSPrototype::shutdown(bool prio) {
+    int data = 1 | ((prio && 0xFF) << 24);
     shm_shutdown.Lock();
     buf_shutdown.write(data);
     shm_shutdown.UnLock();
+}
+
+void ESSPrototype::shutdown() {
+    shutdown(false);
 }
 
 bool ESSPrototype::checkMotor() {
@@ -76,8 +80,7 @@ bool ESSPrototype::checkMotor() {
 
     service_status_ = data.back();
 
-    return service_status_ && mo_mask;
-    //TODO make sure last element is the latest
+    return service_status_ & mo_mask;
 }
 
 bool ESSPrototype::checkSpeedSensor() {
@@ -92,8 +95,7 @@ bool ESSPrototype::checkSpeedSensor() {
 
     service_status_ = data.back();
 
-    return service_status_ && sp_mask;
-    //TODO make sure last element is the latest
+    return service_status_ & sp_mask;
 }
 
 bool ESSPrototype::checkSteering() {
@@ -108,8 +110,7 @@ bool ESSPrototype::checkSteering() {
 
     service_status_ = data.back();
 
-    return service_status_ && st_mask;
-    //TODO make sure last element is the latest
+    return service_status_ & st_mask;
 }
 
 bool ESSPrototype::checkDistanceSensor() {
@@ -124,30 +125,56 @@ bool ESSPrototype::checkDistanceSensor() {
 
     service_status_ = data.back();
 
-    return service_status_ && di_mask;
-    //TODO make sure last element is the latest
+    return service_status_ & di_mask;
+}
+
+bool ESSPrototype::checkCameraSensor() {
+    int cam_mask = 0x00010000;
+    std::vector<int> data;
+
+    shm_go.Lock();
+    int unreadValues = buf_go.getUnreadValues();
+    for (int i=0; i<unreadValues; i++)
+        data.push_back(buf_go.read());
+    shm_go.UnLock();
+
+    service_status_ = data.back();
+
+    return service_status_ & cam_mask;
 }
 
 void ESSPrototype::setSpeed(char s, bool prio) {
     ESSPrototype::setSpeed(s, 0, prio);
 }
 
+void ESSPrototype::setSpeed(char s) {
+    ESSPrototype::setSpeed(s, 0, false);
+}
+
 void ESSPrototype::setSpeed(char s, char a, bool prio) {
-    int data = s || (a<<8) || (prio<<24);
+    int data = s | (a<<8) | ((prio && 0xFF) << 24);
     shm_mo.Lock();
     buf_mo.write(data);
     shm_mo.UnLock();
 }
 
+void ESSPrototype::setSpeed(char s, char a) {
+    ESSPrototype::setSpeed(s, a, false);
+}
+
 void ESSPrototype::setDirection(char d, bool prio) {
-    int data = d || (prio<<24);
+    int data = d | ((prio && 0xFF) << 24);
     shm_st.Lock();
     buf_st.write(data);
     shm_st.UnLock();
 }
 
+void ESSPrototype::setDirection(char d) {
+    setDirection(d, false);
+}
+
 void ESSPrototype::setMinDistance(char d, bool prio) {
-    int data = d || (prio<<24);
+    int data = d | (prio && 0xFF << 24);
     shm_setmin.Lock();
     buf_setmin.write(data);
     shm_setmin.UnLock();
@@ -160,7 +187,7 @@ char ESSPrototype::getSpeed() {
     for (int i=0; i<unreadValues; i++)
         data.push_back(buf_sp.read());
     shm_sp.UnLock();
-    return (char) data.back(); // TODO make sure last element is the latest
+    return (char) data.back();
 }
 
 char ESSPrototype::getDistance() {
@@ -201,6 +228,6 @@ bool ESSPrototype::getGoStatus() {
     checkSpeedSensor();
     checkSteering();
     checkDistanceSensor();
-    // TODO check camera
-    return service_status_ == 0x00001111; // TODO take camera into account
+    checkCameraSensor();
+    return service_status_ == 0x00011111;
 }
