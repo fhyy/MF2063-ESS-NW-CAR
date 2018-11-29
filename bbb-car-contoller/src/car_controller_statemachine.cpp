@@ -64,51 +64,53 @@ static func stateFunctionAry[] = {
 
 //currently put the steering flag in the camera
 static stStateTransfor stateMatrix[] = {
-    //currentState  distanceFlag   speedFlag  cameraFlag nextState
-    {stateAny, evAny, evAny, evStop, stateStandingStill},
-    {stateAny,  evLow,  evAny, evRun,   stateStandingStill},
+    //currentState  distanceFlag   speedFlag  cameraFlag  goStatus nextState
+    {stateAny, evAny, evAny, evStop, evAny, stateStandingStill},
+    {stateAny,  evLow,  evAny, evAny, evTrue,  stateStandingStill},
+    {stateAny, evAny, evAny, evAny, evFalse, stateStandingStill},
+
     
-    {stateAny, evAny, evAny, evLeft, stateSteeringLeft},
-    {stateAny, evAny, evAny, evRight, stateSteeringRight},
+    {stateAny, evAny, evAny, evLeft, evTrue, stateSteeringLeft},
+    {stateAny, evAny, evAny, evRight, evTrue, stateSteeringRight},
 
-    {stateSteeringLeft, evAny, evAny, evAny, stateConstatntSpeed},
-    {stateSteeringRight, evAny, evAny, evAny, stateConstatntSpeed},
+    {stateSteeringLeft, evAny, evAny, evAny, evTrue, stateConstatntSpeed},
+    {stateSteeringRight, evAny, evAny, evAny, evTrue, stateConstatntSpeed},
 
-    {stateStandingStill, evHigh, evLow, evRun, stateAccelerating},
+    {stateStandingStill, evHigh, evLow, evRun, evTrue, stateAccelerating},
 
-    {stateAccelerating, evHigh, evLow, evRun, stateAccelerating},
-    {stateAccelerating, evHigh, evHigh, evRun, stateRetarding},
-    {stateAccelerating, evHigh, evOk, evRun, stateConstantSpeed},
+    {stateAccelerating, evHigh, evLow, evRun, evTrue, stateAccelerating},
+    {stateAccelerating, evHigh, evHigh, evRun, evTrue, stateRetarding},
+    {stateAccelerating, evHigh, evOk, evRun, evTrue, stateConstantSpeed},
  
-    {stateConstantSpeed, evHigh, evOk, evRun, stateConstantSpeed},
-    {stateConstantSpeed, evHigh, evHigh, evRun, stateRetarding},
-    {stateConstantSpeed, evHigh, evLow, evRun, stateAccelerating},
+    {stateConstantSpeed, evHigh, evOk, evRun, evTrue, stateConstantSpeed},
+    {stateConstantSpeed, evHigh, evHigh, evRun, evTrue, stateRetarding},
+    {stateConstantSpeed, evHigh, evLow, evRun, evTrue, stateAccelerating},
 
-    {stateRetarding, evHigh, evHigh, evRun, stateRetarding},
-    {stateRetarding, evHigh, evLow, evRun, stateAccelerating},
-    {stateConstantSpeed, evHigh, evOk, evRun,    stateConstantSpeed},
+    {stateRetarding, evHigh, evHigh, evRun, evTrue, stateRetarding},
+    {stateRetarding, evHigh, evLow, evRun, evTrue, stateAccelerating},
+    {stateRetarding, evHigh, evOk, evRun,  evTrue,  stateConstantSpeed},
 };
 
 void statemachineInit(stCarStatemachine* statemachine){
     sm = statemachine;
-    statemachine->state = stateStandingStill;
-
-    statemachine->speed = evLow;
-    statemachine->distance = evHigh;
-    statemah*ine->camera  =  evStop;
-    statemachine->targetSpeed = TARGET_SPEED_STOP;
-    statemachine->direction = DIRECTION_STRAIGHT;
+    sm->state = stateStandingStill;
+    sm->speed = evLow;
+    sm->distance = evHigh;
+    sm->camera  =  evStop;
+    sm->targetSpeed = TARGET_SPEED_STOP;
+    sm->direction = DIRECTION_STRAIGHT;
+    sm->goStatus = evFalse;
 }
-// call sel
+
 void statemachineGetEvents(ESSPrototype* pty){
     char speed, camera, distance;
-    
+    bool goStatus;
 
     // read data from different places
     speed = pty->getSpeed();
     camera = pty->getFlag();
     distance = pty->getDistance();
-    
+    goStatus = pty->getGoStatus();
     // speed setup
    if(speed == SPEED_OK){
         sm->speed = evOk;
@@ -136,6 +138,11 @@ void statemachineGetEvents(ESSPrototype* pty){
         // if wired msg is received, stop the car
         sm->camera = evStop;
     }
+    // goStatus setup
+    if(goStatus == TRUE)
+        sm->goStatus = evTrue;
+    else
+        sm->goStatus = evFalse;
 }
 
 void statemachineIteration(ESSPrototype* pty){
@@ -145,10 +152,11 @@ void statemachineIteration(ESSPrototype* pty){
         if(sm->state == stateMatrix[i].currentState || stateMatrix[i].currentState==stateAny){
             if(sm->speed == stateMatrix[i].currentSpeedEvent || stateMatrix[i].currentSpeedEvent == evAny){
                 if(sm->distance == stateMatrix[i].currentDistanceEvent || stateMatrix[i].currentDistanceEvent == evAny){
-                    if(sm->camera == stateMatrix[i].currentCameraEvent ){
-                        sm->state = stateMatrix[i].nextState;
-                        (stateFunctionAry[sm->state])(pty);
-                        break;
+                    if(sm->camera == stateMatrix[i].currentCameraEvent || stateMatrix[i].currentCameraEvent == evAny){
+                        if(sm->goStatus == stateMatrix[i].currentGoStatus)
+                            sm->state = stateMatrix[i].nextState;
+                            (stateFunctionAry[sm->state])(pty);
+                            break;
                     }
                 }
             }
@@ -157,6 +165,6 @@ void statemachineIteration(ESSPrototype* pty){
 }
 
 void printState(stCarStatemachine* statemachine){
-    printf("\n state: %s, distance: %s, speed: %s, camera: %s\n, targetSpeed: %d\n", 
-        stateText[statemachine->state],eventText[statemachine->distance],eventText[statemachine->speed],cameraText[statemachine->camera],statemachine->targetSpeed);
+    printf("\n state: %s, distance: %s, speed: %s, camera: %s, goStatus: %s, targetSpeed: %d\n", 
+        stateText[statemachine->state],eventText[statemachine->distance],eventText[statemachine->speed],cameraText[statemachine->camera],goStatusText[statemachine->goStatus],statemachine->targetSpeed);
 }

@@ -25,6 +25,7 @@ chi#ifndef __car_controller_statemachine__
 #define CAMERA_LEFT 3
 #define CAMERA_RIGHT 4
 
+
 // Enumeraiion of states
 typedef enum
 {
@@ -51,8 +52,16 @@ typedef enum
     evStop=0,
     evRun,
     evLeft,
-    evRight
+    evRight,
+    evAny
 } evCameraEvent;
+
+typedef enum
+{
+    evTrue=0,
+    evFalse,
+    evAny
+}evGoStatusEvent;
 
 // structure of a sigle state
 typedef struct{
@@ -60,8 +69,9 @@ typedef struct{
     evCarEvent distance;
     evCarEvent speed;
     evCameraEvent camera;
+    evGoStatusEvent goStatus;
     uint8_t targetSpeed;
-    uint8_t direction; // -1 - left, 0 - straight, 1 - right
+    uint8_t direction; // 1 - left, 0 - straight, 2 - right
 } stCarStatemachine;
 
 // used for state transformation
@@ -70,6 +80,7 @@ typedef struct{
     evCarEvent currentDistanceEvent;
     evCarEvent currentSpeedEvent;
     evCameraEvent currentCameraEvent;
+    evGoStatusEvent currentGoStatus;
     stCarState nextState;
 } stStateTransfor;
 typedef struct{
@@ -100,23 +111,17 @@ static char* cameraText[]={
     "RIGHT"
 };
 
+static char* goStatusText[]={
+    "TRUE",
+    "FALSE"
+};
+
 
 
 void statemachineInit(stCarStatemachine *statemachine);
 void statemachineGetEvents(ESSPrototype* pty);
 void statemachineIteration(ESSPrototype* pty);
-void printState();
-// functions below are waitting for 
-//  detailed library
+void printState(stCarStatemachine* statemachine);
 
-/* int getFlag();
-int* getDistance();
-int getSpeed();
-bool start();
-
-void setMinDistance(int distance); // in cm
-void setDistance(int distance, int prio);
-void setDirection(int direction, int prio);
-void setSpeed(int Speed, int prio); */
 
 #endif
