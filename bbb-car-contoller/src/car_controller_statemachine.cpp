@@ -43,12 +43,12 @@ void retarding(ESSPrototype* pty){
 }
 
 void steeringLeft(ESSPrototype* pty){
-    sm->direction = DIRECTION_STRAIGHT;
+    sm->direction = DIRECTION_LEFT;
     pty->setDirection(sm->direction, DIRECTION_PRIO);
 }
 
 void steeringRight(ESSPrototype pty){
-    sm->direction = DIRECTION_STRAIGHT;
+    sm->direction = DIRECTION_RIGHT;
     pty->setDirection(sm->direction, DIRECTION_PRIO);
 }
 
@@ -70,6 +70,9 @@ static stStateTransfor stateMatrix[] = {
     
     {stateAny, evAny, evAny, evLeft, stateSteeringLeft},
     {stateAny, evAny, evAny, evRight, stateSteeringRight},
+
+    {stateSteeringLeft, evAny, evAny, evAny, stateConstatntSpeed},
+    {stateSteeringRight, evAny, evAny, evAny, stateConstatntSpeed},
 
     {stateStandingStill, evHigh, evLow, evRun, stateAccelerating},
 
@@ -128,7 +131,7 @@ void statemachineGetEvents(ESSPrototype* pty){
     }else if(camera == CAMERA_LEFT){
         sm->camera = evLeft;
     }else if (camera == CAMERA_RIGHT){
-        sm->camera == CAMERA_RIGHT;
+        sm->camera = evRight;
     }else {
         // if wired msg is received, stop the car
         sm->camera = evStop;
@@ -153,7 +156,7 @@ void statemachineIteration(ESSPrototype* pty){
     }
 }
 
-void printState(){
-    printf("\n state: %s, distance: %s, speed: %s, camera: %s\n", 
-        stateText[sm->state],eventText[sm->distance],eventText[sm->speed],cameraText[sm->camera]);
+void printState(stCarStatemachine* statemachine){
+    printf("\n state: %s, distance: %s, speed: %s, camera: %s\n, targetSpeed: %d\n", 
+        stateText[statemachine->state],eventText[statemachine->distance],eventText[statemachine->speed],cameraText[statemachine->camera],statemachine->targetSpeed);
 }

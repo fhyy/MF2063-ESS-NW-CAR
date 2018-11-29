@@ -37,10 +37,11 @@ int main() {
 		printf("**********************************");
 		printf("\nESS prototype car is online now!\n");
 		printf("**********************************");
-		while(1){
+		while(){
 			statemachineInit(&carStatemachine);
 			statemachineIteration(&prototype);
-			printState();
+			printState(&carStatemachine);
+			
 		}
 	}
 

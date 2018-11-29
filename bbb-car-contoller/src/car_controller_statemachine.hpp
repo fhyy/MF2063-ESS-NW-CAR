@@ -16,9 +16,9 @@ chi#ifndef __car_controller_statemachine__
 #define DIRECTION_PRIO 0
 #define SPEED_PRIO 0 // just set for test currrently
 
-#define DIRECTION_LEFT -1
+#define DIRECTION_LEFT 1
 #define DIRECTION_STRAIGHT 0
-#define DIRCTION_RIGHT 1
+#define DIRCTION_RIGHT 2
 
 #define CAMERA_RUN 1
 #define CAMERA_STOP 0
