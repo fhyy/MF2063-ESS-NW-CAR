@@ -27,10 +27,10 @@ __Stream__
 
 |Byte 1|  
 |:---:|  
-|TargetSpeed or CurrentSpeed|  
+|TargetSpeed /</br> CurrentSpeed|  
 
 __Variable definition__  
 
 |Name|Range|Description|  
 |:---:|:---:|:---|  
-|TargetSpeed/CurrentSped|[Bit 0 --> 7] (0,125) |(Bit 8 = 0):The target speed in cm/s / (Bit 8 = 1): The latest encoder readings in cm/s|  
+|TargetSpeed </br>CurrentSpeed|[Bit 0 --> 7]</br> (0,125) |(Bit 8 = 0):The target speed in cm/s </br> (Bit 8 = 1): The latest encoder readings in cm/s|  
