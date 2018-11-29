@@ -1,18 +1,9 @@
-<<<<<<< HEAD
 # Pin mapping (Arduino Micro)
 _ESC RX S_ - Digital Pin 10  
 _ESC RX __-___ - GND  
 _SPI CLK_ - SCK  
 _SPI Master out_ - MOSI  
 _SPI Slave select_ - SS  
-=======
-#Pin mapping (Arduino Micro)
-ESC __S__ signal - Digital Pin 10  
-ESC __-__ signal - GND 
-_Don't connect ESC __+___
-SPI - TBD
->>>>>>> ard-motor
-
 
 # Installation
 ## Command line
