@@ -30,6 +30,8 @@ bool bootup(ESSPrototype prototype){
 
 int main() {
 	ESSPrototype prototype;
+
+	sleep(2);
 	bool bootFlag = bootup(prototype);
 	stCarStatemachine carStatemachine;
 	
@@ -37,11 +39,12 @@ int main() {
 		printf("**********************************");
 		printf("\nESS prototype car is online now!\n");
 		printf("**********************************");
-		while(){
+		while(1){
 			statemachineInit(&carStatemachine);
 			statemachineIteration(&prototype);
 			printState(&carStatemachine);
 			
+			sleep(0.1);
 		}
 	}
 

@@ -22,8 +22,8 @@ chi#ifndef __car_controller_statemachine__
 
 #define CAMERA_RUN 1
 #define CAMERA_STOP 0
-#define CAMERA_LEFT 3
-#define CAMERA_RIGHT 4
+#define CAMERA_LEFT 2
+#define CAMERA_RIGHT 3
 
 
 // Enumeraiion of states
