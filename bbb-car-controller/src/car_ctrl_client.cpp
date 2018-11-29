@@ -1,6 +1,8 @@
 #include "car_ctrl_client.hpp"
 
-CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep) :
+#define DEBUG 1
+
+CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep, bool skip_go) :
     run_(false),
     go_(false),
     is_ava_di_(false),
@@ -20,8 +22,14 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     req_mo_sleep_(mo_sleep),
     req_st_sleep_(st_sleep),
     req_setmin_sleep_(setmin_sleep),
+    skip_go_(skip_go),
     req_shutdown_sleep_(2000) // TODO make settable through CTR?
 {
+    #if (DEBUG)
+        std::cout << "## DEBUG ## car_ctrl_client initializing consumer memory ## DEBUG ##"
+                  << std::endl;
+    #endif
+
     int *p;
 
     shm_mo.Create(BUFFER_SIZE, O_RDWR);
@@ -44,7 +52,12 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     p = (int*) shm_shutdown.GetData();
     buf_shutdown = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    sleep(4);
+    sleep(5);
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## car_ctrl_client initializing producer memory ## DEBUG ##"
+                  << std::endl;
+    #endif
 
     shm_sp.Create(BUFFER_SIZE, O_RDWR);
     shm_sp.Attach(PROT_WRITE);
@@ -139,6 +152,7 @@ void CarCTRLClient::stop() {
     req_setmin_thread_.join();
     req_shutdown_thread_.join();
     go_ = false;
+    skip_go_ = false;
     app_->stop();
 }
 
@@ -187,7 +201,8 @@ void CarCTRLClient::send_motor_req() {
     }
 
     while(run_) {
-        //while(!go_); // TODO uncomment
+
+        while(!(go_ || skip_go_));
 
         std::vector<vsomeip::byte_t> req_data;
 
@@ -225,8 +240,8 @@ void CarCTRLClient::send_steer_req() {
     }
 
     while(run_) {
-        while(!go_);
 
+        while(!(go_ || skip_go_));
 
         std::vector<int> req_data;
 
@@ -286,7 +301,8 @@ void CarCTRLClient::send_setmin_req() {
     }
 
     while(run_) {
-        while(!go_);
+
+        while(!(go_ || skip_go_));
 
         std::vector<vsomeip::byte_t> req_data;
 
@@ -324,7 +340,8 @@ void CarCTRLClient::send_shutdown_req() {
     }
 
     while(run_) {
-        while(!go_);
+
+        while(!(go_ || skip_go_));
 
         std::vector<vsomeip::byte_t> req_data;
 
@@ -546,10 +563,12 @@ int main(int argc, char** argv) {
     uint32_t mo_sleep = 1000;
     uint32_t st_sleep = 1500;
     uint32_t setmin_sleep = 1750;
+    bool skip_go = false;
 
     std::string motor_flag("--motor-sleep");
     std::string steer_flag("--steer-sleep");
     std::string setmin_flag("--setmin-sleep");
+    std::string skip_go_flag("--skip-go");
 
     for (int i=1; i<argc; i++) {
         if (steer_flag==argv[i] && i+1<argc) {
@@ -570,15 +589,18 @@ int main(int argc, char** argv) {
             conv << argv[i];
             conv >> setmin_sleep;
         }
+        else if (skip_go_flag==argv[i]) {
+            skip_go = true;
+        }
     }
 
-    CarCTRLClient ccc(mo_sleep, st_sleep, setmin_sleep);
+    CarCTRLClient ccc(mo_sleep, st_sleep, setmin_sleep, skip_go);
 
-#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
-    ccc_ptr = &ccc;
-    signal(SIGINT, handle_signal);
-    signal(SIGTERM, handle_signal);
-#endif
+    #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+        ccc_ptr = &ccc;
+        signal(SIGINT, handle_signal);
+        signal(SIGTERM, handle_signal);
+    #endif
 
     if (ccc.init()) {
         ccc.start();

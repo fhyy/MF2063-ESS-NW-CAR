@@ -2,8 +2,15 @@
 #define ESS_PROTOTYPE_HPP
 
 #include <vector>
+#include <iostream>
 #include "SharedMemory.hpp"
 #include "CyclicBuffer.hpp"
+
+#define MO_MASK 0x00000001
+#define ST_MASK 0x00000002
+#define SP_MASK 0x00000004
+#define DI_MASK 0x00000008
+#define CAM_MASK 0x00000010
 
 class Flag {
 public:
