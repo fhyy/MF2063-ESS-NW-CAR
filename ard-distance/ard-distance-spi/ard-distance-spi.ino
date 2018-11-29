@@ -33,12 +33,10 @@ void setup (void)
 // SPI interrupt routine
 ISR (SPI_STC_vect)
 { 
-  if(send_it){
     SPI.transfer(cm1);
     SPI.transfer(cm2);
     SPI.transfer(cm3);
-    Serial.println("hi");
-  }
+
 }  // end of interrupt routine SPI_STC_vect
 
 
