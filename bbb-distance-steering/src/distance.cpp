@@ -51,7 +51,7 @@ void spiSSInit(int gpio1, int gpio2){
 
 int main(){
        unsigned int fd,i;
-
+       bool canSend = 0;
        uint8_t bits=8, mode=0;
        uint32_t speed=1000000;
        int sentObject,readObejct;
@@ -93,23 +93,27 @@ int main(){
 
               // write distance-packet to shm
               if (sentObject != -1) {
-                   // lock shared memory and write packet
                    shmMemory_di.Lock();
                    circBuffer_di.write(sentObject);
                    shmMemory_di.UnLock();
               }
 
-               // some other works need to be done.
 
-              //read steering pakcet from shared memory
+              // read steering pakcet from shared memory
               shmMemory_st.Lock();
-              readObject = cirBuffer_st.read();
+              if(cirBuffer_st.getUnreadValues()>0){
+                     readObject = cirBuffer_st.read();
+                     canSend = 1;
+              }
               shmMemory_st.Unlock();
 
-              angle = (char)readObject;
-              gpio_set_value(60, LOW);
-              write(fd, &angle, 1);
-              gpio_set_value(60, HIGH);
+              // write steering cmd to arduino_st
+              if(canSend){
+                     angle = (char)readObject;
+                     gpio_set_value(60, LOW);
+                     write(fd, &angle, 1);
+                     gpio_set_value(60, HIGH);
+              }
 
               usleep(500000); // half seconds
        }
