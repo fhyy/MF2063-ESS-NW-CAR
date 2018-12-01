@@ -34,7 +34,7 @@ void spiInit(unsigned int fd)
         //Initiates all slave-select pins so we can set them manually to the chip we want to communicate with
         spiSSInit(MOTOR_PIN);   //pin 60
         spiSSInit(SENSOR_PIN);  //Pin 48
-        
+
         //SPI parameters
         uint8_t bits=8, mode=0;
         uint32_t speed=1000000;
@@ -91,7 +91,7 @@ int main(void)
         fd = open(SPI_PATH, O_RDWR);
         // SPI parameter setup
         spiInit(fd);
-        
+
         // shared memory initialization, hint: first CONSUMER then PRODUCER
         CSharedMemory shmMemory_mo("/shm_mo");
         shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
@@ -112,7 +112,7 @@ int main(void)
                 //Read the sensor value given by the spedometer
                 receivedMessage = readSensorValue(fd);
 		printf("######## Sensor value was: %d\n", receivedMessage);
-                
+
 
 
                 //write to the named pipe to send the information over vsomeip
@@ -127,12 +127,12 @@ int main(void)
 
                 //TODO: get values from the named pipe to send to the motor controller
                 shmMemory_mo.Lock();
-                if(cirBuffer_mo.getUnreadValues()>0){
-                int tmp = cirBuffer_mo.read();
+                if(circBuffer_mo.getUnreadValues()>0){
+                int tmp = circBuffer_mo.read();
                      controlValue = (char)tmp;
                      canSend = 1;
                 }
-                shmMemory_st.Unlock();
+                shmMemory_mo.UnLock();
 
                 //Send the values to the arduino motor controller
                 if(canSend){

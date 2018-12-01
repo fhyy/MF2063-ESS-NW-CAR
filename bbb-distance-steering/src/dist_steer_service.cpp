@@ -185,7 +185,7 @@ void DistSteerService::on_steer_req(const std::shared_ptr<vsomeip::message> &msg
     vsomeip::byte_t *data = msg->get_payload()->get_data();
 
     // Turn the four-element data packet into an int before writing.
-    int req = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
+    int req = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0]);
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Got steer request!! Data: (" << (int) data[0]
@@ -377,3 +377,4 @@ int main(int argc, char** argv) {
     else
         return 1;
 }
+

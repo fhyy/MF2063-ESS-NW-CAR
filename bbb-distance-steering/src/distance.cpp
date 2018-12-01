@@ -54,25 +54,27 @@ int main(){
        bool canSend = 0;
        uint8_t bits=8, mode=0;
        uint32_t speed=1000000;
-       int sentObject,readObejct;
+       int sentObject,readObject;
        char angle;
        spiSSInit(60, 48);
 
 
 
 //---------------- Ask Jacob if this is ok ---------------------------------------------
+          CSharedMemory shmMemory_st("/shm_st");
+          shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
+          shmMemory_st.Attach(PROT_WRITE);
+          int* circBufferP_st = (int*)shmMemory_st.GetData();
+          Buffer circBuffer_st(BUFFER_SIZE, circBufferP_st, B_CONSUMER);
+
 	  sleep(2);
+
           CSharedMemory shmMemory_di("/shm_di");
           shmMemory_di.Create(BUFFER_SIZE, O_RDWR);
           shmMemory_di.Attach(PROT_WRITE);
           int* circBufferP_di = (int*)shmMemory_di.GetData();
           Buffer circBuffer_di(BUFFER_SIZE, circBufferP_di, B_PRODUCER);
 
-          CSharedMemory shmMemory_st("/shm_st");
-          shmMemory_st.Create(BUFFER_SIZE, O_RDWR);
-          shmMemory_st.Attach(PROT_WRITE);
-          int* circBufferP_st = (int*)shmMemory_st.GetData();
-          Buffer circBuffer_st(BUFFER_SIZE, circBufferP_st, B_CONSUMER);
 //-------------------------------------------------------------------------------------
 
        fd = open(SPI_PATH, O_RDWR);
@@ -101,11 +103,11 @@ int main(){
 
               // read steering pakcet from shared memory
               shmMemory_st.Lock();
-              if(cirBuffer_st.getUnreadValues()>0){
-                     readObject = cirBuffer_st.read();
+              if(circBuffer_st.getUnreadValues()>0){
+                     readObject = circBuffer_st.read();
                      canSend = 1;
               }
-              shmMemory_st.Unlock();
+              shmMemory_st.UnLock();
 
               // write steering cmd to arduino_st
               if(canSend){
@@ -113,6 +115,7 @@ int main(){
                      gpio_set_value(60, LOW);
                      write(fd, &angle, 1);
                      gpio_set_value(60, HIGH);
+                     canSend = 0;
               }
 
               usleep(500000); // half seconds
