@@ -21,6 +21,7 @@
 //Initialize a GPIO-pin to act as a Slave Select (SS)
 void spiSSInit(int gpio)
 {
+        gpio_unexport(gpio);
         gpio_export(gpio);
         gpio_set_dir(gpio, OUTPUT_PIN);
         gpio_set_value(gpio, HIGH);
