@@ -1,4 +1,4 @@
-#include "car_controller_statemachine.h"
+#include "car_controller_statemachine.hpp"
 #include <stdint.h>
 
 stCarStatemachine *sm = 0x0;
@@ -70,8 +70,8 @@ static stStateTransfor stateMatrix[] = {
     {stateAny, evAny, evAny, evAny, evFalse, stateStandingStill},
 
     
-    {stateAny, evAny, evAny, evLeft, evTrue, stateSteeringLeft},
-    {stateAny, evAny, evAny, evRight, evTrue, stateSteeringRight},
+    {stateAny, evAny, evAny, evRight, evTrue, stateSteeringLeft},
+    {stateAny, evAny, evAny, evLeft, evTrue, stateSteeringRight},
 
     {stateSteeringLeft, evAny, evAny, evAny, evTrue, stateConstatntSpeed},
     {stateSteeringRight, evAny, evAny, evAny, evTrue, stateConstatntSpeed},

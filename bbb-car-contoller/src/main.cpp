@@ -1,24 +1,24 @@
 #include "ess_prototype.hpp"
-#include "car_controller_statemachine.h"
+#include "car_controller_statemachine.hpp"
 #include <stdio.h>
 
 // check the status of the system before we start
-bool bootup(ESSPrototype prototype){
-	if(!prototype.checkMotor()){
+bool bootup(ESSPrototype* prototype){
+	if(!prototype->checkMotor()){
 		perror("motor doesn't pass the check\n");
 		return 0;
-	}else if (!prototype.checkSpeedSensor()){
+	}else if (!prototype->checkSpeedSensor()){
 		perror("Speed Sensor doesn't pass the check\n");
 		return 0;
-	}else if (!prototype.checkSteering()){
+	}else if (!prototype->checkSteering()){
 		perror("Steering doesn't pass the check\n");
 		return 0;
-	}else if(!prototype.checkDistanceSensor()){
+	}else if(!prototype->checkDistanceSensor()){
 		perror("DistanceSensor doesn't pass the check\n");
 		return 0;
 	}
 
-	bool bSetMinDi = prototype.setMinDistance(DISTANCE_STOP, DISTANCE_PRIO);
+	bool bSetMinDi = prototype->setMinDistance(DISTANCE_STOP, DISTANCE_PRIO);
 	if(!bSetMinDi){
 		perror("Failed to set the minimum distance\n");
 		return 0;		
@@ -32,7 +32,7 @@ int main() {
 	ESSPrototype prototype;
 
 	sleep(2);
-	bool bootFlag = bootup(prototype);
+	bool bootFlag = bootup(&prototype);
 	stCarStatemachine carStatemachine;
 	
 	if(bootFlag){
