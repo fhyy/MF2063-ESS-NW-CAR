@@ -1,4 +1,4 @@
-chi#ifndef __car_controller_statemachine__
+#ifndef __car_controller_statemachine__
 #define __car_controller_statemachine__
 
 #include <stdint.h>
@@ -10,7 +10,7 @@ chi#ifndef __car_controller_statemachine__
 
 #define DISTANCE_STOP 100   //cm
 
-#define SPEED_OK 50 // just set for test currently 
+#define SPEED_OK 50 // cm/s, just set for test currently 
 
 #define DISTANCE_PRIO 0
 #define DIRECTION_PRIO 0
@@ -26,7 +26,6 @@ chi#ifndef __car_controller_statemachine__
 #define CAMERA_RIGHT 3
 
 
-// Enumeraiion of states
 typedef enum
 {
     stateStandingStill=0,
@@ -38,7 +37,9 @@ typedef enum
     stateAny
 } stCarState;
 
-// Enumeration of events of speed and distance
+/**
+ * Enumeration of events of speed and distance
+ */
 typedef enum
 {
     evHigh=0,
@@ -46,7 +47,10 @@ typedef enum
     evOk,
     evAny
 } evCarEvent;
-// Enumeraiion of events of camera
+
+/**
+ * Enumeraiion of events of camera
+ */
 typedef enum
 {
     evStop=0,
@@ -56,6 +60,9 @@ typedef enum
     evAny
 } evCameraEvent;
 
+/**
+ * Enumeraiion of events of go status
+ */
 typedef enum
 {
     evTrue=0,
@@ -63,7 +70,10 @@ typedef enum
     evAny
 }evGoStatusEvent;
 
-// structure of a sigle state
+/**
+ * Structure of a sigle state
+ */
+
 typedef struct{
     stCarState state;
     evCarEvent distance;
@@ -74,7 +84,9 @@ typedef struct{
     uint8_t direction; // 1 - left, 0 - straight, 2 - right
 } stCarStatemachine;
 
-// used for state transformation
+/**
+ * Used for state transformation matrix
+ */
 typedef struct{
     stCarState currentState;
     evCarEvent currentDistanceEvent;
@@ -83,6 +95,10 @@ typedef struct{
     evGoStatusEvent currentGoStatus;
     stCarState nextState;
 } stStateTransfor;
+
+/**
+ * Only used in the test program,
+ */
 typedef struct{
     uint32_t speed;
     uint32_t distance;
@@ -134,6 +150,11 @@ void statemachineGetEvents(ESSPrototype* pty);
  * call corresponding function 
  */
 void statemachineIteration(ESSPrototype* pty);
+
+/**
+ * Print current statemachine car_controller_statemachine,
+ * used for test
+ */
 void printState(stCarStatemachine* statemachine);
 
 
