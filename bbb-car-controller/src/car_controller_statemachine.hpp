@@ -16,12 +16,12 @@ chi#ifndef __car_controller_statemachine__
 #define DIRECTION_PRIO 0
 #define SPEED_PRIO 0 // just set for test currrently
 
-#define DIRECTION_LEFT 1
 #define DIRECTION_STRAIGHT 0
+#define DIRECTION_LEFT 1
 #define DIRCTION_RIGHT 2
 
-#define CAMERA_RUN 1
 #define CAMERA_STOP 0
+#define CAMERA_RUN 1
 #define CAMERA_LEFT 2
 #define CAMERA_RIGHT 3
 
@@ -117,9 +117,22 @@ static char* goStatusText[]={
 };
 
 
-
+/**
+ * Initial the statemachine
+ * 
+ */
 void statemachineInit(stCarStatemachine *statemachine);
+
+/**
+ * Grab data from shared memory,
+ * set flags for input flags of statemachine
+ */
 void statemachineGetEvents(ESSPrototype* pty);
+
+/**
+ * Search right entry in stateMatrix,
+ * call corresponding function 
+ */
 void statemachineIteration(ESSPrototype* pty);
 void printState(stCarStatemachine* statemachine);
 

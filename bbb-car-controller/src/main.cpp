@@ -2,7 +2,9 @@
 #include "car_controller_statemachine.hpp"
 #include <stdio.h>
 
-// check the status of the system before we start
+/**
+ * Check the status of the system before the statemachine is started
+ */
 bool bootup(ESSPrototype* prototype){
 	if(!prototype->checkMotor()){
 		perror("motor doesn't pass the check\n");
@@ -44,7 +46,7 @@ int main() {
 			statemachineIteration(&prototype);
 			printState(&carStatemachine);
 			
-			sleep(0.1);
+			usleep(500000);// 500ms
 		}
 	}
 
