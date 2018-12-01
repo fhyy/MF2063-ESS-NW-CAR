@@ -85,18 +85,25 @@ int readSensorValue(unsigned int fd)
 int main(void)
 {
         unsigned int fd,i;
-        char receivedMessage;
+        char receivedMessage, controlValue;
+        bool canSend = 0;
 
         fd = open(SPI_PATH, O_RDWR);
         // SPI parameter setup
         spiInit(fd);
-
-          sleep(2);
-          CSharedMemory shmMemory_sp("/shm_sp");
-          shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
-          shmMemory_sp.Attach(PROT_WRITE);
-          int* circBufferP_sp = (int*)shmMemory_sp.GetData();
-          Buffer circBuffer_sp(BUFFER_SIZE, circBufferP_sp, B_PRODUCER);
+        
+        // shared memory initialization, hint: first CONSUMER then PRODUCER
+        CSharedMemory shmMemory_mo("/shm_mo");
+        shmMemory_mo.Create(BUFFER_SIZE, O_RDWR);
+        shmMemory_mo.Attach(PROT_WRITE);
+        int* circBufferP_mo = (int*)shmMemory_mo.GetData();
+        Buffer circBuffer_mo(BUFFER_SIZE, circBufferP_mo, B_CONSUMER);
+        sleep(2);
+        CSharedMemory shmMemory_sp("/shm_sp");
+        shmMemory_sp.Create(BUFFER_SIZE, O_RDWR);
+        shmMemory_sp.Attach(PROT_WRITE);
+        int* circBufferP_sp = (int*)shmMemory_sp.GetData();
+        Buffer circBuffer_sp(BUFFER_SIZE, circBufferP_sp, B_PRODUCER);
 
 
         //Endless loop
@@ -105,23 +112,35 @@ int main(void)
                 //Read the sensor value given by the spedometer
                 receivedMessage = readSensorValue(fd);
 		printf("######## Sensor value was: %d\n", receivedMessage);
-                   shmMemory_sp.Lock();
-                   circBuffer_sp.write((int) receivedMessage);
-                   shmMemory_sp.UnLock();
+                
 
 
-                //TODO: write to the named pipe to send the information over vsomeip
+                //write to the named pipe to send the information over vsomeip
+                shmMemory_sp.Lock();
+                circBuffer_sp.write((int) receivedMessage);
+                shmMemory_sp.UnLock();
 
                 //Print received value for debugging
-                if(receivedMessage != 0) {
+                /*if(receivedMessage != 0) {
                     printf("%d \n", receivedMessage);
-                }
+                }*/
 
                 //TODO: get values from the named pipe to send to the motor controller
-                int controlValue = 30;
+                shmMemory_mo.Lock();
+                if(cirBuffer_mo.getUnreadValues()>0){
+                int tmp = cirBuffer_mo.read();
+                     controlValue = (char)tmp;
+                     canSend = 1;
+                }
+                shmMemory_st.Unlock();
 
                 //Send the values to the arduino motor controller
-                //sendMotorValue(fd, controlValue);
+                if(canSend){
+                    sendMotorValue(fd, controlValue);
+                    canSend = 0;
+                }
+
+                //
 
                 //We sleep so we dont interrupt the arduino to often and it never gets to do work
                 usleep(2000000);
