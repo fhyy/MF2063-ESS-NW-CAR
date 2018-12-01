@@ -17,7 +17,7 @@ IVAR
 
         -- Camera parameters
         camera_check: boolean;
-        camera: {left, right, blind, run, stop};
+        camera: {left, right, run, stop};
 
         -- Speed parameters
         speed_sensor_check: boolean;
@@ -40,7 +40,7 @@ ASSIGN
                 -- state = standing_still    
                 distance = high & speed = low & camera = run & state = standing_still : accelerating;
                 --stopping
-                ((distance = blind & speed = blind & camera = stop) | (distance = low & speed = blind & camera = blind)) & state = retarding : standing_still;
+                (camera = stop | distance = low) & state = retarding : standing_still;
                 --failsafe
                 (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = standing_still : failsafe;
 
@@ -49,22 +49,22 @@ ASSIGN
                 distance = high & speed = ok & camera = run & state = accelerating : constant_speed;
                 distance = high & speed = high & camera = run & state = accelerating : retarding;
                 --steering
-                distance = blind & speed = blind & camera = left & state = retarding : steering_right;
-                distance = blind & speed = blind & camera = right & state = retarding : steering_left;
+                camera = left & state = retarding : steering_right;
+                camera = right & state = retarding : steering_left;
                 --stopping
-                ((distance = blind & speed = blind & camera = stop) | (distance = low & speed = blind & camera = blind)) & state = retarding : standing_still;
+                (camera = stop | distance = low) & state = retarding : standing_still;
                 --failsafe
                 (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = standing_still : failsafe;
                 
                 -- state = constant_speed    
                 distance = high & speed = ok & camera = run & state = constant_speed: constant_speed;
                 distance = high & speed = low & camera = run & state = constant_speed : accelerating;
-                distance = low & speed = high & camera = run & state = constant_speed : retarding;
+                distance = high & speed = high & camera = run & state = constant_speed : retarding;
                 --steering
-                distance = blind & speed = blind & camera = left & state = retarding : steering_right;
-                distance = blind & speed = blind & camera = right & state = retarding : steering_left;
+                camera = left & state = retarding : steering_right;
+                camera = right & state = retarding : steering_left;
                 --stopping
-                ((distance = blind & speed = blind & camera = stop) | (distance = low & speed = blind & camera = blind)) & state = retarding : standing_still;
+                (camera = stop | distance = low) & state = retarding : standing_still;
                 --failsafe
                 (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = constant_speed : failsafe;
                 
@@ -73,24 +73,24 @@ ASSIGN
                 distance = high & speed = ok & camera = run & state = retarding : constant_speed;
                 distance = high & speed = high & camera = run & state = retarding : retarding;
                 --steering
-                distance = blind & speed = blind & camera = left & state = retarding : steering_right;
-                distance = blind & speed = blind & camera = right & state = retarding : steering_left;
+                camera = left & state = retarding : steering_right;
+                camera = right & state = retarding : steering_left;
                 --stopping
-                ((distance = blind & speed = blind & camera = stop) | (distance = low & speed = blind & camera = blind)) & state = retarding : standing_still;
+                (camera = stop | distance = low) & state = retarding : standing_still;
                 --failsafe
                 (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = retarding : failsafe;
 
                 -- state = steering_left
                 camera = ok & state = steering_left : constant_speed;
                 --stopping
-                ((distance = blind & speed = blind & camera = stop) | (distance = low & speed = blind & camera = blind)) & state = retarding : standing_still;
+                (camera = stop | distance = low) & state = retarding : standing_still;
                 --failsafe
                 (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = retarding : failsafe;
 
                 -- state = steering_right
                 camera = ok & state = steering_right : constant_speed;
                 --stopping
-                ((distance = blind & speed = blind & camera = stop) | (distance = low & speed = blind & camera = blind)) & state = retarding : standing_still;
+                (camera = stop | distance = low) & state = retarding : standing_still;
                 --failsafe
                 (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = retarding : failsafe;
 
@@ -133,7 +133,7 @@ LTLSPEC
 -- BOOTUP
 -- bootup sequence -> standing_still
 LTLSPEC
-    G(state = bootup) & distance_sensor_check & camera_check & steering_check & motor_check -> X(state != standing_still)
+    G(state = bootup & distance_sensor_check & camera_check & steering_check & motor_check -> X(state != standing_still))
 
 -- STANDING STILL
 -- standing_still -> accelerating
@@ -162,7 +162,7 @@ LTLSPEC
 
 -- constant_speed -> accelerating
 LTLSPEC
-    G(state = constant_speed & distance = high & speed = ok & camera = run -> X(state != accelerating))
+    G(state = constant_speed & distance = high & speed = low & camera = run -> X(state != accelerating))
 
 -- constant_speed -> retarding
 LTLSPEC
