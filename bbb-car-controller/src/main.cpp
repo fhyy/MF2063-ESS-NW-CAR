@@ -1,6 +1,7 @@
 #include "ess_prototype.hpp"
-#include "car_controller_statemachine.hpp"
+#include "controller_statemachine.hpp"
 #include <stdio.h>
+
 
 /**
  * Check the status of the system before the statemachine is started
@@ -20,11 +21,11 @@ bool bootup(ESSPrototype* prototype){
 		return 0;
 	}
 
-	bool bSetMinDi = prototype->setMinDistance(DISTANCE_STOP, DISTANCE_PRIO);
+	/*bool bSetMinDi = prototype->setMinDistance(DISTANCE_STOP, DISTANCE_PRIO);
 	if(!bSetMinDi){
 		perror("Failed to set the minimum distance\n");
 		return 0;		
-	}
+	}*/
 	return 1;
 }
 

@@ -1,5 +1,7 @@
-#include "car_controller_statemachine.hpp"
+#include "controller_statemachine.hpp"
+#include "ess_prototype.hpp"
 #include <stdint.h>
+
 
 stCarStatemachine *sm = 0x0;
 
@@ -163,10 +165,7 @@ void statemachineIteration(ESSPrototype* pty){
         }
     }
 }
-/**
- * Print current statemachine car_controller_statemachine,
- * used for test
- */
+
 void printState(stCarStatemachine* statemachine){
     printf("\n state: %s, distance: %s, speed: %s, camera: %s, goStatus: %s, targetSpeed: %d\n", 
         stateText[statemachine->state],eventText[statemachine->distance],eventText[statemachine->speed],cameraText[statemachine->camera],goStatusText[statemachine->goStatus],statemachine->targetSpeed);

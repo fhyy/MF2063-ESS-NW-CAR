@@ -128,8 +128,8 @@ static char* cameraText[]={
 };
 
 static char* goStatusText[]={
-    "TRUE",
-    "FALSE"
+    "FALSE",
+    "TRUE"
 };
 
 
