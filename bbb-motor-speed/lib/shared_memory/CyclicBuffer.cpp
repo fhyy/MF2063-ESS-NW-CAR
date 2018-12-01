@@ -8,19 +8,20 @@ Buffer::Buffer(unsigned size, int* circBuffP, int permission) : memorySize(size)
 {
     //If we read, we dont have access to write in this segment (i.e. segmentation fault)
     //The first tree values of the buffer tells us:
-    //[0]; the amount of unread values in the buffer (UNREAD_INDEX)
-    //[1]; the read index of the buffer (tail) (READ_INDEX)
-    //[2]; the write index of the buffer (head) (WRITE_INDEX)
+    //[0]; the amount of unread values in the buffer
+    //[1]; the read index of the buffer (tail)
+    //[2]; the write index of the buffer (head)
     //[3..n] values written to the buffer
-    buffer = circBuffP;
-    buffer[UNREAD_INDEX] = 0;
-    buffer[READ_INDEX] = READ_START;
-    buffer[WRITE_INDEX] = WRITE_START;
-    
     if(DEBUG)
         printf("Size of buffer is: %d\n", bufferSize);
+    buffer = circBuffP;
+    if(permission == B_PRODUCER){
+        buffer[UNREAD_INDEX] = 0;
+        buffer[READ_INDEX] = READ_START;
+        buffer[WRITE_INDEX] = WRITE_START;
+    }
+    if(DEBUG)
         printf("buffer value:%d \n", *buffer);
-
     //Set unique pointers to the buffer-status values
     unreadValues = &buffer[UNREAD_INDEX];
     if(DEBUG)
