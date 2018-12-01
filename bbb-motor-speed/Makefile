@@ -6,7 +6,7 @@ PROGRAM = motor_speed_spi
 
 CC := g++
 CFLAGS =
-LIBS =
+LIBS = pthread rt
 LDFLAGS = $(LIBS:%=-l%)
 
 $(PROGRAM) : $(OBJECTS)
