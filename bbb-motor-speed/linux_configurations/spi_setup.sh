@@ -80,9 +80,7 @@ cp "$DEST_NAME" /lib/firmware/
 
 rm "$SOURCE_NAME" "$DEST_NAME"
 
-cd /boot/
-
-printf "optargs=quiet drm.debug=7 capemgr.disable_partno=BB-BONELT-HDMI,BB-BONELT-HDMIN\ncapemgr.enable_partno=BB-SPI1-01" >> uEnv.txt
+dd if=/dev/zero of=/dev/mmcblk1 bs=1M count=10
 
 printf "\nSetup finished! Please restart the BBB for changes to take effect. You should then have two spidev-files in the folder /dev/ using the command:\n\n"
 printf "ls -al /dev/spidev1.*\n\n\n"
