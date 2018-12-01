@@ -61,11 +61,11 @@ while True:
                 # draw the circle and centroid on the frame,
                 # then update the list of tracked points
                 output = key + loc + '\n'
-                output = bytes(output, 'UTF-8')
-                p.stdin.write(output)
-                p.stdin.flush()
-
-                # ONLY FOR TEST(DELETE WHEN USING)
-                result = p.stdout.readline().strip()
-                print(result)
-            break
+            else:
+                output = '\n'
+            output = bytes(output, 'UTF-8')
+            p.stdin.write(output)
+            p.stdin.flush()
+            # ONLY FOR TEST(DELETE WHEN USING)
+            result = p.stdout.readline().strip()
+            print(result)
