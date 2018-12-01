@@ -9,7 +9,7 @@
 #include <linux/spi/spidev.h>
 #include <time.h>
 #include <sys/time.h>
-#include "SimpleGPIO.h"
+#include "SimpleGPIO.hpp"
 
 #define SPI_PATH "/dev/spidev1.0"
 #define EVER (;;)
@@ -19,6 +19,7 @@
 //Initialize a GPIO-pin to act as a Slave Select (SS)
 void spiSSInit(int gpio)
 {
+        gpio_unexport(gpio);
         gpio_export(gpio);
         gpio_set_dir(gpio, OUTPUT_PIN);
         gpio_set_value(gpio, HIGH);
