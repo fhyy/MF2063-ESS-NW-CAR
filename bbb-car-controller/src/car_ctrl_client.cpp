@@ -612,12 +612,14 @@ void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg)
     std::vector<vsomeip::byte_t> dummy_data(7);
 
     // Shutdown the motor service.
+    /*
     send_req(dummy_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Shutdown request sent to motor service! ## DEBUG ##"
                   << std::endl;
     #endif
+    */
 
     // Unlock the vsomeip app.
     app_busy_ = false;

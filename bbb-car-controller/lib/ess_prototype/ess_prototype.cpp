@@ -180,7 +180,7 @@ unsigned char ESSPrototype::getDistance() {
     if (data.size() > 0) {
         // Set the latest known distance values to the last values read in the buffer,
         // which should also be the most recent values.
-        unsigned int dist_latest_ = data.back();
+        dist_latest_ = data.back();
     }
 
     // Each value in the buffer represents three sensor values,
@@ -188,6 +188,14 @@ unsigned char ESSPrototype::getDistance() {
     unsigned char s1 = dist_latest_ & 0xFF;
     unsigned char s2 = (dist_latest_ >> 8) & 0xFF;
     unsigned char s3 = (dist_latest_ >> 16) & 0xFF;
+
+    #if (DEBUG)
+        std::cout << " ## DEBUG ##(s1, s2, s3) = (" << (int) s1 << ", "
+                  << (int) s2 << ", "
+                  << (int) s3
+                  << ") ## DEBUG ##" << std::endl;
+    #endif
+
     if (s1 < s2 && s1 < s3)
         return s1;
 

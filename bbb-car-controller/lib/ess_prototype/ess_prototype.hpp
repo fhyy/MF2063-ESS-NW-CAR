@@ -230,7 +230,7 @@ public:
 private:
 
     int service_status_;
-    unsigned char dist_latest_;
+    int dist_latest_;
     unsigned char speed_latest_;
     Flag flag_latest_;
 };
