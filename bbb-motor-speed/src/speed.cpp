@@ -18,9 +18,12 @@
 #define MOTOR_PIN 60
 #define SENSOR_PIN 48
 
+#define DEBUG 0
+
 //Initialize a GPIO-pin to act as a Slave Select (SS)
 void spiSSInit(int gpio)
 {
+        gpio_unexport(gpio);
         gpio_export(gpio);
         gpio_set_dir(gpio, OUTPUT_PIN);
         gpio_set_value(gpio, HIGH);
@@ -111,7 +114,9 @@ int main(void)
 
                 //Read the sensor value given by the spedometer
                 receivedMessage = readSensorValue(fd);
-		printf("######## Sensor value was: %d\n", receivedMessage);
+                if(DEBUG){
+		    printf("######## Sensor value was: %d\n", receivedMessage);
+                }
 
 
 
@@ -120,12 +125,6 @@ int main(void)
                 circBuffer_sp.write((int) receivedMessage);
                 shmMemory_sp.UnLock();
 
-                //Print received value for debugging
-                /*if(receivedMessage != 0) {
-                    printf("%d \n", receivedMessage);
-                }*/
-
-                //TODO: get values from the named pipe to send to the motor controller
                 shmMemory_mo.Lock();
                 if(circBuffer_mo.getUnreadValues()>0){
                 int tmp = circBuffer_mo.read();
@@ -139,8 +138,6 @@ int main(void)
                     sendMotorValue(fd, controlValue);
                     canSend = 0;
                 }
-
-                //
 
                 //We sleep so we dont interrupt the arduino to often and it never gets to do work
                 usleep(2000000);
