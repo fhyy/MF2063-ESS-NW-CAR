@@ -17,13 +17,39 @@
 
 class CarCTRLClient {
 public:
-    CarCTRLClient(uint32_t mo_sleep, uint32_t di_sleep, uint32_t setmin_sleep);
+
+    CSharedMemory shm_mo;
+    Buffer buf_mo;
+
+    CSharedMemory shm_st;
+    Buffer buf_st;
+
+    CSharedMemory shm_sp;
+    Buffer buf_sp;
+
+    CSharedMemory shm_di;
+    Buffer buf_di;
+
+    CSharedMemory shm_go;
+    Buffer buf_go;
+
+    CSharedMemory shm_setmin;
+    Buffer buf_setmin;
+
+    CSharedMemory shm_cam;
+    Buffer buf_cam;
+
+    CSharedMemory shm_shutdown;
+    Buffer buf_shutdown;
+
+    CarCTRLClient(uint32_t mo_sleep, uint32_t di_sleep, uint32_t setmin_sleep, bool skip_go);
     bool init();
     void start();
     void stop();
 private:
     bool run_;
     bool go_;
+    bool skip_go_;
     bool app_busy_;
     bool is_ava_di_;
     bool is_ava_st_;
@@ -49,30 +75,6 @@ private:
     std::shared_ptr<vsomeip::application> app_;
     std::shared_ptr<vsomeip::payload> payload_;
     std::shared_ptr<vsomeip::message> request_;
-
-    CSharedMemory shm_mo;
-    Buffer buf_mo;
-
-    CSharedMemory shm_st;
-    Buffer buf_st;
-
-    CSharedMemory shm_sp;
-    Buffer buf_sp;
-
-    CSharedMemory shm_di;
-    Buffer buf_di;
-
-    CSharedMemory shm_go;
-    Buffer buf_go;
-
-    CSharedMemory shm_setmin;
-    Buffer buf_setmin;
-
-    CSharedMemory shm_cam;
-    Buffer buf_cam;
-
-    CSharedMemory shm_shutdown;
-    Buffer buf_shutdown;
 
     void update_go_status();
     void send_motor_req();

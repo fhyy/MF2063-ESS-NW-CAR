@@ -28,19 +28,33 @@
 class DistSteerService {
 public:
 
+    /**
+     * @brief Shared memory used for IPC between the distance sensor reader program and this class.
+     */
     CSharedMemory shm_di;
+
+    /**
+     * @brief Cyclic buffer for keeping track of distance values in the shared memory.
+     */
     Buffer buf_di;
 
+    /**
+     * @brief Shared memory used for IPC between this class and the steering control program.
+     */
     CSharedMemory shm_st;
+
+    /**
+     * @brief Cyclic buffer for keeping track of requested steering values in the shared memory.
+     */
     Buffer buf_st;
 
     /**
      * @brief Constructor for the DistSteerService class.
      * @param di_sleep Time (in millisec) that the distance notifier thread will sleep
      *        during each cycle.
-     * @author Leon Fernandez
+     * @param skip_go Allows threads to ignore the value @ref go_. Only for testing purposes!
      */
-    DistSteerService(uint32_t di_sleep, bool skip_go_);
+    DistSteerService(uint32_t di_sleep, bool skip_go);
 
     /**
      * @brief Initializer for a DistSteerService app/instance.
@@ -49,7 +63,6 @@ public:
      * Initializes the DistSteering app by registering @ref on_state, @ref on_steer_req and
      * @ref on_go_availability as handlers for different vsomeip events. It also initializes
      * @ref pub_di_thread_.
-     * @author Leon Fernandez
      */
     bool init();
 
@@ -61,13 +74,11 @@ public:
 
     /**
      * @brief Stops the application by joining all threads and deregistering from the vsomeip RTE
-     * @author Leon Fernandez
      */
     void stop();
 
     /**
      * @brief Getter so external entities can read the run_ member.
-     * @author Leon Fernandez
      */
     bool is_running();
 private:
@@ -145,8 +156,8 @@ private:
      * @param msg vsomeip message with STEER_METHOD_ID and a payload representing the
      *            desired angle for the wheels.
      *
-     * Currently does nothing
-     * @author Leon Fernandez
+     * Unpacks and writes the received request data to a shared memory, which can then be
+     * read by the process controlling the steering.
      */
     void on_steer_req(const std::shared_ptr<vsomeip::message>& msg);
 
@@ -155,7 +166,6 @@ private:
      * @param msg vsomeip message with SHUTDOWN_METHOD_ID
      *
      * Shuts down the application and the entire program by calling @ref stop.
-     * @author Leon Fernandez
      */
     void on_shutdown(const std::shared_ptr<vsomeip::message>& msg);
 
@@ -168,7 +178,6 @@ private:
      * The go-service is a service made available by the central node (bbb-car-controller)
      * when that node has a preset number of services (ie when it has discovered all actuators).
      * The availability of the go-service basically works as a pause/play switch for this Class.
-     * @author Leon Fernandez
      */
     void on_go_availability(vsomeip::service_t serv, vsomeip::instance_t inst, bool go);
 
@@ -178,7 +187,6 @@ private:
      * 
      * Upon succesful registration within the vsomeip runtime it offers the steering and
      * distance services (makes them available) and requests association with the go-server.
-     * @author Leon Fernandez
      */
     void on_state(vsomeip::state_type_e state);
 };

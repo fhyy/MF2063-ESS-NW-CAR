@@ -1,6 +1,8 @@
 #include "car_ctrl_client.hpp"
 
-CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep) :
+#define DEBUG 1
+
+CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep, bool skip_go) :
     run_(false),
     go_(false),
     is_ava_di_(false),
@@ -20,8 +22,14 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     req_mo_sleep_(mo_sleep),
     req_st_sleep_(st_sleep),
     req_setmin_sleep_(setmin_sleep),
+    skip_go_(skip_go),
     req_shutdown_sleep_(2000) // TODO make settable through CTR?
 {
+    #if (DEBUG)
+        std::cout << "## DEBUG ## car_ctrl_client initializing consumer memory ## DEBUG ##"
+                  << std::endl;
+    #endif
+
     int *p;
 
     shm_mo.Create(BUFFER_SIZE, O_RDWR);
@@ -44,7 +52,12 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     p = (int*) shm_shutdown.GetData();
     buf_shutdown = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
-    sleep(4);
+    sleep(5);
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## car_ctrl_client initializing producer memory ## DEBUG ##"
+                  << std::endl;
+    #endif
 
     shm_sp.Create(BUFFER_SIZE, O_RDWR);
     shm_sp.Attach(PROT_WRITE);
@@ -139,6 +152,7 @@ void CarCTRLClient::stop() {
     req_setmin_thread_.join();
     req_shutdown_thread_.join();
     go_ = false;
+    skip_go_ = false;
     app_->stop();
 }
 
@@ -151,7 +165,9 @@ void CarCTRLClient::stop() {
 void CarCTRLClient::update_go_status() {
     if (!run_)
         return;
-    else if (is_ava_di_ && is_ava_st_ && is_ava_mo_ && is_ava_sp_) {
+    else if (is_ava_di_ && is_ava_st_ &&
+             is_ava_mo_ && is_ava_sp_ &&
+             is_ava_cam_) {
         go_ = true;
         app_->offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
@@ -160,237 +176,453 @@ void CarCTRLClient::update_go_status() {
         app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
 
-    // error here
     int mo_onehot = 0x00000001;
-    int st_onehot = 0x00000010;
-    int sp_onehot = 0x00000100;
-    int di_onehot = 0x00001000;
-    int service_status = mo_onehot && is_ava_mo_ ||
-                         st_onehot && is_ava_st_ ||
-                         sp_onehot && is_ava_sp_ ||
-                         di_onehot && is_ava_mo_; // TODO add camera
+    int st_onehot = 0x00000002;
+    int sp_onehot = 0x00000004;
+    int di_onehot = 0x00000008;
+    int cam_onehot = 0x00000010;
+    int service_status = mo_onehot && is_ava_mo_ |
+                         st_onehot && is_ava_st_ |
+                         sp_onehot && is_ava_sp_ |
+                         di_onehot && is_ava_mo_ |
+                         cam_onehot && is_ava_cam_;
 
-    // TODO fix error caused by these lines
-    /*shm_go.Lock();
+    shm_go.Lock();
     buf_go.write(service_status);
-    shm_go.UnLock();*/
+    shm_go.UnLock();
 }
 
 /*
- * This is a thread!
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- send_motor_req ------------------------------------------------
+ *--------------------------------- NOTE: This is a thread ----------------------------------------
+ *-------------------------------------------------------------------------------------------------
  */
 void CarCTRLClient::send_motor_req() {
+    // Synchronization lock upon initialization.
     {
         std::unique_lock<std::mutex> run_lk(mu_run_);
         while (!run_)
             cond_run_.wait(run_lk);
     }
 
+    #if (DEBUG)
+        std::cout << "## DEBUG ## send_motor_req thread entering thread loop ## DEBUG ##"
+                  << std::endl;
+    #endif
+
+    // Thread loop.
     while(run_) {
-        //while(!go_); // TODO uncomment
 
-        std::vector<vsomeip::byte_t> req_data;
+        // Pause here if !go_.
+        while(!(go_ || skip_go_));
 
+        // Store values from shared memory in sensor_data.
+        std::vector<int> req_data;
+
+        // Read from the shared memory.
         shm_mo.Lock();
         int unreadValues = buf_mo.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            req_data.push_back((vsomeip::byte_t) buf_mo.read());
+            req_data.push_back(buf_mo.read());
         shm_mo.UnLock();
 
+        // Prepare and send transmission if data was read from shared memory.
         if (req_data.size() > 0) {
+
+            // Use only newest request value for transmission.
+            unsigned int req_data_latest = req_data.back();
+
+            // Turn int into std::vector of four vsomeip::byte_t.
+            std::vector<vsomeip::byte_t> req_data_formatted;
+            char byte;
+            for (int j=0; j<4; j++) {
+
+                // First element of of vector is lowest 8 bits and so on.
+                byte = (req_data_latest >> j*8) & 0xFF;
+                req_data_formatted.push_back(byte);
+            }
+
+            // Lock down the vsomeip app before sending.
             std::unique_lock<std::mutex> app_lk(mu_app_);
             while (app_busy_)
                 cond_app_.wait(app_lk);
             app_busy_ = true;
 
-            send_req(req_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, MOTOR_METHOD_ID);
+            // Send the request.
+            send_req(req_data_formatted, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, MOTOR_METHOD_ID);
 
+            // Unlock the vsomeip app.
             app_busy_ = false;
             app_lk.unlock();
             cond_app_.notify_one();
+
+            #if (DEBUG)
+    	        std::cout << "## DEBUG ## Motor request sent: ("
+                          << (int) req_data_formatted[0] 
+                          << ", " << (int) req_data_formatted[1]
+                          << ", " << (int) req_data_formatted[2]
+                          << ", " << (int) req_data_formatted[3]
+                          << ") ## DEBUG ##" << std::endl;
+            #endif
         }
 
+        // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_mo_sleep_));
+        #if (DEBUG)
+	        std::cout << "## DEBUG ## send_motor_req woke up from sleeping! ## DEBUG ##" << std::endl; 
+        #endif
     }
 }
 
 /*
- * This is a thread!
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- send_steer_req ------------------------------------------------
+ *--------------------------------- NOTE: This is a thread ----------------------------------------
+ *-------------------------------------------------------------------------------------------------
  */
 void CarCTRLClient::send_steer_req() {
+    // Synchronization lock upon initialization.
     {
         std::unique_lock<std::mutex> run_lk(mu_run_);
         while (!run_)
             cond_run_.wait(run_lk);
     }
 
+    #if (DEBUG)
+        std::cout << "## DEBUG ## send_steer_req thread entering thread loop ## DEBUG ##"
+                  << std::endl;
+    #endif
+
+    // Thread loop.
     while(run_) {
-        while(!go_);
 
+        // Pause here if !go_.
+        while(!(go_ || skip_go_));
 
+        // Store values from shared memory in sensor_data.
         std::vector<int> req_data;
 
+        // Read from the shared memory.
         shm_st.Lock();
         int unreadValues = buf_st.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
             req_data.push_back(buf_st.read());
         shm_st.UnLock();
 
-
+        // Prepare and send transmission if data was read from shared memory
         if (req_data.size() > 0) {
 
-            // Use only newest req values for transmission
+            // Use only newest request value for transmission.
             int req_data_latest = req_data.back();
 
-            // turn int into std::vector of four vsomeip::byte_t
+            // Turn int into std::vector of four vsomeip::byte_t.
             std::vector<vsomeip::byte_t> req_data_formatted;
             char byte;
             for (int j=0; j<4; j++) {
-                // first element of of vector is lowest 8 bits and so on
-                byte = (req_data_latest >> j*8);
-                req_data_formatted.push_back(byte);
 
-                // Priority (0x0000=low, other=high) could be set here in a future implementation
-                // sensor_data_formatted[3] = priority;
+                // First element of of vector is lowest 8 bits and so on.
+                byte = (req_data_latest >> j*8) & 0xFF;
+                req_data_formatted.push_back(byte);
             }
 
-
-
+            // Lock down the vsomeip app before sending.
             std::unique_lock<std::mutex> app_lk(mu_app_);
             while (app_busy_)
                 cond_app_.wait(app_lk);
             app_busy_ = true;
 
+            // Send the request.
             send_req(req_data_formatted, STEER_SERVICE_ID, STEER_INSTANCE_ID, STEER_METHOD_ID);
 
-	    std::cout << "Sent steer request!!! Data: " << req_data_latest << std::endl;
-
+            // Unlock the vsomeip app.
             app_busy_ = false;
             app_lk.unlock();
             cond_app_.notify_one();
 
+            #if (DEBUG)
+    	        std::cout << "## DEBUG ## Steer request sent: ("
+                          << (int) req_data_formatted[0] 
+                          << ", " << (int) req_data_formatted[1]
+                          << ", " << (int) req_data_formatted[2]
+                          << ", " << (int) req_data_formatted[3]
+                          << ") ## DEBUG ##" << std::endl;
+            #endif
         }
 
+        // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_st_sleep_));
+        #if (DEBUG)
+	        std::cout << "## DEBUG ## send_steer_req woke up from sleeping! ## DEBUG ##"
+                      << std::endl; 
+        #endif
     }
 }
 
 /*
- * This is a thread!
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- send_setmin_req -----------------------------------------------
+ *--------------------------------- NOTE: This is a thread ----------------------------------------
+ *-------------------------------------------------------------------------------------------------
  */
 void CarCTRLClient::send_setmin_req() {
+    // Synchronization lock upon initialization.
     {
         std::unique_lock<std::mutex> run_lk(mu_run_);
         while (!run_)
             cond_run_.wait(run_lk);
     }
 
+    #if (DEBUG)
+        std::cout << "## DEBUG ## send_setmin_req thread entering thread loop ## DEBUG ##"
+                  << std::endl;
+    #endif
+
+    // Thread loop.
     while(run_) {
-        while(!go_);
 
-        std::vector<vsomeip::byte_t> req_data;
+      // Pause here if !go_.
+        while(!(go_ || skip_go_));
 
+        // Store values from shared memory in sensor_data.
+        std::vector<int> req_data;
+
+        // Read from the shared memory.
         shm_setmin.Lock();
         int unreadValues = buf_setmin.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
-            req_data.push_back((vsomeip::byte_t) buf_setmin.read());
+            req_data.push_back(buf_setmin.read());
         shm_setmin.UnLock();
 
+        // Prepare and send transmission if data was read from shared memory.
         if (req_data.size() > 0) {
+
+            // Use only newest request values for transmission.
+            int req_data_latest = req_data.back();
+
+            // Turn int into std::vector of four vsomeip::byte_t.
+            std::vector<vsomeip::byte_t> req_data_formatted;
+            char byte;
+            for (int j=0; j<4; j++) {
+
+                // First element of of vector is lowest 8 bits and so on.
+                byte = (req_data_latest >> j*8) & 0xFF;
+                req_data_formatted.push_back(byte);
+            }
+
+            // Lock down the vsomeip app before sending.
             std::unique_lock<std::mutex> app_lk(mu_app_);
             while (app_busy_)
                 cond_app_.wait(app_lk);
             app_busy_ = true;
 
-            send_req(req_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SETMIN_METHOD_ID);
+            // Send the request.
+            send_req(req_data_formatted, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SETMIN_METHOD_ID);
 
+            // Unlock the vsomeip app.
             app_busy_ = false;
             app_lk.unlock();
             cond_app_.notify_one();
+
+            #if (DEBUG)
+    	        std::cout << "## DEBUG ## Setmin request sent: ("
+                          << (int) req_data_formatted[0] 
+                          << ", " << (int) req_data_formatted[1]
+                          << ", " << (int) req_data_formatted[2]
+                          << ", " << (int) req_data_formatted[3]
+                          << ") ## DEBUG ##" << std::endl;
+            #endif
         }
 
+        // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_setmin_sleep_));
+        #if (DEBUG)
+	        std::cout << "## DEBUG ## send_setmin_req woke up from sleeping! ## DEBUG ##"
+                      << std::endl; 
+        #endif
     }
 }
 
 /*
- * This is a thread!
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- send_shutdown_req ---------------------------------------------
+ *--------------------------------- NOTE: This is a thread ----------------------------------------
+ *-------------------------------------------------------------------------------------------------
  */
 void CarCTRLClient::send_shutdown_req() {
+    // Synchronization lock upon initialization.
     {
         std::unique_lock<std::mutex> run_lk(mu_run_);
         while (!run_)
             cond_run_.wait(run_lk);
     }
 
+    #if (DEBUG)
+        std::cout << "## DEBUG ## send_shutdown_req thread entering thread loop ## DEBUG ##"
+                  << std::endl;
+    #endif
+
+    // Thread loop.
     while(run_) {
-        while(!go_);
 
-        std::vector<vsomeip::byte_t> req_data;
+        // Pause here if !go_.
+        while(!(go_ || skip_go_));
 
+        // Store values from shared memory in sensor_data.
+        std::vector<int> req_data;
+
+        // Read from the shared memory.
         shm_shutdown.Lock();
         int unreadValues = buf_shutdown.getUnreadValues();
         for (int i=0; i<unreadValues; i++)
             req_data.push_back((vsomeip::byte_t) buf_shutdown.read());
         shm_shutdown.UnLock();
 
-        if (req_data.size() > 0 && req_data.back() == 1) {
+        // Prepare and send transmission if data was read from shared memory.
+        if (req_data.size() > 0) {
+
+            // Lock down the vsomeip app before sending.
             std::unique_lock<std::mutex> app_lk(mu_app_);
             while (app_busy_)
                 cond_app_.wait(app_lk);
             app_busy_ = true;
 
-            send_req(req_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
-            send_req(req_data, STEER_SERVICE_ID, STEER_INSTANCE_ID, SHUTDOWN_METHOD_ID);
-            send_req(req_data, SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SHUTDOWN_METHOD_ID);
-            send_req(req_data, DIST_SERVICE_ID, DIST_INSTANCE_ID, SHUTDOWN_METHOD_ID);
-            send_req(req_data, CAM_SERVICE_ID, CAM_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            
 
+            /*
+             * TODO
+             * int req_data_latest = req_data.back();
+             * Analyze req_data_latest to see which services the request wants to shut down
+             * and the shut down only those services. This needs to be implemented on the
+             * ESSPrototype-side aswell.
+             */
+
+            // Dummy data with some random value since the contents does not matter anyway
+            std::vector<vsomeip::byte_t> dummy_data(7);
+
+            // Send the request.
+            send_req(dummy_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            send_req(dummy_data, STEER_SERVICE_ID, STEER_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            send_req(dummy_data, SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            send_req(dummy_data, DIST_SERVICE_ID, DIST_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+            send_req(dummy_data, CAM_SERVICE_ID, CAM_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+
+            // Unlock the vsomeip app.
             app_busy_ = false;
             app_lk.unlock();
             cond_app_.notify_one();
+
+            #if (DEBUG)
+    	        std::cout << "## DEBUG ## Shutdown requests sent to all services! ## DEBUG ##"
+                          << std::endl;
+            #endif
         }
 
+        // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_shutdown_sleep_));
+        #if (DEBUG)
+	        std::cout << "## DEBUG ## send_shutdown_req woke up from sleeping! ## DEBUG ##"
+                      << std::endl; 
+        #endif
     }
 }
 
 void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
+    // Store received packet, should always have a length of 4
     vsomeip::byte_t *data = msg->get_payload()->get_data();
-    vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shm_di.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
-    for(int i=0; i<datalength; i++) {
-        buf_di.write(data[i]);
-    }
+    // Turn the four-element data packet into an int before writing
+    int sensor_data = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## Dist sensor data received by car_ctrl_client: (" << (int) data[0] 
+                  << ", " << (int) data[1] << ", " << (int) data[2]
+                  << ", " << (int) data[3] << ") ## DEBUG ##" << std::endl;
+    #endif
+
+    // Write to shared memory
+    shm_di.Lock();
+    buf_di.write(sensor_data);
     shm_di.UnLock();
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## Dist sensor data written to shared memory ## DEBUG ##"
+                  << std::endl;
+    #endif
 }
 
 void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &msg) {
+    // Store received packet, should always have a length of 4
     vsomeip::byte_t *data = msg->get_payload()->get_data();
-    vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shm_sp.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
-    for(int i=0; i<datalength; i++) {
-        buf_sp.write(data[i]);
-    }
+    // Turn the four-element data packet into an int before writing
+    int sensor_data = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## Speed sensor data received by car_ctrl_client: ("
+                  << (int) data[0]
+                  << ", " << (int) data[1] << ", " << (int) data[2]
+                  << ", " << (int) data[3] << ") ## DEBUG ##" << std::endl;
+    #endif
+
+    // Write to shared memory
+    shm_sp.Lock();
+    buf_sp.write(sensor_data);
     shm_sp.UnLock();
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## Speed sensor data written to shared memory ## DEBUG ##"
+                  << std::endl;
+    #endif
 }
 
 void CarCTRLClient::on_cam_eve(const std::shared_ptr<vsomeip::message> &msg) {
+    // Store received packet, should always have a length of 4
     vsomeip::byte_t *data = msg->get_payload()->get_data();
-    vsomeip::length_t datalength = msg->get_payload()->get_length();
 
-    shm_cam.Lock(); // TODO ask Jacob if it is okay to lock outside for-loop
-    for(int i=0; i<datalength; i++) {
-        buf_cam.write(data[i]);
-    }
+    // Turn the four-element data packet into an int before writing
+    int sensor_data = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | data[0];
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## Camera data received by car_ctrl_client ## DEBUG ##"
+                  << std::endl;
+    #endif
+
+    // Write to the shared memory
+    shm_cam.Lock();
+    buf_cam.write(sensor_data);
     shm_cam.UnLock();
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## Camera data written to shared memory ## DEBUG ##"
+                  << std::endl;
+    #endif
 }
 
 void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg) {
-    vsomeip::byte_t *data = msg->get_payload()->get_data();
-    std::cout << "EMBREAK EVENT!!!!!!!!!! Data is: " << (int) data[0]<< std::endl;
+    std::cout << "## WARNING ## Motor has performed an emergency break ## WARNING ##" << std::endl;
+
+    // Lock down the vsomeip app before sending.
+    std::unique_lock<std::mutex> app_lk(mu_app_);
+    while (app_busy_)
+        cond_app_.wait(app_lk);
+    app_busy_ = true;
+
+    // Dummy data with some random value since the contents does not matter anyway
+    std::vector<vsomeip::byte_t> dummy_data(7);
+
+    // Shutdown the motor service.
+    send_req(dummy_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
+
+    #if (DEBUG)
+        std::cout << "## DEBUG ## Shutdown request sent to motor service! ## DEBUG ##"
+                  << std::endl;
+    #endif
+
+    // Unlock the vsomeip app.
+    app_busy_ = false;
+    app_lk.unlock();
+    cond_app_.notify_one();
 }
 
 void CarCTRLClient::send_req(std::vector<vsomeip::byte_t> data,
@@ -546,10 +778,12 @@ int main(int argc, char** argv) {
     uint32_t mo_sleep = 1000;
     uint32_t st_sleep = 1500;
     uint32_t setmin_sleep = 1750;
+    bool skip_go = false;
 
     std::string motor_flag("--motor-sleep");
     std::string steer_flag("--steer-sleep");
     std::string setmin_flag("--setmin-sleep");
+    std::string skip_go_flag("--skip-go");
 
     for (int i=1; i<argc; i++) {
         if (steer_flag==argv[i] && i+1<argc) {
@@ -570,15 +804,18 @@ int main(int argc, char** argv) {
             conv << argv[i];
             conv >> setmin_sleep;
         }
+        else if (skip_go_flag==argv[i]) {
+            skip_go = true;
+        }
     }
 
-    CarCTRLClient ccc(mo_sleep, st_sleep, setmin_sleep);
+    CarCTRLClient ccc(mo_sleep, st_sleep, setmin_sleep, skip_go);
 
-#ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
-    ccc_ptr = &ccc;
-    signal(SIGINT, handle_signal);
-    signal(SIGTERM, handle_signal);
-#endif
+    #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
+        ccc_ptr = &ccc;
+        signal(SIGINT, handle_signal);
+        signal(SIGTERM, handle_signal);
+    #endif
 
     if (ccc.init()) {
         ccc.start();

@@ -2,13 +2,37 @@
 #define ESS_PROTOTYPE_HPP
 
 #include <vector>
+#include <iostream>
 #include "SharedMemory.hpp"
 #include "CyclicBuffer.hpp"
 
+#define MO_MASK 0x00000001
+#define ST_MASK 0x00000002
+#define SP_MASK 0x00000004
+#define DI_MASK 0x00000008
+#define CAM_MASK 0x00000010
+
 class Flag {
 public:
-    std::string color;
-    std::string position;
+
+    Flag() : col(Null_Color), pos(Null_Position) {}
+
+    enum Color {
+        Red,
+        Green,
+        Yellow,
+        Null_Color
+    };
+
+    enum Position {
+        Left,
+        Right,
+        Middle,
+        Null_Position
+    };
+
+    Color col;
+    Position pos;    
 };
 
 // TODO overload methods so that prio does not have to be passed
@@ -41,15 +65,25 @@ public:
 
     /**
      * @brief
-     * @param ccc
      *
      *
      */
     ESSPrototype();
 
-    //TODO bool boot();
-
+    /**
+     * @brief
+     *
+     *
+     */
     void shutdown();
+
+    /**
+     * @brief
+     * @param prio
+     *
+     *
+     */
+    void shutdown(bool prio);
 
     /**
      * @brief
@@ -89,13 +123,28 @@ public:
      *
      *
      */
+    bool checkCameraSensor();
+
+    /**
+     * @brief
+     * @param d
+     * @param prio
+     *
+     */
     void setMinDistance(char d, bool prio);
+
+    /**
+     * @brief
+     * @param d
+     *
+     *
+     */
+    void setMinDistance(char d);
 
     /**
      * @brief
      * @param s
      * @param prio
-     * @return
      *
      *
      */
@@ -104,9 +153,16 @@ public:
     /**
      * @brief
      * @param s
+     *
+     *
+     */
+    void setSpeed(char s);
+
+    /**
+     * @brief
+     * @param s
      * @param a
      * @param prio
-     * @return
      *
      *
      */
@@ -114,9 +170,17 @@ public:
 
     /**
      * @brief
+     * @param s
+     * @param a
+     *
+     *
+     */
+    void setSpeed(char s, char a);
+
+    /**
+     * @brief
      * @param d
      * @param prio
-     * @return
      *
      *
      */
@@ -124,11 +188,11 @@ public:
 
     /**
      * @brief
-     * @return
+     * @param d
      *
      *
      */
-    char getSpeed();
+    void setDirection(char d);
 
     /**
      * @brief
@@ -136,7 +200,15 @@ public:
      *
      *
      */
-    char getDistance();
+    unsigned char getSpeed();
+
+    /**
+     * @brief
+     * @return
+     *
+     *
+     */
+    unsigned char getDistance();
 
     /**
      * @brief
@@ -158,7 +230,9 @@ public:
 private:
 
     int service_status_;
-
+    unsigned char dist_latest_;
+    unsigned char speed_latest_;
+    Flag flag_latest_;
 };
 
 #endif

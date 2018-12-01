@@ -9,15 +9,17 @@ find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 
 include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
-include_directories("${PROJECT_SOURCE_DIR}/shared")
-add_subdirectory(shared) 
+include_directories("${PROJECT_SOURCE_DIR}/lib/shared_memory")
+add_subdirectory(lib/shared_memory)
+include_directories("${PROJECT_SOURCE_DIR}/lib/ess_prototype")
+add_subdirectory(lib/ess_prototype)
 
 add_executable(car-ctrl-client "${PROJECT_SOURCE_DIR}/src/car_ctrl_client.cpp")
 target_link_libraries(car-ctrl-client vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
 install(TARGETS car-ctrl-client DESTINATION bin)
 
 add_executable(prototype-test "${PROJECT_SOURCE_DIR}/src/prototype_test.cpp")
-target_link_libraries(prototype-test cbuf shm pthread rt)
+target_link_libraries(prototype-test cbuf shm essproto pthread rt)
 install(TARGETS prototype-test DESTINATION bin)
 #########################################################################################
 
