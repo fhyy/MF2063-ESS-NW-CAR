@@ -49,7 +49,7 @@ void steeringLeft(ESSPrototype* pty){
     pty->setDirection(sm->direction, DIRECTION_PRIO);
 }
 
-void steeringRight(ESSPrototype pty){
+void steeringRight(ESSPrototype* pty){
     sm->direction = DIRECTION_RIGHT;
     pty->setDirection(sm->direction, DIRECTION_PRIO);
 }
@@ -72,11 +72,11 @@ static stStateTransfor stateMatrix[] = {
     {stateAny, evAny, evAny, evAny, evFalse, stateStandingStill},
 
     
-    {stateAny, evAny, evAny, evRight, evTrue, stateSteeringLeft},
-    {stateAny, evAny, evAny, evLeft, evTrue, stateSteeringRight},
+    {stateAny, evAny, evAny, evLeft, evTrue, stateSteeringLeft},
+    {stateAny, evAny, evAny, evRight, evTrue, stateSteeringRight},
 
-    {stateSteeringLeft, evAny, evAny, evAny, evTrue, stateConstatntSpeed},
-    {stateSteeringRight, evAny, evAny, evAny, evTrue, stateConstatntSpeed},
+    {stateSteeringLeft, evAny, evAny, evRun, evTrue, stateConstatntSpeed},
+    {stateSteeringRight, evAny, evAny, evRun, evTrue, stateConstatntSpeed},
 
     {stateStandingStill, evHigh, evLow, evRun, evTrue, stateAccelerating},
 
