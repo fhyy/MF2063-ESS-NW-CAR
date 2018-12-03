@@ -8,16 +8,16 @@
  */
 bool bootup(ESSPrototype* prototype){
 	if(!prototype->checkMotor()){
-		perror("motor doesn't pass the check\n");
+		printf("motor doesn't pass the check\n");
 		return 0;
 	}else if (!prototype->checkSpeedSensor()){
-		perror("Speed Sensor doesn't pass the check\n");
+		printf("Speed Sensor doesn't pass the check\n");
 		return 0;
 	}else if (!prototype->checkSteering()){
-		perror("Steering doesn't pass the check\n");
+		printf("Steering doesn't pass the check\n");
 		return 0;
 	}else if(!prototype->checkDistanceSensor()){
-		perror("DistanceSensor doesn't pass the check\n");
+		printf("DistanceSensor doesn't pass the check\n");
 		return 0;
 	}
 

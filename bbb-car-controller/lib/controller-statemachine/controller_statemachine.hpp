@@ -2,11 +2,11 @@
 #define __car_controller_statemachine__
 
 #include <stdint.h>
-#include <ess_prototype.hpp>
+#include "ess_prototype.hpp"
 
 #define TARGET_SPEED_STEP 1
 #define TARGET_SPEED_STOP 0
-#define TARGET_SPEED_MAX 100
+#define TARGET_SPEED_MAX 100 // cm/s
 
 #define DISTANCE_STOP 50   //cm
 
@@ -19,11 +19,6 @@
 #define DIRECTION_STRAIGHT 50
 #define DIRECTION_LEFT 0
 #define DIRCTION_RIGHT 100
-
-#define CAMERA_STOP 0
-#define CAMERA_RUN 1
-#define CAMERA_LEFT 2
-#define CAMERA_RIGHT 3
 
 
 typedef enum
