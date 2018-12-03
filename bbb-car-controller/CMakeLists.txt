@@ -13,14 +13,16 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/shared_memory")
 add_subdirectory(lib/shared_memory)
 include_directories("${PROJECT_SOURCE_DIR}/lib/ess_prototype")
 add_subdirectory(lib/ess_prototype)
+include_directories("${PROJECT_SOURCE_DIR}/lib/controller_statemachine")
+add_subdirectory(lib/controller_statemachine)
 
 add_executable(car-ctrl-client "${PROJECT_SOURCE_DIR}/src/car_ctrl_client.cpp")
 target_link_libraries(car-ctrl-client vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
 install(TARGETS car-ctrl-client DESTINATION bin)
 
-add_executable(prototype-test "${PROJECT_SOURCE_DIR}/src/prototype_test.cpp")
-target_link_libraries(prototype-test cbuf shm essproto pthread rt)
-install(TARGETS prototype-test DESTINATION bin)
+add_executable(main "${PROJECT_SOURCE_DIR}/src/main.cpp")
+target_link_libraries(main cbuf shm essproto ctrl-sm pthread rt)
+install(TARGETS main DESTINATION bin)
 #########################################################################################
 
 
