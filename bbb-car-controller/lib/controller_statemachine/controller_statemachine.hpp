@@ -18,7 +18,7 @@
 
 #define DIRECTION_STRAIGHT 50
 #define DIRECTION_LEFT 0
-#define DIRCTION_RIGHT 100
+#define DIRECTION_RIGHT 100
 
 
 typedef enum
@@ -40,7 +40,7 @@ typedef enum
     evHigh=0,
     evLow,
     evOk,
-    evAny
+    evCarAny
 } evCarEvent;
 
 /**
@@ -52,7 +52,7 @@ typedef enum
     evRun,
     evLeft,
     evRight,
-    evAny
+    evCameraAny
 } evCameraEvent;
 
 /**
@@ -62,7 +62,7 @@ typedef enum
 {
     evTrue=0,
     evFalse,
-    evAny
+    evGoStatusAny
 }evGoStatusEvent;
 
 /**
@@ -100,7 +100,7 @@ typedef struct{
     uint32_t camera;
 } stControllerInput;
 
-static char* stateText[]={
+static string stateText[6]={
     "STANDING_STILL",
     "ACCELERATING",
     "CONSTANT_SPEED",
@@ -109,20 +109,20 @@ static char* stateText[]={
     "STEERINF_RIGHT"
 };
 
-static char* eventText[]={
+static string eventText[3]={
     "HIGH",
     "LOW",
     "OK"
 };
 
-static char* cameraText[]={
+static string cameraText[4]={
     "STOP",
     "RUN",
     "LEFT",
     "RIGHT"
 };
 
-static char* goStatusText[]={
+static string goStatusText[2]={
     "FALSE",
     "TRUE"
 };

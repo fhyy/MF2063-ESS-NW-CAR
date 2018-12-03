@@ -10,7 +10,7 @@ void stopping(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
 
     pty->setDirection(sm->direction, DIRECTION_PRIO);
-    pty->setSpeed(sm->targetSpeed, SPEED_PRIO);
+    pty->setSpeed((char)(sm->targetSpeed), SPEED_PRIO);
 }
 
 void accelerating(ESSPrototype* pty){
@@ -21,14 +21,14 @@ void accelerating(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
 
     pty->setDirection(sm->direction, DIRECTION_PRIO);
-    pty->setSpeed(sm->targetSpeed, SPEED_PRIO);
+    pty->setSpeed((char)(sm->targetSpeed), SPEED_PRIO);
 }
 
 void constantSpeed(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
 
     pty->setDirection(sm->direction, DIRECTION_PRIO);
-    pty->setSpeed(sm->targetSpeed, SPEED_PRIO);
+    pty->setSpeed((char)(sm->targetSpeed), SPEED_PRIO);
 }
 
 void retarding(ESSPrototype* pty){
@@ -40,7 +40,7 @@ void retarding(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
     
     pty->setDirection(sm->direction, DIRECTION_PRIO);
-    pty->setSpeed(sm->targetSpeed, SPEED_PRIO);
+    pty->setSpeed((char)(sm->targetSpeed), SPEED_PRIO);
 
 }
 
@@ -54,29 +54,29 @@ void steeringRight(ESSPrototype* pty){
     pty->setDirection(sm->direction, DIRECTION_PRIO);
 }
 
-typedef void (*func)(void);
-static func stateFunctionAry[] = {
-    &stopping,
-    &accelerating,
-    &constantSpeed,
-    &retarding,
-    &steeringLeft,
-    &steeringRight
+
+void (*stateFunctionAry[6])(ESSPrototype*) = {
+    stopping,
+    accelerating,
+    constantSpeed,
+    retarding,
+    steeringLeft,
+    steeringRight
     };
 
 //currently put the steering flag in the camera
 static stStateTransfor stateMatrix[] = {
     //currentState  distanceFlag   speedFlag  cameraFlag  goStatus nextState
-    {stateAny, evAny, evAny, evStop, evAny, stateStandingStill},
-    {stateAny,  evLow,  evAny, evAny, evTrue,  stateStandingStill},
-    {stateAny, evAny, evAny, evAny, evFalse, stateStandingStill},
+    {stateAny, evCarAny, evCarAny, evStop, evGoStatusAny, stateStandingStill},
+    {stateAny,  evLow,  evCarAny, evCameraAny, evTrue,  stateStandingStill},
+    {stateAny, evCarAny, evCarAny, evCameraAny, evFalse, stateStandingStill},
 
     
-    {stateAny, evAny, evAny, evLeft, evTrue, stateSteeringLeft},
-    {stateAny, evAny, evAny, evRight, evTrue, stateSteeringRight},
+    {stateAny, evCarAny, evCarAny, evLeft, evTrue, stateSteeringLeft},
+    {stateAny, eCarvAny, evCarAny, evRight, evTrue, stateSteeringRight},
 
-    {stateSteeringLeft, evAny, evAny, evRun, evTrue, stateConstatntSpeed},
-    {stateSteeringRight, evAny, evAny, evRun, evTrue, stateConstatntSpeed},
+    {stateSteeringLeft, evCarAny, evCarAny, evRun, evTrue, stateConstatntSpeed},
+    {stateSteeringRight, evCarAny, evCarAny, evRun, evTrue, stateConstatntSpeed},
 
     {stateStandingStill, evHigh, evLow, evRun, evTrue, stateAccelerating},
 
@@ -128,7 +128,7 @@ void statemachineGetEvents(ESSPrototype* pty){
         sm->distance = evLow;
     }
     // camera setup
-    if(camera.col == Flag::Red)
+    if(camera.col == Flag::Red){
         sm->camera = evStop;
     }else if (camera.col == Flag::Green && camera.pos == Flag::Middle){
         sm->camera = evRun;
@@ -152,12 +152,12 @@ void statemachineIteration(ESSPrototype* pty){
     statemachineGetEvents(pty);
     for (i = 0; i < sizeof(stateMatrix) / sizeof(stateMatrix[0]);i++){
         if(sm->state == stateMatrix[i].currentState || stateMatrix[i].currentState==stateAny){
-            if(sm->speed == stateMatrix[i].currentSpeedEvent || stateMatrix[i].currentSpeedEvent == evAny){
-                if(sm->distance == stateMatrix[i].currentDistanceEvent || stateMatrix[i].currentDistanceEvent == evAny){
-                    if(sm->camera == stateMatrix[i].currentCameraEvent || stateMatrix[i].currentCameraEvent == evAny){
-                        if(sm->goStatus == stateMatrix[i].currentGoStatus)
+            if(sm->speed == stateMatrix[i].currentSpeedEvent || stateMatrix[i].currentSpeedEvent == evCarAny){
+                if(sm->distance == stateMatrix[i].currentDistanceEvent || stateMatrix[i].currentDistanceEvent == evCarAny){
+                    if(sm->camera == stateMatrix[i].currentCameraEvent || stateMatrix[i].currentCameraEvent == evCameraAny){
+                        if(sm->goStatus == stateMatrix[i].currentGoStatus || sm->goStatus == evGoStatusAny)
                             sm->state = stateMatrix[i].nextState;
-                            (stateFunctionAry[sm->state])(pty);
+                            (*stateFunctionAry[sm->state])(pty);
                             break;
                     }
                 }
