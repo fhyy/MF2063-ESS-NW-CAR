@@ -105,9 +105,9 @@ void statemachineInit(stCarStatemachine* statemachine){
 }
 
 void statemachineGetEvents(ESSPrototype* pty){
-    char speed, camera, distance;
+    char speed, distance;
     bool goStatus;
-
+    Flag camera;
     // read data from different places
     speed = pty->getSpeed();
     camera = pty->getFlag();
@@ -128,16 +128,16 @@ void statemachineGetEvents(ESSPrototype* pty){
         sm->distance = evLow;
     }
     // camera setup
-    if(camera == CAMERA_STOP)
+    if(camera.col == Flag::Red)
         sm->camera = evStop;
-    }else if (camera == CAMERA_RUN){
+    }else if (camera.col == Flag::Green && camera.pos == Flag::Middle){
         sm->camera = evRun;
-    }else if(camera == CAMERA_LEFT){
+    }else if(camera.col == Flag::Green && camera.pos == Flag::Left){
         sm->camera = evLeft;
-    }else if (camera == CAMERA_RIGHT){
+    }else if (camera.col == Flag::Green && camera.pos == Flag::Right){
         sm->camera = evRight;
     }else {
-        // if wired msg is received, stop the car
+        // if weried msg is received, stop the car
         sm->camera = evStop;
     }
     // goStatus setup
