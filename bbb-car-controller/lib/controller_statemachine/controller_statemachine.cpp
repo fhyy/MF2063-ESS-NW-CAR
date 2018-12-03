@@ -10,7 +10,7 @@ void stopping(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
 
     pty->setDirection(sm->direction, DIRECTION_PRIO);
-    pty->setSpeed((char)(sm->targetSpeed), SPEED_PRIO);
+    pty->setSpeed((char)(sm->targetSpeed), false);
 }
 
 void accelerating(ESSPrototype* pty){
@@ -21,14 +21,14 @@ void accelerating(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
 
     pty->setDirection(sm->direction, DIRECTION_PRIO);
-    pty->setSpeed((char)(sm->targetSpeed), SPEED_PRIO);
+    pty->setSpeed((char)(sm->targetSpeed), false);
 }
 
 void constantSpeed(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
 
     pty->setDirection(sm->direction, DIRECTION_PRIO);
-    pty->setSpeed((char)(sm->targetSpeed), SPEED_PRIO);
+    pty->setSpeed((char)(sm->targetSpeed), false);
 }
 
 void retarding(ESSPrototype* pty){
@@ -40,7 +40,7 @@ void retarding(ESSPrototype* pty){
     sm->direction = DIRECTION_STRAIGHT;
     
     pty->setDirection(sm->direction, DIRECTION_PRIO);
-    pty->setSpeed((char)(sm->targetSpeed), SPEED_PRIO);
+    pty->setSpeed((char)(sm->targetSpeed), false);
 
 }
 
@@ -73,10 +73,10 @@ static stStateTransfor stateMatrix[] = {
 
     
     {stateAny, evCarAny, evCarAny, evLeft, evTrue, stateSteeringLeft},
-    {stateAny, eCarvAny, evCarAny, evRight, evTrue, stateSteeringRight},
+    {stateAny, evCarAny, evCarAny, evRight, evTrue, stateSteeringRight},
 
-    {stateSteeringLeft, evCarAny, evCarAny, evRun, evTrue, stateConstatntSpeed},
-    {stateSteeringRight, evCarAny, evCarAny, evRun, evTrue, stateConstatntSpeed},
+    {stateSteeringLeft, evCarAny, evCarAny, evRun, evTrue, stateConstantSpeed},
+    {stateSteeringRight, evCarAny, evCarAny, evRun, evTrue, stateConstantSpeed},
 
     {stateStandingStill, evHigh, evLow, evRun, evTrue, stateAccelerating},
 
@@ -113,6 +113,35 @@ void statemachineGetEvents(ESSPrototype* pty){
     camera = pty->getFlag();
     distance = pty->getDistance();
     goStatus = pty->getGoStatus();
+    printf("speed: %d", speed);
+    printf("distance: %d", distance);
+    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
+    std::cout << "@@@@@@@@ Attempting to get flag info... " << std::endl;
+    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
+    std::string msg("(");
+    switch (camera.col) {
+        case Flag::Red : msg += "Red, ";
+                         break;
+        case Flag::Green : msg += "Green, ";
+                           break;
+        case Flag::Yellow : msg += "Yellow, ";
+                            break;
+        default : msg += "No color, ";
+                  break;
+    }
+    switch (camera.pos) {
+        case Flag::Left : msg += "Left)";
+                          break;
+        case Flag::Right : msg += "Right)";
+                           break;
+        case Flag::Middle : msg += "Middle)";
+                            break;
+        default : msg += "No position)";
+                  break;
+    }
+    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
+    std::cout << "@@@@@@@@ Flag info: " + msg << std::endl;
+    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
     // speed setup
    if(speed == SPEED_OK){
         sm->speed = evOk;
@@ -141,7 +170,7 @@ void statemachineGetEvents(ESSPrototype* pty){
         sm->camera = evStop;
     }
     // goStatus setup
-    if(goStatus == TRUE)
+    if(goStatus == true)
         sm->goStatus = evTrue;
     else
         sm->goStatus = evFalse;
