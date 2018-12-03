@@ -8,7 +8,7 @@
 #define TARGET_SPEED_STOP 0
 #define TARGET_SPEED_MAX 100
 
-#define DISTANCE_STOP 100   //cm
+#define DISTANCE_STOP 50   //cm
 
 #define SPEED_OK 50 // cm/s, just set for test currently 
 
@@ -16,9 +16,9 @@
 #define DIRECTION_PRIO 0
 #define SPEED_PRIO 0 // just set for test currrently
 
-#define DIRECTION_STRAIGHT 0
-#define DIRECTION_LEFT 1
-#define DIRCTION_RIGHT 2
+#define DIRECTION_STRAIGHT 50
+#define DIRECTION_LEFT 0
+#define DIRCTION_RIGHT 100
 
 #define CAMERA_STOP 0
 #define CAMERA_RUN 1
