@@ -1,5 +1,9 @@
 This folder contains configuration files for the Beagle Bone Black with hostname bbb-distance-steering
 
+SCRIPT                  DESCRIPTION
+spi_setup.sh            This script initialises all the necessary pins for the beaglebone to communicate using its SPI interface. The script is cofigured for debian9 and only needs to be executed once for each new debian installation, i.e. the settings made by it survives reboots.
+
+
 FILE			PLACE IN LINUX FILESYSTEM
 hostname		/etc/hostname
 hosts			/etc/hosts
