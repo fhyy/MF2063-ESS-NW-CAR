@@ -54,9 +54,9 @@
 %	FOOTER TEXT
 %----------------------------------------------------------------------------------------
 
-\newcommand{\leftfoot}{http://www.LaTeXTemplates.com} % Left footer text
+\newcommand{\leftfoot}{ESS-NW/CAR} % Left footer text
 
-\newcommand{\rightfoot}{john@smith.com} % Right footer text
+\newcommand{\rightfoot}{MF2063} % Right footer text
 
 %----------------------------------------------------------------------------------------
 
@@ -80,7 +80,7 @@
 \begin{block}{Introduction}
 
 \begin{itemize}
-\item Donec fringilla, velit id lobortis commodo, eros dui consectetur mi, ut interdum lorem dui sed mauris. Duis id sem nunc, a pharetra odio. Phasellus posuere \alert{semper massa}, id bibendum ligula tristique at. Integer sit amet vulputate turpis. Sed erat lacus, faucibus at viverra et, mattis nec sem. Cras faucibus \alert{scelerisque} cursus. Opet volutpat ligula. Duis semper lorem eget dui dignissim porttitor. Nulla facilisi. In ullamcorper lorem quis dolor iaculis nec egestas enim ultricies. Cras ut mauris elit, ut lacinia dui. Proin in ante et libero hendrerit iaculis. Nulla eu erat a urna laoreet auctor id a turpis. Nam mollis tristique neque eu luctus. Suspendisse rutrum congue nisi sed convallis. Aenean id neque dolor.
+\item This project is to create an autonomous car that is based on an software-defined network (SDN). On the car is different sensors placed to monitor the performance of the car and all this information is used in a control unit to control the car. The information providers and the consumers have to be connected and this is done via an SDN network there a control unit decides how the packet should be sent via the network. The information providers in the car is ultrasound to measure distance, object recognition and speed sensor. 
 \end{itemize}
 
 \end{block}
@@ -90,38 +90,16 @@
 %----------------------------------------------------------------------------------------
 
 \begin{block}{Network}
+    \begin{itemize}
+        \item The network topology in the car is as shown in figure \ref{pic:network}, there all the information providers and consumers are connected via an SDN network.  The controller for the SDN is a raspberry pi model 3, and runs an SDN controller program called Ryu and is used to control the network on how the packages should travel and what priority they have. 
+        \item VSOMEIP 
+    \end{itemize}
 
-\begin{columns} % Subdivide the first main column
-\begin{column}{.54\textwidth} % The first subdivided column within the first main column
-\begin{itemize}
-\item Vestibulum nisl, quis euismod velit eros in ligula.
-\begin{itemize}
-\item Cras rhoncus quam et augue convallis in elementum urna tincidunt.
-\end{itemize}
-\item Proin ut vestibulum augue.
-\begin{itemize}
-\item Donec dapibus sagittis neque eu ultrices.
-\end{itemize}
-\end{itemize}
-\end{column}
-
-\begin{column}{.43\textwidth} % The second subdivided column within the first main column
-\centering
-\begin{figure}
-\includegraphics[width=0.8\linewidth]{placeholder.jpg}
-\caption{Figure caption}
-\end{figure}
-\end{column}
-\end{columns} % End of the subdivision
-
-\begin{itemize}
-\item Curabitur sapien ligula, faucibus in feugiat quis, vestibulum a turpis.
-\begin{itemize}
-\item Phasellus quis nunc neque. Suspendisse mauris diam, suscipit non gravida in, placerat id enim. Ut nec ipsum in lectus ultrices sagittis.
-\item Ut nec ipsum in lectus ultrices sagittis.
-\item Phasellus quis nunc neque.
-\end{itemize}
-\end{itemize}
+    \begin{figure}
+        \includegraphics[width=1\linewidth]{network.png}
+        \caption{Network topology}
+        \label{pic:network}
+        \end{figure}
 
 \end{block}
 
@@ -132,24 +110,9 @@
 \begin{block}{Control and sensors}
 
 \begin{itemize}
-\item Maecenas Vel Nisl Elit
-\begin{itemize}
-\item Suspendisse potenti. Fusce a est eget turpis rhoncus varius sed sed dui. Cras justo nibh, bibendum a cursus eget, consequat et dui. Maecenas vel nisl elit, sed dignissim dolor. 
-\item In hac habitasse platea dictumst.
-\end{itemize}
-
-\item Viewpoint Matching Constraints
-\begin{itemize}
-\item Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. 
-\item Proin in nisi diam.
-\item Nam ultricies pellentesque nunc, ultrices volutpat nisl ultrices a.
-\end{itemize}
-
-\item Volutpat 
-\begin{itemize}
-\item Duis semper lorem eget dui dignissim porttitor.
-\item Nulla facilisi. In ullamcorper lorem quis dolor.
-\end{itemize}
+    \item ultrasound
+    \item Object recognition
+    \item Speed sensor
 \end{itemize}
 
 \end{block}
@@ -252,25 +215,13 @@ Treatment 3 & 0.0009271 & 0.296 \\
 \end{block}
 
 %----------------------------------------------------------------------------------------
-%	REFERENCES
-%----------------------------------------------------------------------------------------
-
-\begin{block}{References}
-        
-\nocite{*} % Insert publications even if they are not cited in the poster
-\small{\bibliographystyle{unsrt}
-\bibliography{sample}}
-
-\end{block}
-
-%----------------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS
 %----------------------------------------------------------------------------------------
 
 \begin{block}{Acknowledgments}
 
 \begin{itemize}
-\item Nam mollis tristique neque eu luctus. Suspendisse rutrum congue nisi sed convallis. Aenean id neque dolor. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.
+\item We want to thank the project owners for their support they have given us under this project. 
 \end{itemize}
 
 \end{block}
@@ -281,11 +232,11 @@ Treatment 3 & 0.0009271 & 0.296 \\
 
 \setbeamercolor{block title}{fg=black,bg=orange!70} % Change the block title color
 
-\begin{block}{Contact Information}
+\begin{block}{Prodject Information}
 
 \begin{itemize}
-\item Github: https://github.com/fhyy/MF2063-ESS-NW-CAR
-\item Email: 
+\item Github: \href{https://github.com/fhyy/MF2063-ESS-NW-CAR}{https://github.com/fhyy/MF2063-ESS-NW-CAR}
+
 \end{itemize}
 
 \end{block}
