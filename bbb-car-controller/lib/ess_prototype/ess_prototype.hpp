@@ -35,7 +35,6 @@ public:
     Position pos;    
 };
 
-// TODO overload methods so that prio does not have to be passed
 class ESSPrototype {
 public:
 

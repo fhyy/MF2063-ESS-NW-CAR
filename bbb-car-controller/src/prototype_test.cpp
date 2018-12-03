@@ -62,9 +62,9 @@ int main() {
     switch (f.pos) {
         case Flag::Left : msg += "Left)";
                           break;
-        case Flag::Green : msg += "Right)";
+        case Flag::Right : msg += "Right)";
                            break;
-        case Flag::Yellow : msg += "Middle)";
+        case Flag::Middle : msg += "Middle)";
                             break;
         default : msg += "No position)";
                   break;
