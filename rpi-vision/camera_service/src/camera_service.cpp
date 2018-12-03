@@ -200,7 +200,6 @@ void CameraService::run_cam() {
         std::vector<std::string> camera_vector;
         while(true) {
             getline(std::cin, camera_data);
-	    std::cout<<camera_data<<std::endl;
             if (camera_data.empty())
                 break;
 
@@ -268,7 +267,7 @@ void CameraService::run_cam() {
 int main(int argc, char** argv) {
     // Default values for cmdline args.
     uint32_t cam_sleep = 1000;
-    bool skip_go = true;
+    bool skip_go = false;
 
 
     // Flags for passing cmdline args.
