@@ -5,6 +5,7 @@ import numpy as np
 import imutils
 import cv2
 from subprocess import Popen, PIPE
+import time
 
 print("INFO: Initialize color space")
 # define the lower and upper boundaries of the colors in the HSV color space
@@ -26,7 +27,7 @@ while True:
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     # for each color in dictionary check object in frame
     for key, value in upper.items():
-        
+
         # construct a mask for the color from dictionary`1, then perform
         # a series of dilations and erosions to remove any small
         # blobs left in the mask
@@ -65,5 +66,4 @@ while True:
                 output = bytes(output, 'UTF-8')
                 p.stdin.write(output)
                 p.stdin.flush()
-
-            break
+    time.sleep(1)
