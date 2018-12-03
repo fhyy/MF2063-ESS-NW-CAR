@@ -136,6 +136,9 @@ int main(void)
                 //Send the values to the arduino motor controller
                 if(canSend){
                     sendMotorValue(fd, controlValue);
+		    char currentSpeed = (1<<7) | receivedMessage;
+		    usleep(50000);
+	            sendMotorValue(fd, currentSpeed);
                     canSend = 0;
                 }
 

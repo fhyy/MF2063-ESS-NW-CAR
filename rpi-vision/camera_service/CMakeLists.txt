@@ -45,5 +45,5 @@ set(target_py ${CMAKE_CURRENT_LIST_DIR}/src/color_detection_cpp.py)
 set(link_py ${CMAKE_CURRENT_LIST_DIR}/build/color_detection_cpp.py)
 
 ADD_CUSTOM_TARGET(link_target_py ALL
-                  COMMAND ${CMAKE_COMMAND} -E create_symlink ${target} ${link})
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink ${target_py} ${link_py})
 #########################################################################################
