@@ -1,6 +1,7 @@
 #include "controller_statemachine.hpp"
 #include "ess_prototype.hpp"
 #include <stdint.h>
+#include <iostream>
 
 
 stCarStatemachine *sm = 0x0;
@@ -114,7 +115,7 @@ void statemachineGetEvents(ESSPrototype* pty){
     distance = pty->getDistance();
     goStatus = pty->getGoStatus();
     printf("speed: %d", speed);
-    printf("distance: %d", distance);
+    printf("distance: %d\n", distance);
     std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
     std::cout << "@@@@@@@@ Attempting to get flag info... " << std::endl;
     std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
@@ -196,6 +197,9 @@ void statemachineIteration(ESSPrototype* pty){
 }
 
 void printState(stCarStatemachine* statemachine){
-    printf("\n state: %s, distance: %s, speed: %s, camera: %s, goStatus: %s, targetSpeed: %d\n", 
-        stateText[statemachine->state],eventText[statemachine->distance],eventText[statemachine->speed],cameraText[statemachine->camera],goStatusText[statemachine->goStatus],statemachine->targetSpeed);
+    //printf("\n state: %s, distance: %s, speed: %s, camera: %s, goStatus: %s, targetSpeed: %d\n", 
+    //    stateText[statemachine->state],eventText[statemachine->distance],eventText[statemachine->speed],cameraText[statemachine->camera],goStatusText[statemachine->goStatus],statemachine->targetSpeed);
+    std::cout << "state: " << stateText[statemachine->state] << " distance: " << eventText[statemachine->distance];
+    std::cout << " camera: " << eventText[statemachine->camera] << " goStatus: " << eventText[statemachine->goStatus];
+    std::cout << " target speed: " << statemachine->targetSpeed << std::endl;
 }

@@ -100,7 +100,7 @@ typedef struct{
     uint32_t camera;
 } stControllerInput;
 
-static string stateText[6]={
+const std::string stateText[]={
     "STANDING_STILL",
     "ACCELERATING",
     "CONSTANT_SPEED",
@@ -109,20 +109,20 @@ static string stateText[6]={
     "STEERINF_RIGHT"
 };
 
-static string eventText[3]={
+const std::string eventText[]={
     "HIGH",
     "LOW",
     "OK"
 };
 
-static string cameraText[4]={
+const std::string cameraText[]={
     "STOP",
     "RUN",
     "LEFT",
     "RIGHT"
 };
 
-static string goStatusText[2]={
+const std::string goStatusText[]={
     "FALSE",
     "TRUE"
 };
