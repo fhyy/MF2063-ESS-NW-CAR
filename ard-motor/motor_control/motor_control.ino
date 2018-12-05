@@ -102,9 +102,9 @@ ISR(SPI_STC_vect)
     targetSpeed = spi_in;
   }
  
-	Serial.print("One: ");
+	Serial.print("Target: ");
   Serial.println((int)targetSpeed);
-	Serial.print("Two: ");
+	Serial.print("Current: ");
   Serial.println((int)lastEncoderVal);
 	
 	// Variables used for predicting speed change
@@ -123,6 +123,10 @@ void setupAndCallibrateESC()
 {
   esc.attach(MOTOR_PIN);  // Attach servo to pin
 
+  esc.writeMicroseconds(ESC_MIN);  // Send minimum signal value for calibration
+
+  /*delay(ESC_CALIBRATION_DELAY); // Wait for ESC to acknowledge signal
+  
   esc.writeMicroseconds(ESC_MAX); // Send calibration signal to ESC (also max value)
 
   // Start ESC during this time
@@ -134,6 +138,7 @@ void setupAndCallibrateESC()
 
   esc.writeMicroseconds(ESC_ARM); // Send arm signal to ESC
   delay(1000);
+  */
   setupComplete = 1;
 }
 
