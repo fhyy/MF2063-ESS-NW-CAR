@@ -109,77 +109,74 @@ void statemachineInit(stCarStatemachine* statemachine){
 }
 
 void statemachineGetEvents(ESSPrototype* pty){
-    char speed, distance;
-    bool goStatus;
-    Flag camera;
-    // read data from different places
-    speed = pty->getSpeed();
-    camera = pty->getFlag();
-    distance = pty->getDistance();
-    goStatus = pty->getGoStatus();
-    printf("speed: %d", speed);
-    printf("distance: %d\n", distance);
-    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@ Attempting to get flag info... " << std::endl;
-    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
-    std::string msg("(");
-    switch (camera.col) {
-        case Flag::Red : msg += "Red, ";
-                         break;
-        case Flag::Green : msg += "Green, ";
-                           break;
-        case Flag::Yellow : msg += "Yellow, ";
+    bool goStatus = pty->getGoStatus();
+    if(goStatus){
+        
+        char speed = pty->getSpeed();
+        char distance = pty->getDistance();;
+        Flag camera = pty->getFlag();
+        
+        printf("speed: %d", speed);
+        printf("distance: %d\n", distance);
+        std::string msg("(");
+        switch (camera.col) {
+            case Flag::Red : msg += "Red, ";
                             break;
-        default : msg += "No color, ";
-                  break;
-    }
-    switch (camera.pos) {
-        case Flag::Left : msg += "Left)";
-                          break;
-        case Flag::Right : msg += "Right)";
-                           break;
-        case Flag::Middle : msg += "Middle)";
+            case Flag::Green : msg += "Green, ";
                             break;
-        default : msg += "No position)";
-                  break;
-    }
-    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
-    std::cout << "@@@@@@@@ Flag info: " + msg << std::endl;
-    std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
-    // speed setup
-   if(speed == SPEED_OK){
-        sm->speed = evOk;
-    }else if(speed > SPEED_OK){
-        sm->speed = evHigh;
+            case Flag::Yellow : msg += "Yellow, ";
+                                break;
+            default : msg += "No color, ";
+                    break;
+        }
+        switch (camera.pos) {
+            case Flag::Left : msg += "Left)";
+                            break;
+            case Flag::Right : msg += "Right)";
+                            break;
+            case Flag::Middle : msg += "Middle)";
+                                break;
+            default : msg += "No position)";
+                    break;
+        }
+        std::cout << "@@@@@@@@ Flag info: " + msg << std::endl;
+        std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
+        //go staus setup
+        sm->goStatus = True;
+        // speed setup
+        if(speed == SPEED_OK){
+            sm->speed = evOk;
+        }else if(speed > SPEED_OK){
+            sm->speed = evHigh;
+        }else{
+            sm->speed = evLow;
+        } 
+        // distance setup
+        if(distance > DISTANCE_STOP){
+            sm->distance = evHigh;
+        }else{
+            sm->distance = evLow;
+        }
+        // camera setup
+        /*
+        if(camera.col == Flag::Red){
+            sm->camera = evStop;
+        }else if (camera.col == Flag::Green && camera.pos == Flag::Middle){
+            sm->camera = evRun;
+        }else if(camera.col == Flag::Green && camera.pos == Flag::Left){
+            sm->camera = evLeft;
+        }else if (camera.col == Flag::Green && camera.pos == Flag::Right){
+            sm->camera = evRight;
+        }else {
+            // if weried msg is received, stop the car
+            sm->camera = evStop;
+        }
+        */
+
     }else{
-        sm->speed = evLow;
-    } 
-    // distance setup
-    if(distance > DISTANCE_STOP){
-        sm->distance = evHigh;
-    }else{
-        sm->distance = evLow;
-    }
-    // camera setup
-    /*
-    if(camera.col == Flag::Red){
-        sm->camera = evStop;
-    }else if (camera.col == Flag::Green && camera.pos == Flag::Middle){
-        sm->camera = evRun;
-    }else if(camera.col == Flag::Green && camera.pos == Flag::Left){
-        sm->camera = evLeft;
-    }else if (camera.col == Flag::Green && camera.pos == Flag::Right){
-        sm->camera = evRight;
-    }else {
-        // if weried msg is received, stop the car
-        sm->camera = evStop;
-    }
-    // goStatus setup
-    if(goStatus == true)
-        sm->goStatus = evTrue;
-    else
         sm->goStatus = evFalse;
-    */
+        doctor(pty);
+    }
 }
 
 void statemachineIteration(ESSPrototype* pty){
@@ -212,4 +209,25 @@ void printState(stCarStatemachine* statemachine){
     std::cout << " camera: " << cameraText[statemachine->camera] << " goStatus: " << goStatusText[statemachine->goStatus]<<std::endl;
     std::cout << " speed: " << eventText[statemachine->speed] << std::endl;
     printf("targetSpeed %d\n",statemachine->targetSpeed);
+}
+
+bool doctor(ESSPrototype* prototype){
+	bool checkFlag = true;
+	if(!prototype->checkMotor()){
+		printf("motor doesn't pass the check\n");
+		checkFlag = false;
+	}
+	if (!prototype->checkSpeedSensor()){
+		printf("Speed Sensor doesn't pass the check\n");
+		checkFlag = false;
+	}
+	if (!prototype->checkSteering()){
+		printf("Steering doesn't pass the check\n");
+		checkFlag = false;
+	}
+	if(!prototype->checkDistanceSensor()){
+		printf("DistanceSensor doesn't pass the check\n");
+		checkFlag = false;
+	}
+    return checkFlag;
 }

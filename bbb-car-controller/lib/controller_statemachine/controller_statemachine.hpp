@@ -153,5 +153,6 @@ void statemachineIteration(ESSPrototype* pty);
  */
 void printState(stCarStatemachine* statemachine);
 
+bool doctor(ESSPrototype *prototype);
 
 #endif
