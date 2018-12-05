@@ -99,10 +99,12 @@ void statemachineInit(stCarStatemachine* statemachine){
     sm->state = stateStandingStill;
     sm->speed = evLow;
     sm->distance = evHigh;
-    sm->camera  =  evStop;
+    //sm->camera  =  evStop;
+    sm->camera = evRun; // used for test, always run
     sm->targetSpeed = TARGET_SPEED_STOP;
     sm->direction = DIRECTION_STRAIGHT;
-    sm->goStatus = evFalse;
+    //sm->goStatus = evFalse;
+    sm->goStatus = evTrue; // used for test
 }
 
 void statemachineGetEvents(ESSPrototype* pty){
@@ -158,6 +160,7 @@ void statemachineGetEvents(ESSPrototype* pty){
         sm->distance = evLow;
     }
     // camera setup
+    /*
     if(camera.col == Flag::Red){
         sm->camera = evStop;
     }else if (camera.col == Flag::Green && camera.pos == Flag::Middle){
@@ -175,6 +178,7 @@ void statemachineGetEvents(ESSPrototype* pty){
         sm->goStatus = evTrue;
     else
         sm->goStatus = evFalse;
+    */
 }
 
 void statemachineIteration(ESSPrototype* pty){

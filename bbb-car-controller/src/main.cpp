@@ -37,7 +37,7 @@ int main() {
 	sleep(2);
 	bool bootFlag = bootup(&prototype);
 	stCarStatemachine carStatemachine;
-	
+	bootFlag = true;
 	if(bootFlag){
 		printf("**********************************");
 		printf("\nESS prototype car is online now!\n");
