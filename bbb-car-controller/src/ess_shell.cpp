@@ -2,6 +2,7 @@
 #include <iostream>
 #include "ess_prototype.hpp"
 
+#define SYSSTAT_CMD 0
 #define SETSPEED_CMD 1
 #define SETSTEER_CMD 2
 #define SETMIN_CMD 3
@@ -44,6 +45,7 @@ int main() {
     while(true) {
         cout << "==================================" << endl;
         cout << "Select command:" << endl;
+        cout << "0. Get system status" << endl;
         cout << "1. Set speed" << endl;
         cout << "2. Set steering" << endl;
         cout << "3. Set minimum distance" << endl;
@@ -60,6 +62,12 @@ int main() {
         int input = getArgument();
 
         switch (input) {
+            case SYSSTAT_CMD:
+                {
+                    bool ok = proto.getGoStatus();
+                    cout << "> System status loaded. Current status: " + string(ok? "Not Ready" : "Ready");
+                }
+                break;
             case SETSPEED_CMD:
                 cout << "Enter desired speed (0-125):" << endl;
                 cout << "< ";
