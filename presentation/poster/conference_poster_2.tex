@@ -80,7 +80,7 @@
 \begin{block}{Introduction}
 
 \begin{itemize}
-\item This project is about to create an autonomous car that is based on an software-defined network (SDN). On the car is different sensors placed to monitor the performance of the car and all this information is used in a control unit to control the car. The information providers and the consumers have to be connected and this is done via an SDN network there a control unit decides how the packet should be sent via the network. The information providers in the car is ultrasound to measure distance, object recognition and speed sensor. 
+\item This project is about to implement an autonomous car that uses software-defined network (SDN) to communicate between the different nodes in the car. SDN is a new type of technology that moves the control part in the switches to a controller. The communication over the network will be done via something called VSOME/IP and is an application middleware designed for the car industry and compatible with AUTOSAR. On the cat is also different types of sensors used to monitor the car performance and its surrounding. There all the sensors will communicate to each other via the SDN network. 
 \end{itemize}
 
 \end{block}
@@ -153,10 +153,13 @@
 
 \begin{block}{Network}
     \begin{itemize}
-        \item The network topology in the car is as shown in figure \ref{pic:network}, there all the information providers and consumers are connected via an SDN network.  The controller for the SDN is a raspberry pi model 3, and runs an SDN controller program called Ryu and is used to control the network on how the packages should travel and what priority they have. 
-        \item The switches used in this project is Zodiac FX and is made for SDN network and openflow. 
+        \item Software defined network (SDN) is a type of network configuration that moves the intelligent from the switches to a controller unit. This is to make the network smart and can sort packages depending on their priorities and traffic load to different paths, to enable faster computing and distribute the network load. It also self-configured to if a link is down or a new link is up it will detect it.  SDN is done via a protocol called OpenFlow to control the switches. 
+        
+        \item For this project is only three SDN switches of type Zodiac FX used and the network is configured according to the topology in figure \ref{pic:network}. The controller is a raspberry pi model 3 that uses the RYU SDN framework to control the switches and to gather information. 
+        
         \item To send information between the nodes is a middleware application called VSOME/IP and is an application designed for automotive products e.g. cares and is compatible with AUTOSAR. 
-        \item In the end of the network is Arduino micro used to sample the data from the sensor and then send to a Beaglebone black via SPI interface. 
+        
+        \item At the edges of the network is Arduino used to control the sensors, and to gather the information. This information is then passed via an SPI interface to a Beaglebone black that sends it out on the network.  
     \end{itemize}
 
     
@@ -172,21 +175,7 @@
     
 \end{block}
 
-%----------------------------------------------------------------------------------------
-%	Control and Sensors 
-%----------------------------------------------------------------------------------------
 
-\begin{block}{Control and sensors}
-
-\begin{itemize}
-    \item On the car is three ultrasound sensors placed to detect object in front of the car, to give information to the controller if something is in front of it. Three sensors was used to detect obstacle from left, right and in the middle of the car direction
-    
-    \item The car should be able to detect traffic signs, and we did a simplification of only using colours to drive the car. If there is a green signed in front of the car will it follow it and if the sign is red it will stop.  
-    
-    \item Speed sensor
-\end{itemize}
-
-\end{block}
 
 %----------------------------------------------------------------------------------------
 %	
@@ -201,11 +190,30 @@
 \begin{column}{.03\textwidth}\end{column} % Empty spacer column
  
 \begin{column}{.465\textwidth} % The second column
+
+    %----------------------------------------------------------------------------------------
+%	Control and Sensors 
+%----------------------------------------------------------------------------------------
+
+\begin{block}{Control and sensors}
+
+    \begin{itemize}
+        \item On the car is three ultrasound sensors placed to detect object in front of the car, to give information to the controller if something is in front of it. Three sensors was used to detect obstacle from left, right and in the middle of the car direction
+        
+        \item The car should be able to detect traffic signs, and we did a simplification of only using colours to drive the car. If there is a green signed in front of the car will it follow it and if the sign is red it will stop.  
+        
+        \item Speed sensor
+    \end{itemize}
+    
+    \end{block}
+
+
+
     \begin{block}{Assembley}
 
         \begin{itemize}
-            \item The car was assembled via via some acyle plastic that was used to cut out the pieces to assemble the devices one the car.
-            \item The design of the assembly platform is done in Autodesk fusion 360
+            \item The car was assembled via some acyle plastic that was used to cut out the pieces to assemble the devices one the car, as shown in figure \ref{fig:car1}.
+            \item The design of the assembly platform is done in Autodesk fusion 360.
             
             
             \item The car is power via a lithium battery of 3 cells and is used power the engine and all the components of the car. The power is deliver from the PCB designs and via a boost converter to boost the 5v to 9v to run one of the switches.
@@ -214,16 +222,25 @@
     
     \end{block}
 %----------------------------------------------------------------------------------------
-\begin{block}{Figure of assembely}
-    
+\begin{block}{Figure of the car}
+    \begin{figure}
+        \includegraphics[width=1\linewidth]{car1.jpg}
+        \label{fig:car1}
+        \caption{Picture of the car}
+    \end{figure}
 \end{block}
 
 %------------------------------------------------
 
-\
-
-
-
+%\begin{block}{Figure of the car}
+%    \begin{figure}
+%        \includegraphics[width=1\linewidth]{car2.jpg}
+%        \label{gig:car2}
+%        \caption{Picture of the car}
+%    \end{figure}
+%\end{block}
+%
+%
 
 
 %----------------------------------------------------------------------------------------
@@ -239,7 +256,7 @@
 \end{block}
 
 %----------------------------------------------------------------------------------------
-%	CONTACT INFORMATION
+%	INFORMATION
 %----------------------------------------------------------------------------------------
 
 \setbeamercolor{block title}{fg=black,bg=orange!70} % Change the block title color
