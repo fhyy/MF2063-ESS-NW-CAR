@@ -65,7 +65,8 @@ int main() {
             case SYSSTAT_CMD:
                 {
                     bool ok = proto.getGoStatus();
-                    cout << "> System status loaded. Current status: " + string(ok? "Not Ready" : "Ready");
+                    cout << "> System status loaded. Current status: "
+                         + string(ok? "Ready" : "Not Ready") << endl;
                 }
                 break;
             case SETSPEED_CMD:
@@ -85,6 +86,7 @@ int main() {
                 cout << "< ";
                 proto.setMinDistance((char) getArgument(), false);
                 cout << endl;
+                break;
             case GETSPEED_CMD:
                 cout << "> Current speed is " << (int) proto.getSpeed() << " cm/s." << endl;
                 break;
