@@ -22,72 +22,77 @@ using namespace std;
 int main() {
     ESSPrototype proto;
 
-    cout << "****************************************************" << std::endl;
-    cout << "****************************************************" << std::endl;
-    cout << "***                                              ***" << std::endl;
-    cout << "***         #######   ###########   ###########  ***" << std::endl;
-    cout << "***        #######   ##########    ##########    ***" << std::endl;
-    cout << "***       ###         ###  ###      ###  ###     ***" << std::endl;
-    cout << "***      #######       ###           ###         ***" << std::endl;
-    cout << "***     #######         ###           ###        ***" << std::endl;
-    cout << "***    ###          ###  ###      ###  ###       ***" << std::endl;
-    cout << "***   #######      ##########    ##########      ***" << std::endl;
-    cout << "***  #######      ##########    ##########       ***" << std::endl;
-    cout << "***                                              ***" << std::endl;
-    cout << "****************************************************" << std::endl;
-    cout << "****************************************************" << std::endl;
+    cout << "****************************************************" << endl;
+    cout << "****************************************************" << endl;
+    cout << "***                                              ***" << endl;
+    cout << "***         #######   ###########   ###########  ***" << endl;
+    cout << "***        #######   ##########    ##########    ***" << endl;
+    cout << "***       ###         ###  ###      ###  ###     ***" << endl;
+    cout << "***      #######       ###           ###         ***" << endl;
+    cout << "***     #######         ###           ###        ***" << endl;
+    cout << "***    ###          ###  ###      ###  ###       ***" << endl;
+    cout << "***   #######      ##########    ##########      ***" << endl;
+    cout << "***  #######      ##########    ##########       ***" << endl;
+    cout << "***                                              ***" << endl;
+    cout << "****************************************************" << endl;
+    cout << "****************************************************" << endl;
 
     while(true) {
-        cout << "Select command:" << std::endl;
-        cout << "1. Set speed" << std::endl;
-        cout << "2. Set steering" << std::endl;
-        cout << "3. Get speed" << std::endl;
-        cout << "4. Get distance" << std::endl;
-        cout << "5. Get camera" << std::endl;
-        cout << "6. Check motor" << std::endl;
-        cout << "7. Check steering" << std::endl;
-        cout << "8. Check speedometer" << std::endl;
-        cout << "9. Check distance sensors" << std::endl;
-        cout << "10. Check camera" << std::endl;
-        cout << "11. Quit" << std::endl;
+        cout << "==================================" << endl;
+        cout << "Select command:" << endl;
+        cout << "1. Set speed" << endl;
+        cout << "2. Set steering" << endl;
+        cout << "3. Get speed" << endl;
+        cout << "4. Get distance" << endl;
+        cout << "5. Get camera" << endl;
+        cout << "6. Check motor" << endl;
+        cout << "7. Check steering" << endl;
+        cout << "8. Check speedometer" << endl;
+        cout << "9. Check distance sensors" << endl;
+        cout << "10. Check camera" << endl;
+        cout << "11. Quit" << endl;
 
         int input = getArgument();
 
         switch (input) {
             case SETSPEED_CMD:
+                cout << "Enter desired speed (0-125): ";
                 proto.setSpeed((char) getArgument(), false);
+                cout << endl;
                 break;
             case SETSTEER_CMD:
+                cout << "Enter desired angle (0-100): ";
                 proto.setDirection((char) getArgument(), false);
+                cout << endl;
                 break;
             case GETSPEED_CMD:
-                cout << "Current speed is " << (int) proto.getSpeed() << "cm/s." << std::endl;
+                cout << "> Current speed is " << (int) proto.getSpeed() << "cm/s." << endl;
                 break;
             case GETDIST_CMD:
-                cout << "Free distance ahead is " << (int) proto.getDistance() << "cm." << std::endl;
+                cout << "> Free distance ahead is " << (int) proto.getDistance() << "cm." << endl;
                 break;
             case GETCAMERA_CMD:
-                cout << decodeFlag(proto.getFlag()) << std::endl;
+                cout << decodeFlag(proto.getFlag()) << endl;
                 break;
             case CHECK_MOTOR:
-                cout << "Motor is " + string((proto.checkMotor() ? "" : "NOT "))
-                     + "online." << std::endl;
+                cout << "> Motor is " + string((proto.checkMotor() ? "" : "NOT "))
+                     + "online." << endl;
                 break;
             case CHECK_STEER:
-                cout << "Steering is " + string((proto.checkSteering() ? "" : "NOT "))
-                     + "online." << std::endl;
+                cout << "> Steering is " + string((proto.checkSteering() ? "" : "NOT "))
+                     + "online." << endl;
                 break;
             case CHECK_SPEEDOMETER:
-                cout << "Speedometer is " + string((proto.checkSpeedSensor() ? "" : "NOT "))
-                     + "online." << std::endl;
+                cout << "> Speedometer is " + string((proto.checkSpeedSensor() ? "" : "NOT "))
+                     + "online." << endl;
                 break;
             case CHECK_DISTSENSORS:
-                cout << "Distance sensors are " + string((proto.checkDistanceSensor() ? "" : "NOT "))
-                     + "online." << std::endl;
+                cout << "> Distance sensors are " + string((proto.checkDistanceSensor() ? "" : "NOT "))
+                     + "online." << endl;
                 break;
             case CHECK_CAMERA:
-                cout << "Camera is " + string((proto.checkCameraSensor() ? "" : "NOT "))
-                     + "online." << std::endl;
+                cout << "> Camera is " + string((proto.checkCameraSensor() ? "" : "NOT "))
+                     + "online." << endl;
                 break;
             case QUIT:
                 goto endloop;
@@ -95,9 +100,13 @@ int main() {
             default:
                 break;
         }
+
+    cout << "==================================" << endl;
     }
 endloop:
     // TODO stop proto?
+    cout << "Quitting ess_shell..." << endl;
+    cout << "==================================" << endl;
     return 0;
 }
 
@@ -116,7 +125,7 @@ int getArgument() {
 }
 
 string decodeFlag(Flag f) {
-    string msg("");
+    string msg("> ");
 
     switch (f.col) {
         case Flag::Red : msg += "Flag is red and ";

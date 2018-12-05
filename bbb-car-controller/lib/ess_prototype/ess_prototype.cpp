@@ -1,6 +1,6 @@
 #include "ess_prototype.hpp"
 
-#define DEBUG 1
+#define DEBUG 0
 
 ESSPrototype::ESSPrototype() :
     service_status_(0),
