@@ -23,6 +23,10 @@ install(TARGETS car-ctrl-client DESTINATION bin)
 add_executable(main "${PROJECT_SOURCE_DIR}/src/main.cpp")
 target_link_libraries(main cbuf shm essproto ctrl-sm pthread rt)
 install(TARGETS main DESTINATION bin)
+
+add_executable(ess_shell "${PROJECT_SOURCE_DIR}/src/ess_shell.cpp")
+target_link_libraries(ess_shell cbuf shm essproto pthread rt)
+install(TARGETS ess_shell DESTINATION bin)
 #########################################################################################
 
 
