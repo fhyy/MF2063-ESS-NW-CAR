@@ -76,6 +76,7 @@
 %\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
 }
 
+\usepackage[export]{adjustbox}
 \usepackage{graphicx} % Allows including images
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 \graphicspath{ {./figures/} }
@@ -87,7 +88,7 @@
 \title[ESS-NW/CAR]{ESS-NW/CAR } % The short title appears at the bottom of every slide, the full title is only on the title page
 
 \author{ Leon Fernandez, Jonas Ekman, Fredrik Hyyrynen, Jacob Kimblad, Yini Gao and  Yifan Ruan} % Your name
-\institute[UCLA] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+\institute[KTH] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
 {
 MF2063 \\ % Your institution for the title page
 \medskip
@@ -115,53 +116,113 @@ MF2063 \\ % Your institution for the title page
     
 \begin{frame}{Introduction}
     \begin{itemize}
-        \item Communication in self driving cares
+        \item Autonomous Driving (AD) and Advandced Driving Assistance Systems (ADAS)
+        \item Communication in self driving cars
+        \begin{itemize}
+            \item CAN
+            \item LIN
+            \item FlexRay
+            \item Ethernet
+        \end{itemize}
         \item Intelligent system monitoring
+        \begin{itemize}
+            \item Startup
+            \item Fault detection
+            \item Network statistics
+        \end{itemize}
         \item Adaptation services
+        \begin{itemize}
+            \item Failsafe
+            \item Network reconfiguration
+        \end{itemize}
+
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Introduction}
-    \begin{figure}
-        \includegraphics{network.png}
-        \caption{Network}
-    \end{figure}
-\end{frame}
 
+%------------------------------------------------
 
 \section{Network}
 \subsection{SDN}
 \begin{frame}{SDN}
     \begin{itemize}
         \item Software defined Network (SDN)
-        \item 
     \end{itemize}
+    \begin{figure}
+        \includegraphics[width=0.6\linewidth]{network.png}
+        \caption{Network}
+    \end{figure}
 \end{frame}
 \subsection{VSome/IP}
 \begin{frame}{VSOME/IP}
     
 \end{frame}
 
+%------------------------------------------------
+
 \section{Control and sensors }
-\subsection{Ultra sound}
-\subsection{Object recognition}
-\subsection{Control}
+\subsection{Sensors}
+\begin{frame}{Sensors}
+    \begin{itemize}
+     \item Ultrasonic sensor
+    \begin{figure}
+        \includegraphics[width=0.2\linewidth, left]{ultrasonic.jpg}
+    \end{figure}
+    \item Reflective object sensor
+    \begin{figure}
+        \includegraphics[width=0.2\linewidth, left]{ir.jpg}
+    \end{figure}
+    \item Camera
+    \begin{figure}
+        \includegraphics[width=0.2\linewidth, left]{camera.jpg}
+    \end{figure}
+
+    \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\subsection{Actutators}
+\begin{frame}{Actuators}
+ \begin{itemize}
+  \item Motor controller
+  \item Steering controller
+ \end{itemize}
+
+\end{frame}
 
 \section{Assembly}
 \subsection{Power}
 \subsection{Mounting}
 
-\section{Conclusion}
-
-\begin{frame}
-\frametitle{Introduction}
-
-\end{frame}
 %------------------------------------------------
 
+\subsection{Autonomous behaviour}
+\begin{frame}{Autonomous behaviour}
+ \begin{itemize}
+  \item Services
+  \item State machine
+  \begin{figure}
+    \includegraphics[width=0.7\linewidth]{statemachine.png}
+    \caption{State machine}
+  \end{figure}
+ \end{itemize}
 
+\end{frame}
+
+\section{Assembly}
+\subsection{Power}
+\subsection{Mounting}
+
+%------------------------------------------------
+
+\section{Conclusion}
 \begin{frame}{Conclusion}
     \begin{itemize}
+        \item Ethernet is a promising candidate for increasing demand on bandwidth for communication in autonomous cars.
+        \item Ethernet is not without problems, which of many SDN is a promising candidate to solve.
+        \item SDN networks allow for safe, fast and customisable communication on autnomous vehicles.
         \item Thanks to our project owners! 
     \end{itemize}
     
