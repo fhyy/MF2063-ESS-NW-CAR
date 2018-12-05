@@ -16,7 +16,6 @@ upper = {'1': (186, 255, 255), '2': (86, 255, 255),  '3': (54, 255, 255)}
 colors = {'1': (0, 0, 255), '2': (0, 255, 0),  '3': (0, 255, 217)}
 print("INFO: starting camera")
 camera = cv2.VideoCapture(0)
-p = Popen(['./camera-service'], stdout=PIPE, stdin=PIPE)
 
 # keep looping
 while True:
@@ -64,6 +63,5 @@ while True:
                 # then update the list of tracked points
                 output = key + loc + '\n'
                 output = bytes(output, 'UTF-8')
-                p.stdin.write(output)
-                p.stdin.flush()
+                print(output)
     time.sleep(1)
