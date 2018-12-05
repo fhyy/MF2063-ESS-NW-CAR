@@ -1,6 +1,6 @@
 #include "car_ctrl_client.hpp"
 
-#define DEBUG 1
+#define DEBUG 0
 #define WAKEUP_DEBUG 0
 
 CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep, bool skip_go) :
