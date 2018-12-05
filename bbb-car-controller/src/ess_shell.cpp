@@ -4,15 +4,16 @@
 
 #define SETSPEED_CMD 1
 #define SETSTEER_CMD 2
-#define GETSPEED_CMD 3
-#define GETDIST_CMD 4
-#define GETCAMERA_CMD 5
-#define CHECK_MOTOR 6
-#define CHECK_STEER 7
-#define CHECK_SPEEDOMETER 8
-#define CHECK_DISTSENSORS 9
-#define CHECK_CAMERA 10
-#define QUIT 11
+#define SETMIN_CMD 3
+#define GETSPEED_CMD 4
+#define GETDIST_CMD 5
+#define GETCAMERA_CMD 6
+#define CHECK_MOTOR 7
+#define CHECK_STEER 8
+#define CHECK_SPEEDOMETER 9
+#define CHECK_DISTSENSORS 10
+#define CHECK_CAMERA 11
+#define QUIT 12
 
 int getArgument();
 string decodeFlag(Flag f);
@@ -22,6 +23,9 @@ using namespace std;
 int main() {
     ESSPrototype proto;
 
+    sleep(4);
+
+    cout << endl;
     cout << "****************************************************" << endl;
     cout << "****************************************************" << endl;
     cout << "***                                              ***" << endl;
@@ -42,29 +46,37 @@ int main() {
         cout << "Select command:" << endl;
         cout << "1. Set speed" << endl;
         cout << "2. Set steering" << endl;
-        cout << "3. Get speed" << endl;
-        cout << "4. Get distance" << endl;
-        cout << "5. Get camera" << endl;
-        cout << "6. Check motor" << endl;
-        cout << "7. Check steering" << endl;
-        cout << "8. Check speedometer" << endl;
-        cout << "9. Check distance sensors" << endl;
-        cout << "10. Check camera" << endl;
-        cout << "11. Quit" << endl;
-
+        cout << "3. Set minimum distance" << endl;
+        cout << "4. Get speed" << endl;
+        cout << "5. Get distance" << endl;
+        cout << "6. Get camera" << endl;
+        cout << "7. Check motor" << endl;
+        cout << "8. Check steering" << endl;
+        cout << "9. Check speedometer" << endl;
+        cout << "10. Check distance sensors" << endl;
+        cout << "11. Check camera" << endl;
+        cout << "12. Quit" << endl;
+        cout << "< ";
         int input = getArgument();
 
         switch (input) {
             case SETSPEED_CMD:
-                cout << "Enter desired speed (0-125): ";
+                cout << "Enter desired speed (0-125):" << endl;
+                cout << "< ";
                 proto.setSpeed((char) getArgument(), false);
                 cout << endl;
                 break;
             case SETSTEER_CMD:
-                cout << "Enter desired angle (0-100): ";
+                cout << "Enter desired angle (0-100):" << endl;
+                cout << "< ";
                 proto.setDirection((char) getArgument(), false);
                 cout << endl;
                 break;
+            case SETMIN_CMD:
+                cout << "Enter desired minimum distance (0-255):" << endl;
+                cout << "< ";
+                proto.setMinDistance((char) getArgument(), false);
+                cout << endl;
             case GETSPEED_CMD:
                 cout << "> Current speed is " << (int) proto.getSpeed() << " cm/s." << endl;
                 break;
