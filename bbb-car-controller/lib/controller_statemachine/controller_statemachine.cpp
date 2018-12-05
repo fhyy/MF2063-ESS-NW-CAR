@@ -142,7 +142,7 @@ void statemachineGetEvents(ESSPrototype* pty){
         std::cout << "@@@@@@@@ Flag info: " + msg << std::endl;
         std::cout << "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" << std::endl;
         //go staus setup
-        sm->goStatus = True;
+        sm->goStatus = evTrue;
         // speed setup
         if(speed == SPEED_OK){
             sm->speed = evOk;
