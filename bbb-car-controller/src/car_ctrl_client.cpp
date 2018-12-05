@@ -1,6 +1,7 @@
 #include "car_ctrl_client.hpp"
 
 #define DEBUG 1
+#define WAKEUP_DEBUG 0
 
 CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep, bool skip_go) :
     run_(false),
@@ -269,7 +270,7 @@ void CarCTRLClient::send_motor_req() {
 
         // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_mo_sleep_));
-        #if (DEBUG)
+        #if (WAKEUP_DEBUG)
 	        std::cout << "## DEBUG ## send_motor_req woke up from sleeping! ## DEBUG ##" << std::endl; 
         #endif
     }
@@ -352,7 +353,7 @@ void CarCTRLClient::send_steer_req() {
 
         // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_st_sleep_));
-        #if (DEBUG)
+        #if (WAKEUP_DEBUG)
 	        std::cout << "## DEBUG ## send_steer_req woke up from sleeping! ## DEBUG ##"
                       << std::endl; 
         #endif
@@ -436,7 +437,7 @@ void CarCTRLClient::send_setmin_req() {
 
         // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_setmin_sleep_));
-        #if (DEBUG)
+        #if (WAKEUP_DEBUG)
 	        std::cout << "## DEBUG ## send_setmin_req woke up from sleeping! ## DEBUG ##"
                       << std::endl; 
         #endif
@@ -487,7 +488,7 @@ void CarCTRLClient::send_shutdown_req() {
                 cond_app_.wait(app_lk);
             app_busy_ = true;
 
-            
+
 
             /*
              * TODO
@@ -520,9 +521,9 @@ void CarCTRLClient::send_shutdown_req() {
 
         // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_shutdown_sleep_));
-        #if (DEBUG)
+        #if (WAKEUP_DEBUG)
 	        std::cout << "## DEBUG ## send_shutdown_req woke up from sleeping! ## DEBUG ##"
-                      << std::endl; 
+                      << std::endl;
         #endif
     }
 }

@@ -15,6 +15,8 @@
 
 #define SPI_PATH "/dev/spidev1.0"
 
+#define DEBUG 0
+
 // get distance from distance Arduino, performance/interrupt issues
 int compareDistance(unsigned int fd){
        char a[3],startByte;
@@ -23,9 +25,10 @@ int compareDistance(unsigned int fd){
        if(startByte==0x0){
                read(fd,a,3);
 
-               //used for test
-               printf("Distance sensors value: %d %d %d\n", a[0], a[1], a[2]);
-
+                //used for test
+                #if (DEBUG)
+		    printf("Distance sensors value: %d %d %d\n", a[0], a[1], a[2]);
+                #endif
 
                fflush(stdout);
                return (int)(0 << 24 | a[0] << 16 | a[1] << 8 | a[2]);
