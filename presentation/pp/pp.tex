@@ -87,7 +87,7 @@
 \title[ESS-NW/CAR]{ESS-NW/CAR } % The short title appears at the bottom of every slide, the full title is only on the title page
 
 \author{ Leon Fernandez, Jonas Ekman, Fredrik Hyyrynen, Jacob Kimblad, Yini Gao and  Yifan Ruan} % Your name
-\institute[UCLA] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+\institute[KTH] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
 {
 MF2063 \\ % Your institution for the title page
 \medskip
@@ -115,15 +115,32 @@ MF2063 \\ % Your institution for the title page
     
 \begin{frame}{Introduction}
     \begin{itemize}
-        \item Communication in self driving cares
+        \item Autonomous Driving (AD) and Advandced Driving Assistance Systems (ADAS)
+        \item Communication in self driving cars
+        \begin{itemize}
+            \item CAN
+            \item LIN
+            \item FlexRay
+            \item Ethernet
+        \end{itemize}
         \item Intelligent system monitoring
+        \begin{itemize}
+            \item Startup
+            \item Fault detection
+            \item Network statistics
+        \end{itemize}
         \item Adaptation services
+        \begin{itemize}
+            \item Failsafe
+            \item Network reconfiguration
+        \end{itemize}
+
     \end{itemize}
 \end{frame}
 
 \begin{frame}{Introduction}
     \begin{figure}
-        \includegraphics{network.png}
+        \includegraphics[width=0.7\linewidth]{network.png}
         \caption{Network}
     \end{figure}
 \end{frame}
@@ -143,7 +160,8 @@ MF2063 \\ % Your institution for the title page
 \end{frame}
 
 \section{Control and sensors }
-\subsection{Ultra sound}
+\subsection{Ultra sound sensors}
+\subsection{Reflective object sensor}
 \subsection{Object recognition}
 \subsection{Control}
 
