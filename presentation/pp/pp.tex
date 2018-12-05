@@ -76,6 +76,7 @@
 %\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
 }
 
+\usepackage[export]{adjustbox}
 \usepackage{graphicx} % Allows including images
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 \graphicspath{ {./figures/} }
@@ -138,48 +139,90 @@ MF2063 \\ % Your institution for the title page
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Introduction}
-    \begin{figure}
-        \includegraphics[width=0.7\linewidth]{network.png}
-        \caption{Network}
-    \end{figure}
-\end{frame}
 
+%------------------------------------------------
 
 \section{Network}
 \subsection{SDN}
 \begin{frame}{SDN}
     \begin{itemize}
         \item Software defined Network (SDN)
-        \item 
     \end{itemize}
+    \begin{figure}
+        \includegraphics[width=0.6\linewidth]{network.png}
+        \caption{Network}
+    \end{figure}
 \end{frame}
 \subsection{VSome/IP}
 \begin{frame}{VSOME/IP}
     
 \end{frame}
 
+%------------------------------------------------
+
 \section{Control and sensors }
-\subsection{Ultra sound sensors}
-\subsection{Reflective object sensor}
-\subsection{Object recognition}
-\subsection{Control}
+\subsection{Sensors}
+\begin{frame}{Sensors}
+    \begin{itemize}
+     \item Ultrasonic sensor
+    \begin{figure}
+        \includegraphics[width=0.2\linewidth, left]{ultrasonic.jpg}
+    \end{figure}
+    \item Reflective object sensor
+    \begin{figure}
+        \includegraphics[width=0.2\linewidth, left]{ir.jpg}
+    \end{figure}
+    \item Camera
+    \begin{figure}
+        \includegraphics[width=0.2\linewidth, left]{camera.jpg}
+    \end{figure}
+
+    \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\subsection{Actutators}
+\begin{frame}{Actuators}
+ \begin{itemize}
+  \item Motor controller
+  \item Steering controller
+ \end{itemize}
+
+\end{frame}
 
 \section{Assembly}
 \subsection{Power}
 \subsection{Mounting}
 
-\section{Conclusion}
-
-\begin{frame}
-\frametitle{Introduction}
-
-\end{frame}
 %------------------------------------------------
 
+\subsection{Autonomous behaviour}
+\begin{frame}{Autonomous behaviour}
+ \begin{itemize}
+  \item Services
+  \item State machine
+  \begin{figure}
+    \includegraphics[width=0.7\linewidth]{statemachine.png}
+    \caption{State machine}
+  \end{figure}
+ \end{itemize}
 
+\end{frame}
+
+\section{Assembly}
+\subsection{Power}
+\subsection{Mounting}
+
+%------------------------------------------------
+
+\section{Conclusion}
 \begin{frame}{Conclusion}
     \begin{itemize}
+        \item Ethernet is a promising candidate for increasing demand on bandwidth for communication in autonomous cars.
+        \item Ethernet is not without problems, which of many SDN is a promising candidate to solve.
+        \item SDN networks allow for safe, fast and customisable communication on autnomous vehicles.
         \item Thanks to our project owners! 
     \end{itemize}
     
