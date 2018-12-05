@@ -1,6 +1,7 @@
 #include "car_ctrl_client.hpp"
 
-#define DEBUG 1
+#define DEBUG 0
+#define WAKEUP_DEBUG 0
 
 CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep, bool skip_go) :
     run_(false),
@@ -176,16 +177,11 @@ void CarCTRLClient::update_go_status() {
         app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
 
-    int mo_onehot = 0x00000001;
-    int st_onehot = 0x00000002;
-    int sp_onehot = 0x00000004;
-    int di_onehot = 0x00000008;
-    int cam_onehot = 0x00000010;
-    int service_status = mo_onehot && is_ava_mo_ |
-                         st_onehot && is_ava_st_ |
-                         sp_onehot && is_ava_sp_ |
-                         di_onehot && is_ava_mo_ |
-                         cam_onehot && is_ava_cam_;
+    int service_status = (is_ava_mo_ << 0) |
+                         (is_ava_st_ << 1) |
+                         (is_ava_sp_ << 2) |
+                         (is_ava_mo_ << 3) |
+                         (is_ava_cam_<< 4);
 
     shm_go.Lock();
     buf_go.write(service_status);
@@ -269,7 +265,7 @@ void CarCTRLClient::send_motor_req() {
 
         // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_mo_sleep_));
-        #if (DEBUG)
+        #if (WAKEUP_DEBUG)
 	        std::cout << "## DEBUG ## send_motor_req woke up from sleeping! ## DEBUG ##" << std::endl; 
         #endif
     }
@@ -352,7 +348,7 @@ void CarCTRLClient::send_steer_req() {
 
         // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_st_sleep_));
-        #if (DEBUG)
+        #if (WAKEUP_DEBUG)
 	        std::cout << "## DEBUG ## send_steer_req woke up from sleeping! ## DEBUG ##"
                       << std::endl; 
         #endif
@@ -436,7 +432,7 @@ void CarCTRLClient::send_setmin_req() {
 
         // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_setmin_sleep_));
-        #if (DEBUG)
+        #if (WAKEUP_DEBUG)
 	        std::cout << "## DEBUG ## send_setmin_req woke up from sleeping! ## DEBUG ##"
                       << std::endl; 
         #endif
@@ -487,7 +483,7 @@ void CarCTRLClient::send_shutdown_req() {
                 cond_app_.wait(app_lk);
             app_busy_ = true;
 
-            
+
 
             /*
              * TODO
@@ -520,9 +516,9 @@ void CarCTRLClient::send_shutdown_req() {
 
         // Sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(req_shutdown_sleep_));
-        #if (DEBUG)
+        #if (WAKEUP_DEBUG)
 	        std::cout << "## DEBUG ## send_shutdown_req woke up from sleeping! ## DEBUG ##"
-                      << std::endl; 
+                      << std::endl;
         #endif
     }
 }
@@ -612,12 +608,14 @@ void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg)
     std::vector<vsomeip::byte_t> dummy_data(7);
 
     // Shutdown the motor service.
+    /*
     send_req(dummy_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Shutdown request sent to motor service! ## DEBUG ##"
                   << std::endl;
     #endif
+    */
 
     // Unlock the vsomeip app.
     app_busy_ = false;

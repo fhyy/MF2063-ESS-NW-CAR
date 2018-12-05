@@ -1,13 +1,13 @@
 {
     "unicast" : "192.168.0.10",
     "logging" :
-    { 
+    {
         "level" : "debug",
-        "console" : "true",
+        "console" : "false",
         "file" : { "enable" : "false", "path" : "/tmp/vsomeip.log" },
         "dlt" : "false"
     },
-    "applications" : 
+    "applications" :
     [
         {
             "name" : "car_ctrl_client",

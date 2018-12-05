@@ -186,9 +186,9 @@ void CameraService::run_cam() {
             cond_run_.wait(run_lk);
     }
 
-    //#if (DEBUG)
-    	//std::cout << "## DEBUG ## run_cam thread entering thread loop ## DEBUG ##" << std::endl;
-    //#endif
+    #if (DEBUG)
+    	std::cout << "## DEBUG ## run_cam thread entering thread loop ## DEBUG ##" << std::endl;
+    #endif
 
     // Thread loop.
     while(run_) {
@@ -200,7 +200,6 @@ void CameraService::run_cam() {
         std::vector<std::string> camera_vector;
         while(true) {
             getline(std::cin, camera_data);
-	    std::cout<<camera_data<<std::endl;
             if (camera_data.empty())
                 break;
 
@@ -209,7 +208,7 @@ void CameraService::run_cam() {
 
         // Prepare and send transmission if camera data was received
         if (camera_vector.size() > 0) {
-            
+
             // Use only newest sensor value for transmission.
             int sensor_data_latest = atoi(camera_vector.back().c_str());
 
@@ -268,9 +267,9 @@ void CameraService::run_cam() {
 int main(int argc, char** argv) {
     // Default values for cmdline args.
     uint32_t cam_sleep = 1000;
-    bool skip_go = true;
-    
-    
+    bool skip_go = false;
+
+
     // Flags for passing cmdline args.
     std::string sleep_flag("--sleep");
     std::string skip_go_flag("--skip-go"); // should only be used for testing and debugging
@@ -290,7 +289,7 @@ int main(int argc, char** argv) {
 
     // Instatiate service.
     CameraService cs(cam_sleep, skip_go);
-    
+
 
     // Take care of signal handling if vsomeip was built without signal handling.
     #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
