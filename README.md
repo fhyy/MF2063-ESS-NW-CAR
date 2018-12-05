@@ -1,3 +1,5 @@
+To access the flag on your phone or computer, go to [this site.](https://fhyy.github.io/MF2063-ESS-NW-CAR/index.html)
+
 # Introduction
 **Network diagram**  
 ![Network diagram](https://raw.githubusercontent.com/fhyy/MF2063-ESS-NW-CAR/master/resources/diagrams/network-diagram.svg?sanitize=true)
