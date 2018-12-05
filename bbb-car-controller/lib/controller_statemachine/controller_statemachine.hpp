@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "ess_prototype.hpp"
 
-#define TARGET_SPEED_STEP 1
+#define TARGET_SPEED_STEP 5
 #define TARGET_SPEED_STOP 0
 #define TARGET_SPEED_MAX 100 // cm/s
 
@@ -123,8 +123,8 @@ const std::string cameraText[]={
 };
 
 const std::string goStatusText[]={
-    "FALSE",
-    "TRUE"
+    "TRUE",
+    "FALSE"
 };
 
 

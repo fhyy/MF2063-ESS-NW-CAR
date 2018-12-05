@@ -192,6 +192,7 @@ void statemachineIteration(ESSPrototype* pty){
                         if(sm->goStatus == stateMatrix[i].currentGoStatus || sm->goStatus == evGoStatusAny)
                             sm->state = stateMatrix[i].nextState;
                             (*stateFunctionAry[sm->state])(pty);
+			    std::cout << "--------------sm interation once--------------" <<std::endl;
                             break;
                     }
                 }
@@ -203,7 +204,8 @@ void statemachineIteration(ESSPrototype* pty){
 void printState(stCarStatemachine* statemachine){
     //printf("\n state: %s, distance: %s, speed: %s, camera: %s, goStatus: %s, targetSpeed: %d\n", 
     //    stateText[statemachine->state],eventText[statemachine->distance],eventText[statemachine->speed],cameraText[statemachine->camera],goStatusText[statemachine->goStatus],statemachine->targetSpeed);
-    std::cout << "state: " << stateText[statemachine->state] << " distance: " << eventText[statemachine->distance];
-    std::cout << " camera: " << eventText[statemachine->camera] << " goStatus: " << eventText[statemachine->goStatus];
-    std::cout << " target speed: " << statemachine->targetSpeed << std::endl;
+    std::cout << "state: " << stateText[statemachine->state] << " distance: " << eventText[statemachine->distance]<<std::endl;
+    std::cout << " camera: " << cameraText[statemachine->camera] << " goStatus: " << goStatusText[statemachine->goStatus]<<std::endl;
+    std::cout << " speed: " << eventText[statemachine->speed] << std::endl;
+    printf("speed %d\n",statemachine->targetSpeed);
 }
