@@ -80,27 +80,96 @@
 \begin{block}{Introduction}
 
 \begin{itemize}
-\item This project is to create an autonomous car that is based on an software-defined network (SDN). On the car is different sensors placed to monitor the performance of the car and all this information is used in a control unit to control the car. The information providers and the consumers have to be connected and this is done via an SDN network there a control unit decides how the packet should be sent via the network. The information providers in the car is ultrasound to measure distance, object recognition and speed sensor. 
+\item This project is about to create an autonomous car that is based on an software-defined network (SDN). On the car is different sensors placed to monitor the performance of the car and all this information is used in a control unit to control the car. The information providers and the consumers have to be connected and this is done via an SDN network there a control unit decides how the packet should be sent via the network. The information providers in the car is ultrasound to measure distance, object recognition and speed sensor. 
 \end{itemize}
 
 \end{block}
-
-%----------------------------------------------------------------------------------------
+%
+%\begin{block}{Requerments}
+%    This is the design requirement for the ESS-CAR
+%    \begin{itemize}
+%        \item Design and evaluate the software- and system-architecture %for the model car platform. The
+%        architecture shall integrate (and potentially adapt) already %existing functionality to achieve a robust and
+%        predictable system design.
+%
+%        \item Setup the physical platform to use different sensors and %actuators (ultrasonic sensor, IR sensor,
+%        accelerometer, servo, motor, etc.). The peripherals shall be %controlled with dedicated microcontrollers
+%        (Arduino). SPI bus is used to communicate between Arduinos and %Beagle Bone ECUs. Software on the
+%        Beagle Bone ECUs shall provide the respective services to t
+%        he system using SOME/IP.
+%
+%        \item Setup the camera module for the Raspberry Pi ECU. This %requires the physical setup (mounting the
+%        camera and designing the hardware to do so) but also a software %service that will make the camera
+%        data (e.g. traffic sign detection through AI algorithm) %available to other software components over
+%        the SOME/IP middleware. This software service shall be %configurable to switch between different
+%        quality modes that will affect the produced network load.
+%        4) Setup a display that will be mounted on the car. The display %service shall be located on a different
+%        ECU than the camera node. The basic functionality is the display %of the video stream that is provided
+%        by the camera.
+%
+%        \item Identify some typical fault models, design and implement %the fault injectors that inject the faults
+%        on the network nodes and switches.
+%
+%        \item Monitor traffic on the ECUs to detect fault conditions and %trigger reconfiguration.
+%        \item Develop coordinated boot and shutdown sequences to %efficiently use the model car.
+%        \item Write a project report documenting the details of %functional blocks and services, as well as basic
+%        system evaluation results.
+%
+%
+%
+%        
+%    \end{itemize}
+%
+%    For the ESS-NW is the following the requirements
+%    \begin{itemize}
+%        \item Build the model car(s) with Turnigy SCT 2WD 1/10 Brushless %Short Course Truck
+%        (KIT) upgraded version.
+%
+%        \item Set up the physical embedded system platform consisting of %BeagelBoneBlack
+%        nodes and Zodiac FX SDN-Switches, plus one Raspberry Pi as
+%        SDN-Controller and Arduino To interface with sensors and %actuators.
+%
+%        \item Investigate available implementations of SDN-Controller %and select one that best
+%        meets the project requirements.
+%
+%        \item Design and implement a basic SDN-Controller application on %one of the ECUs.
+%        
+%        \item Extend the SDN-Controller to manually assign network flows %to preconfigured
+%        routes with defined monitoring points on the switches.
+%
+%        \item Extend the SDN-Controller in a way that the network %resources are reassigned
+%        during runtime if message behaviour changes. This requires %monitoring of
+%        messages on the switches and reconfiguration of the network at %runtime.
+%
+%        \item Write a project report documenting the details of %functional blocks and services, as
+%        well as basic system evaluation results.
+%    \end{itemize}
+%    
+%\end{block}
+%
+%%----------------------------------------------------------------------------------------
 %	NETWORK
 %----------------------------------------------------------------------------------------
 
 \begin{block}{Network}
     \begin{itemize}
         \item The network topology in the car is as shown in figure \ref{pic:network}, there all the information providers and consumers are connected via an SDN network.  The controller for the SDN is a raspberry pi model 3, and runs an SDN controller program called Ryu and is used to control the network on how the packages should travel and what priority they have. 
-        \item VSOMEIP 
+        \item The switches used in this project is Zodiac FX and is made for SDN network and openflow. 
+        \item To send information between the nodes is a middleware application called VSOME/IP and is an application designed for automotive products e.g. cares and is compatible with AUTOSAR. 
+        \item In the end of the network is Arduino micro used to sample the data from the sensor and then send to a Beaglebone black via SPI interface. 
     \end{itemize}
 
+    
+
+\end{block}
+
+\begin{block}{Network Figure}
     \begin{figure}
         \includegraphics[width=1\linewidth]{network.png}
         \caption{Network topology}
         \label{pic:network}
         \end{figure}
-
+    
 \end{block}
 
 %----------------------------------------------------------------------------------------
@@ -110,8 +179,10 @@
 \begin{block}{Control and sensors}
 
 \begin{itemize}
-    \item ultrasound
-    \item Object recognition
+    \item On the car is three ultrasound sensors placed to detect object in front of the car, to give information to the controller if something is in front of it. Three sensors was used to detect obstacle from left, right and in the middle of the car direction
+    
+    \item The car should be able to detect traffic signs, and we did a simplification of only using colours to drive the car. If there is a green signed in front of the car will it follow it and if the sign is red it will stop.  
+    
     \item Speed sensor
 \end{itemize}
 
@@ -121,21 +192,7 @@
 %	
 %----------------------------------------------------------------------------------------
 
-\begin{block}{Mathematical Section}
 
-\begin{itemize}
-\item Maecenas Ultricies Feugiat Velit Non Mattis.
-\begin{itemize}
-\item Duis ante erat, bibendum nec tempus nec, interdum quis est. Nulla at mollis tortor. Phasellus quis leo dolor, aliquam laoreet orci $X$ Donec dapibus sagittis neque eu nec, interdum quis est. $Y_n, n=1,\cdots,N$ ndum nec tempus nec, interd
-\begin{align*}
-X \rightarrow r(X) & = \arg \max_{c} \Big\{ \max_n \big\{ \sum_{x_i \in X} \delta(x_i,Y_{n,c})\big\} \Big\} 
-\end{align*}
-\item Cras faucibus scelerisque cursus. Proin ut vestibulum augue. $\delta(x_i,Y_{n,c})$
-\end{itemize}
-\item Fusce tempus arcu id ligula varius dictum. Donec ut nisl dui, ac consectetur elit. In nec enim porta augue venenatis sollicitudin. Phasellus quis nunc neque. Suspendisse mauris diam, suscipit non gravida in, placerat id enim. Ut nec ipsum in lectus ultrices sagittis.
-\end{itemize}
-
-\end{block}
 
 %----------------------------------------------------------------------------------------
 
@@ -144,75 +201,30 @@ X \rightarrow r(X) & = \arg \max_{c} \Big\{ \max_n \big\{ \sum_{x_i \in X} \delt
 \begin{column}{.03\textwidth}\end{column} % Empty spacer column
  
 \begin{column}{.465\textwidth} % The second column
+    \begin{block}{Assembley}
 
+        \begin{itemize}
+            \item The car was assembled via via some acyle plastic that was used to cut out the pieces to assemble the devices one the car.
+            \item The design of the assembly platform is done in Autodesk fusion 360
+            
+            
+            \item The car is power via a lithium battery of 3 cells and is used power the engine and all the components of the car. The power is deliver from the PCB designs and via a boost converter to boost the 5v to 9v to run one of the switches.
+              
+        \end{itemize}
+    
+    \end{block}
 %----------------------------------------------------------------------------------------
-%	RESULTS
-%----------------------------------------------------------------------------------------
-
-\begin{block}{Results: Table}
-
-\begin{itemize}
-\item Ased Aliquet Luctus Lectus
-\end{itemize}
-
-\begin{table}
-\begin{tabular}{l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\caption{Table caption}
-\end{table}
-
-\begin{itemize}
-\item Sollicitudin Vel Orci
-\item Maecenas Ultricies Feugiat Velit Non Mattis.
-\end{itemize}
-
-\begin{table}
-\begin{tabular}{l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\caption{Table caption}
-\end{table}
-     
+\begin{block}{Figure of assembely}
+    
 \end{block}
 
 %------------------------------------------------
 
-\begin{block}{Results: Figure}
+\
 
-\begin{figure}
-\includegraphics[width=0.8\linewidth]{placeholder.jpg}
-\caption{Figure caption}
-\end{figure}
 
-\end{block}
 
-%----------------------------------------------------------------------------------------
-%	CONCLUSION
-%----------------------------------------------------------------------------------------
 
-\begin{block}{Conclusion}
-
-\begin{itemize}
-\item Opet volutpat ligula. Duis semper lorem eget dui dignissim porttitor. Nulla facilisi. In ullamcorper lorem quis dolor iaculis nec egestas enim ultricies. Cras ut mauris elit, ut lacinia dui. Proin in ante et libero hendrerit iaculis.
-\item Nulla eu erat a urna laoreet auctor id a turpis. Nam mollis tristique neque eu luctus. Suspendisse rutrum congue nisi sed convallis. 
-\item Aenean id neque dolor.
-\item Opet volutpat ligula. Duis semper lorem eget dui dignissim porttitor. Nulla facilisi. In ullamcorper lorem quis dolor iaculis nec egestas enim ultricies. Cras ut mauris elit, ut lacinia dui. Proin in ante et libero hendrerit iaculis.
-\end{itemize}
-
-\end{block}
 
 %----------------------------------------------------------------------------------------
 %	ACKNOWLEDGEMENTS
