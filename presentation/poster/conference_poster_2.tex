@@ -37,32 +37,36 @@
 \usepackage{booktabs} % Top and bottom rules for tables
 
 \graphicspath{{figures/}} % Location of the graphics files
-
+\usepackage{tikz}
 \usecaptiontemplate{\small\structure{\insertcaptionname~\insertcaptionnumber: }\insertcaption} % A fix for figure numbering
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION 
 %----------------------------------------------------------------------------------------
 
-\title{\huge ESS-NW/CAR} % Poster title
+\title{\huge ESS-CAR/NW} % Poster title
 
-\author{Leon Fernandez, Jonas Ekman, Fredrik Hyyrynen, Jacob Kimblad, Yini Gao and  Yifan Ruan} % Author(s)
+\author{Jonas Ekman, Leon Fernandez, Yini Gao, Fredrik Hyyrynen, Jacob Kimblad and  Yifan Ruan} % Author(s)
 
 \institute{ MF2063 Embedded Systems Design Project} % Institution(s)
-
 
 %----------------------------------------------------------------------------------------
 %	FOOTER TEXT
 %----------------------------------------------------------------------------------------
 
-\newcommand{\leftfoot}{ESS-NW/CAR} % Left footer text
+\newcommand{\leftfoot}{ESS-CAR/NW} % Left footer text
 
 \newcommand{\rightfoot}{MF2063} % Right footer text
 
 %----------------------------------------------------------------------------------------
 
 \begin{document}
-
+\addtobeamertemplate{headline}{} 
+{\begin{tikzpicture}[remember picture, overlay]
+     \node [anchor=north east, inner sep=0.5cm]  at (current page.north east)
+     {\includegraphics{LogoFun.png}};
+     \hspace{4cm}
+  \end{tikzpicture}}
 \addtobeamertemplate{block end}{}{\vspace*{2ex}} % White space under blocks
 
 \begin{frame}[t] % The whole poster is enclosed in one beamer frame
@@ -81,7 +85,7 @@
 \begin{block}{Introduction}
 
 \begin{itemize}
-\item This project is about to implement an autonomous car that uses software-defined network (SDN) to communicate between the different nodes in the car. SDN is a new type of technology that moves the control part in the switches to a controller. The communication over the network will be done via something called VSOME/IP and is an application middleware designed for the car industry and compatible with AUTOSAR. On the cat is also different types of sensors used to monitor the car performance and its surrounding. There all the sensors will communicate to each other via the SDN network. 
+\item This project is about the implementation of an autonomous car that utilizes a software-defined network (SDN) for communication between a set of nodes. SDN is a new type of technology that moves the control part in the switches to a separate controlling node. Communication over the network is done via the VSOME/IP middleware. It is an application middleware that is designed for the car industry and is compatible with AUTOSAR. On the car are different types of sensors used to monitor the car performance and its surrounding. The sensor and actuator communication is done via controllers and the SDN network. 
 \end{itemize}
 
 \end{block}
@@ -154,16 +158,14 @@
 
 \begin{block}{Network}
     \begin{itemize}
-        \item Software defined network (SDN) is a type of network configuration that moves the intelligent from the switches to a controller unit. This is to make the network smart and can sort packages depending on their priorities and traffic load to different paths, to enable faster computing and distribute the network load. It also self-configured to if a link is down or a new link is up it will detect it.  SDN is done via a protocol called OpenFlow to control the switches. 
+        \item Software defined network (SDN) is a type of network configuration that moves the intelligence from the switches to a controller unit. This makes the network smarter and more dynamic. It can sort packages depending on their priorities and traffic load to different paths, to enable faster computing and a better distribution of the network load. It is self-configured when a link goes down or a new link opens up. The SDN is implemented using the OpenFlow protocol for controlling the switches. 
         
-        \item For this project is only three SDN switches of type Zodiac FX used and the network is configured according to the topology in figure \ref{pic:network}. The controller is a raspberry pi model 3 that uses the RYU SDN framework to control the switches and to gather information. 
+        \item Three SDN enabled switches from Zodiac FX is used in this project and the network is configured according to the topology in figure \ref{pic:network}. The controller is a Raspberry Pi model 3 that uses the RYU SDN framework to control the switches and to gather network information. 
         
-        \item To send information between the nodes is a middleware application called VSOME/IP and is an application designed for automotive products e.g. cares and is compatible with AUTOSAR. 
+        \item Information is sent between the nodes using a middleware application called VSOME/IP which is designed for automotive products e.g. cars and is compatible with AUTOSAR. 
         
-        \item At the edges of the network is Arduino used to control the sensors, and to gather the information. This information is then passed via an SPI interface to a Beaglebone black that sends it out on the network.  
+        \item Arduinos are used on the edge of the network, to control sensors and actuators. The data is then passed via an SPI interface to a BeagleBone Black that for processing and transporation out in the SDN.  
     \end{itemize}
-
-    
 
 \end{block}
 
@@ -199,11 +201,11 @@
 \begin{block}{Control and sensors}
 
     \begin{itemize}
-        \item On the car is three ultrasound sensors placed to detect object in front of the car, to give information to the controller if something is in front of it. Three sensors was used to detect obstacle from left, right and in the middle of the car direction
+        \item There are three ultrasonic distance sensors placed in front of the car to detect obstacles. The three sensors are placed so that they provide directional distance data, to enable fast avoidance if obstacles are detected on the left or right hand side of the cars heading. 
         
-        \item The car should be able to detect traffic signs, and we did a simplification of only using colours to drive the car. If there is a green signed in front of the car will it follow it and if the sign is red it will stop.  
+        \item By using a Raspberry Pi camera, the car should be able to detect traffic signs, but a simplification was made to only detect a set of colours. If there is a green sign in the field of view of the car, it will follow the sign. If the sign is red, the car will stop.  
         
-        \item To measure the speed of the car, is a IR sensor placed close to the weal and on the weal in aluminium tape to reflect the light. With some calibration can we get the speed. 
+        \item An IR sensor placed close to the left rear wheel to measure the speed. Aluminium tape is placed evenly spaced inside the wheel to reflect the light from the sensor so that it registers a pulse. By counting the pulses and measuring time one can extract speed information.
     \end{itemize}
     
     \end{block}
@@ -213,11 +215,11 @@
     \begin{block}{Assembley}
 
         \begin{itemize}
-            \item The car was assembled via some acyle plastic that was used to cut out the pieces to assemble the devices one the car, as shown in figure \ref{fig:car1}.
-            \item The design of the assembly platform is done in Autodesk fusion 360.
+            \item The car was assembled with laser cut acrylic plastic, designed to secure the hardware on top of the frame. A test rig using the partially assembled car is shown in figure \ref{fig:car1}.
+            \item The design of the assembly platform was done in Autodesk Fusion 360.
             
             
-            \item The car is power via a lithium battery of 3 cells and is used power the engine and all the components of the car. The power is deliver from the PCB designs and via a boost converter to boost the 5v to 9v to run one of the switches.
+            \item The car is powered by a lipo battery with 2 cells. This is used to power the engine and all the components of the car via the PCB designs. One switch requires 9v to run so a boost converter is used to convert the otherwise required 5v supply.
               
         \end{itemize}
     
@@ -251,7 +253,7 @@
 \begin{block}{Acknowledgments}
 
 \begin{itemize}
-\item We want to thank the project owners for their support they have given us under this project. 
+\item We want to thank the project owners for their support they have given us throughout this project. 
 \end{itemize}
 
 \end{block}
