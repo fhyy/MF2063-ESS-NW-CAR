@@ -66,10 +66,10 @@ int main() {
                 cout << endl;
                 break;
             case GETSPEED_CMD:
-                cout << "> Current speed is " << (int) proto.getSpeed() << "cm/s." << endl;
+                cout << "> Current speed is " << (int) proto.getSpeed() << " cm/s." << endl;
                 break;
             case GETDIST_CMD:
-                cout << "> Free distance ahead is " << (int) proto.getDistance() << "cm." << endl;
+                cout << "> Free distance ahead is " << (int) proto.getDistance() << " cm." << endl;
                 break;
             case GETCAMERA_CMD:
                 cout << decodeFlag(proto.getFlag()) << endl;
