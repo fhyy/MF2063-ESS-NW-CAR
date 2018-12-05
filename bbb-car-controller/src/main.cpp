@@ -2,7 +2,6 @@
 #include "controller_statemachine.hpp"
 #include <stdio.h>
 
-
 /**
  * Check the status of the system before the statemachine is started
  */
@@ -38,12 +37,13 @@ int main() {
 	bool bootFlag = bootup(&prototype);
 	stCarStatemachine carStatemachine;
 	bootFlag = true;
+	statemachineInit(&carStatemachine);
+	printState(&carStatemachine);
 	if(bootFlag){
 		printf("**********************************");
 		printf("\nESS prototype car is online now!\n");
 		printf("**********************************");
 		while(1){
-			statemachineInit(&carStatemachine);
 			statemachineIteration(&prototype);
 			printState(&carStatemachine);
 			

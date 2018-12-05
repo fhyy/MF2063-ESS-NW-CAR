@@ -1,6 +1,7 @@
 #ifndef __car_controller_statemachine__
 #define __car_controller_statemachine__
 
+#include <iostream>
 #include <stdint.h>
 #include "ess_prototype.hpp"
 

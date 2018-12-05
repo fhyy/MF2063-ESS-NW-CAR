@@ -1,6 +1,7 @@
 #include "controller_statemachine.hpp"
 #include "ess_prototype.hpp"
 #include <stdint.h>
+#include <stdio.h>
 #include <iostream>
 
 
@@ -189,11 +190,14 @@ void statemachineIteration(ESSPrototype* pty){
             if(sm->speed == stateMatrix[i].currentSpeedEvent || stateMatrix[i].currentSpeedEvent == evCarAny){
                 if(sm->distance == stateMatrix[i].currentDistanceEvent || stateMatrix[i].currentDistanceEvent == evCarAny){
                     if(sm->camera == stateMatrix[i].currentCameraEvent || stateMatrix[i].currentCameraEvent == evCameraAny){
-                        if(sm->goStatus == stateMatrix[i].currentGoStatus || sm->goStatus == evGoStatusAny)
+                        if(sm->goStatus == stateMatrix[i].currentGoStatus || sm->goStatus == evGoStatusAny){
                             sm->state = stateMatrix[i].nextState;
                             (*stateFunctionAry[sm->state])(pty);
-			    std::cout << "--------------sm interation once--------------" <<std::endl;
+			                std::cout << "--------------sm interation once--------------" <<std::endl;
+                            std::cout << "--------------state matrix entry: "<< i << "--------------" <<std::endl;
+                            std::cout << "----------------------------------------------" <<std::endl;
                             break;
+                        }
                     }
                 }
             }
@@ -207,5 +211,5 @@ void printState(stCarStatemachine* statemachine){
     std::cout << "state: " << stateText[statemachine->state] << " distance: " << eventText[statemachine->distance]<<std::endl;
     std::cout << " camera: " << cameraText[statemachine->camera] << " goStatus: " << goStatusText[statemachine->goStatus]<<std::endl;
     std::cout << " speed: " << eventText[statemachine->speed] << std::endl;
-    printf("speed %d\n",statemachine->targetSpeed);
+    printf("targetSpeed %d\n",statemachine->targetSpeed);
 }
