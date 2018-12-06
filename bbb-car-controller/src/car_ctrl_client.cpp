@@ -1,6 +1,6 @@
 #include "car_ctrl_client.hpp"
 
-#define DEBUG 1
+#define DEBUG 0
 #define WAKEUP_DEBUG 0
 
 CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep, bool skip_go) :
@@ -177,16 +177,11 @@ void CarCTRLClient::update_go_status() {
         app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
 
-    int mo_onehot = 0x00000001;
-    int st_onehot = 0x00000002;
-    int sp_onehot = 0x00000004;
-    int di_onehot = 0x00000008;
-    int cam_onehot = 0x00000010;
-    int service_status = mo_onehot && is_ava_mo_ |
-                         st_onehot && is_ava_st_ |
-                         sp_onehot && is_ava_sp_ |
-                         di_onehot && is_ava_mo_ |
-                         cam_onehot && is_ava_cam_;
+    int service_status = (is_ava_mo_ << 0) |
+                         (is_ava_st_ << 1) |
+                         (is_ava_sp_ << 2) |
+                         (is_ava_mo_ << 3) |
+                         (is_ava_cam_<< 4);
 
     shm_go.Lock();
     buf_go.write(service_status);

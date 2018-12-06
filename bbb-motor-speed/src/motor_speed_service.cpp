@@ -287,7 +287,7 @@ void MotorSpeedService::on_motor_req(const std::shared_ptr<vsomeip::message> &ms
     vsomeip::byte_t *data = msg->get_payload()->get_data();
 
     // Turn the four-element data packet into an int before writing
-    int req = (data[3] << 24) || (data[2] << 16) || (data[1] << 8) || (data[0]);
+    int req = (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0]);
 
     #if (DEBUG)
         std::cout << "## DEBUG ## Got motor request!! Data: (" << (int) data[0]

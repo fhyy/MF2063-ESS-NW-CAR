@@ -1,6 +1,7 @@
 #ifndef __car_controller_statemachine__
 #define __car_controller_statemachine__
 
+#include <iostream>
 #include <stdint.h>
 #include "ess_prototype.hpp"
 
@@ -75,7 +76,7 @@ typedef struct{
     evCarEvent speed;
     evCameraEvent camera;
     evGoStatusEvent goStatus;
-    uint8_t targetSpeed;
+    int targetSpeed;
     uint8_t direction; // 1 - left, 0 - straight, 2 - right
 } stCarStatemachine;
 
@@ -152,5 +153,6 @@ void statemachineIteration(ESSPrototype* pty);
  */
 void printState(stCarStatemachine* statemachine);
 
+bool doctor(ESSPrototype *prototype);
 
 #endif
