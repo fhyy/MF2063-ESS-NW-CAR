@@ -792,7 +792,8 @@ WARN_LOGFILE           =
 
 INPUT                  = bbb-car-controller/src \
                          bbb-distance-steering/src \
-                         bbb-motor-speed/src rpi-vision/src \
+                         bbb-motor-speed/src \
+			 rpi-vision/src \
                          lib/controller_statemachine \
                          lib/ess_prototype \
                          lib/shared_memory

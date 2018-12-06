@@ -35,5 +35,5 @@ ssh debian@192.168.0.10 "mkdir /home/debian/bbb-car-controller/build"
 ssh debian@192.168.0.10 "rm -r /home/debian/bbb-car-controller/doc"
 ssh debian@192.168.0.10 "cd /home/debian/bbb-car-controller/build && cmake .. && make"
 
-# Generate documentation
+# Generate documentation for the deployed code
 doxygen Doxyfile
