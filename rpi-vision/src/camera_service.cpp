@@ -196,52 +196,58 @@ void CameraService::run_cam() {
         // Pause here if !go_.
         while(!(go_ || skip_go_));
 
-        std::string camera_data;
-        std::vector<std::string> camera_vector;
+        int camera_data;
+        std::vector<int> camera_vector;
+	std::stringstream conv;
         while(true) {
-            getline(std::cin, camera_data);
-            if (camera_data.empty())
+            std::string camera_data_raw;
+            getline(std::cin, camera_data_raw);
+            conv << camera_data_raw;
+            conv >> camera_data;
+            if (camera_data == 44 || camera_data_raw.empty()){
                 break;
-
+            }
             camera_vector.push_back(camera_data);
         }
 
-        // Prepare and send transmission if camera data was received
+        int sensor_data_latest;
         if (camera_vector.size() > 0) {
-
             // Use only newest sensor value for transmission.
-            int sensor_data_latest = atoi(camera_vector.back().c_str());
-
-            // turn int into std::vector of four vsomeip::byte_t.
-            std::vector<vsomeip::byte_t> sensor_data_formatted;
-            char byte;
-            for (int j=0; j<4; j++) {
-
-                // first element of of vector is lowest 8 bits and so on.
-                byte = (sensor_data_latest >> j*8);
-                sensor_data_formatted.push_back(byte);
-            }
-
-            // Priority (0x0000=low, other=high) could be set here in a future implementation
-            // sensor_data_formatted[3] = priority;
-
-            // Set data and publish it on the network.
-		    payload_->set_data(sensor_data_formatted);
-            app_->notify(CAM_SERVICE_ID, CAM_INSTANCE_ID,
-                         CAM_EVENT_ID, payload_, true, true);
-            #if (DEBUG)
-    	        std::cout << "## DEBUG ## Camera sensor data sent: ("
-                          << (int) sensor_data_formatted[0] << ", "
-                          << (int) sensor_data_formatted[1] << ", "
-                          << (int) sensor_data_formatted[2] << ", "
-                          << (int) sensor_data_formatted[3] << ") ## DEBUG ##" << std::endl;
-            #endif
+            sensor_data_latest = camera_vector.back();
         }
+        else {
+            // TODO Send this packet only one
+            sensor_data_latest = 0;
+        }
+        // turn int into std::vector of four vsomeip::byte_t.
+        std::vector<vsomeip::byte_t> sensor_data_formatted;
+        char byte;
+        for (int j=0; j<4; j++) {
+
+            // first element of of vector is lowest 8 bits and so on.
+            byte = (sensor_data_latest >> j*8);
+            sensor_data_formatted.push_back(byte);
+        }
+
+        // Priority (0x0000=low, other=high) could be set here in a future implementation
+        // sensor_data_formatted[3] = priority;
+
+        // Set data and publish it on the network.
+        payload_->set_data(sensor_data_formatted);
+        app_->notify(CAM_SERVICE_ID, CAM_INSTANCE_ID,
+                     CAM_EVENT_ID, payload_, true, true);
+        #if (DEBUG)
+    	    std::cout << "## DEBUG ## Camera sensor data sent: ("
+                      << (int) sensor_data_formatted[0] << ", "
+                      << (int) sensor_data_formatted[1] << ", "
+                      << (int) sensor_data_formatted[2] << ", "
+                      << (int) sensor_data_formatted[3] << ") ## DEBUG ##" << std::endl;
+        #endif
 
         //sleep before repeating the thread loop.
         std::this_thread::sleep_for(std::chrono::milliseconds(pub_cam_sleep_));
         #if (DEBUG)
-	        std::cout << "## DEBUG ## run_cam woke up from sleeping! ## DEBUG ##" << std::endl;
+            std::cout << "## DEBUG ## run_cam woke up from sleeping! ## DEBUG ##" << std::endl;
         #endif
     }
 }

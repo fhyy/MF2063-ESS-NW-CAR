@@ -12,3 +12,5 @@ ssh debian@192.168.0.10 "rm -r /home/debian/bbb-car-controller/build/*"
 ssh debian@192.168.0.10 "rm -r /home/debian/bbb-car-controller/doc"
 ssh pi@192.168.0.4 "rm -r /home/pi/rpi-vision"
 scp -r rpi-vision pi@192.168.0.4:/home/pi/
+ssh pi@192.168.0.4 "rm-r/home/pi/rpi-vision/build"
+ssh pi@192.168.0.4 "rm-r/home/pi/rpi-vision/doc"

@@ -4,21 +4,26 @@
 import numpy as np
 import imutils
 import cv2
-from subprocess import Popen, PIPE
-
-print("INFO: Initialize color space")
+import time
+import sys
+# hello
+# print("INFO: Initialize color space")
 # define the lower and upper boundaries of the colors in the HSV color space
 lower = {'1': (166, 84, 141), '2': (66, 122, 129), '3': (23, 59, 119)}
 upper = {'1': (186, 255, 255), '2': (86, 255, 255),  '3': (54, 255, 255)}
 
 # define standard colors for circle around the object
 colors = {'1': (0, 0, 255), '2': (0, 255, 0),  '3': (0, 255, 217)}
-print("INFO: starting camera")
+# print("INFO: starting camera")
 camera = cv2.VideoCapture(0)
-p = Popen(['./camera-service'], stdout=PIPE, stdin=PIPE)
+
+streamBlock = False
+streamCount = 0
 
 # keep looping
 while True:
+    nothingDetected = True
+
     # grab the current frame
     (grabbed, frame) = camera.read()
     frame = imutils.resize(frame, width=600)
@@ -26,6 +31,7 @@ while True:
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
     # for each color in dictionary check object in frame
     for key, value in upper.items():
+
         # construct a mask for the color from dictionary`1, then perform
         # a series of dilations and erosions to remove any small
         # blobs left in the mask
@@ -60,12 +66,22 @@ while True:
             if radius > 0.5:
                 # draw the circle and centroid on the frame,
                 # then update the list of tracked points
-                output = key + loc + '\n'
-            else:
-                output = '\n'
-            output = bytes(output, 'UTF-8')
-            p.stdin.write(output)
-            p.stdin.flush()
-            # ONLY FOR TEST(DELETE WHEN USING)
-            result = p.stdout.readline().strip()
-            print(result)
+                if streamCount < 10:
+                    print(key + loc)
+                    sys.stdout.flush()
+                    streamBlock = False
+                    nothingDetected = False
+                    streamCount += 1
+                else:
+                    print('44\n')
+                    sys.stdout.flush()
+                    streamBlock = False
+                    nothingDetected = False
+                    streamCount = 0
+    if (nothingDetected == True) and (streamBlock == False):
+        print('44' + '\n' + '\n')
+        #print("No signal detected!")
+        sys.stdout.flush()
+        streamBlock = True
+
+    time.sleep(0.5)

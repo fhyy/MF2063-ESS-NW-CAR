@@ -6,6 +6,24 @@ _SPI Master out_ - MOSI
 _SPI Slave select_ - SS  
 
 # Installation
+
+## ESC setup 
+_Do this if the ESC does not make this sound when switching on: **beep-beep-boooop**_  
+
+1. Connect GND pin and PWM pin to Arduino GND and pin 10, **NOT Vcc !**  
+2. Run the esc_programmer code on connected Arduino  
+3. Send signal **2000** (in Serial monitor)  
+4. Hold "set" button on ESC and switch it on  
+5. Wait for **orange** **solid** light  
+6. Release "set" button and wait for **solid** **red** light
+7. Send signal **700** (in Serial monitor)  
+8. Wait for **solid** **orange** light  
+9. Send signal 1000  
+10. Wait for **beep** and **no light**  
+11. **Switch off** the ESC and you are **done**!  
+
+Install everything as usual and make sure to switch on the ESC before the motor Arduino sends any pwm signals.
+
 ## Command line
 ??
 ## IDE
