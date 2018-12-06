@@ -1,1 +1,14 @@
 .DS_Store
+
+bbb-car-controller/build
+bbb-car-controller/doc
+
+bbb-distance-steering/build
+bbb-distance-steering/doc
+
+bbb-motor-speed/build
+bbb-motor-speed/doc
+
+rpi-vision/build
+rpi-vision/doc
+
