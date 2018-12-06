@@ -144,7 +144,7 @@ MF2063 \\ % Your institution for the title page
 
 \section{Network}
 \subsection{SDN}
-\begin{frame}{SDN}
+\begin{frame}{Network}
     \begin{itemize}
         \item Software defined Network (SDN)
     \end{itemize}
@@ -153,15 +153,29 @@ MF2063 \\ % Your institution for the title page
         \caption{Network}
     \end{figure}
 \end{frame}
+
+
+
+\begin{frame}{SDN}
+    \begin{itemize}
+        \item Move the intelligence from the switches to a controller
+        \item The controller gather information from the switches
+        \item The controller decides how the traffic should be send in the network
+        \item Scalable
+        \item Ryu controller is the SDN frame work we used, python based and well documented.          
+    \end{itemize}
+    
+\end{frame}{}
+
 \subsection{VSome/IP}
 \begin{frame}{VSOME/IP}
     
 \end{frame}
-
 %------------------------------------------------
 
 \section{Control and sensors }
 \subsection{Sensors}
+
 \begin{frame}{Sensors}
     \begin{itemize}
      \item Ultrasonic sensor
@@ -193,8 +207,35 @@ MF2063 \\ % Your institution for the title page
 \end{frame}
 
 \section{Assembly}
-\subsection{Power}
 \subsection{Mounting}
+\begin{frame}{The platform}
+    
+    \begin{columns}
+        \begin{column}{0.47\textwidth}
+            \begin{itemize}
+                \item  Designed in Fusion 360
+                \item  Cut out in the laser cutter
+                \item  The ide of the design was to build up to get access to everything and to be modular
+                \item Mounted on the car via two holes 
+            \end{itemize}
+        \end{column}
+        \begin{column}{0.5\textwidth}
+            \includegraphics[width=0.7\linewidth]{platform.jpg}
+            \label{fig:platform}
+            %\caption{Platform}
+        \end{column}
+    \end{columns}
+\end{frame}
+\subsection{Power}
+\begin{frame}{Power}
+    \begin{itemize}
+        \item We hade designed PCBs to mount the Arduinos on and to power the other devices
+        \item Could not order PCB
+        \item The machine PCB mill was broken both the one Mentorspace and proto Prototype Center
+        \item Had to use breadboard 
+    \end{itemize}
+\end{frame}
+
 
 %------------------------------------------------
 
@@ -222,7 +263,7 @@ MF2063 \\ % Your institution for the title page
     \begin{itemize}
         \item Ethernet is a promising candidate for increasing demand on bandwidth for communication in autonomous cars.
         \item Ethernet is not without problems, which of many SDN is a promising candidate to solve.
-        \item SDN networks allow for safe, fast and customisable communication on autnomous vehicles.
+        \item SDN networks allow for safe, fast and customisable communication on autonomous vehicles.
         \item Thanks to our project owners! 
     \end{itemize}
     
@@ -232,16 +273,16 @@ MF2063 \\ % Your institution for the title page
 %------------------------------------------------
 
 
-\begin{frame}
-\frametitle{References}
-\footnotesize{
-\begin{thebibliography}{99} % Beamer does not support BibTeX so references must be inserted manually as below
-\bibitem[Smith, 2012]{p1} John Smith (2012)
-\newblock Title of the publication
-\newblock \emph{Journal Name} 12(3), 45 -- 678.
-\end{thebibliography}
-}
-\end{frame}
+%\begin{frame}
+%\frametitle{References}
+%\footnotesize{
+%\begin{thebibliography}{99} % Beamer does not support BibTeX so %references must be inserted manually as below
+%\bibitem[Smith, 2012]{p1} John Smith (2012)
+%\newblock Title of the publication
+%\newblock \emph{Journal Name} 12(3), 45 -- 678.
+%\end{thebibliography}
+%}
+%\end{frame}
 
 %------------------------------------------------
 
