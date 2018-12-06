@@ -18,7 +18,7 @@
 \geometry{margin=2cm, headsep=5mm, includefoot, includehead}
 
 \usepackage{graphicx} % support the \includegraphics command and options
-
+\graphicspath{{figures/}} % Location of the graphics files
 % \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
 
 %%% PACKAGES
@@ -101,11 +101,17 @@
 	%	Headings
 	%------------------------------------------------
 	
+	\begin{figure}
+   		\centering
+    	\includegraphics[scale=1]{kthLogo.png}
+    	\label{fig:kthLogo}
+	\end{figure}
+	
 	\textsc{\LARGE KTH Mechatronics Advanced Course}\\[1cm] % Main heading such as the name of your university/college
 	
-	\textsc{\Large MF2063, HT2018}\\[0.5cm] % Major heading such as course name
+	\textsc{\Large MF2063, HT 2018}\\[0.5cm] % Major heading such as course name
 	
-	\textsc{\Large FINAL REPORT}\\[0.5cm] % Minor heading such as course title
+	\textsc{\Large FINAL REPORT}\\[0.5cm] % Major heading as well
 	
 	%------------------------------------------------
 	%	Title
@@ -115,7 +121,7 @@
 	
 	{\huge\bfseries ESS-NW/ESS-CAR}\\[0.4cm] % Title of your document
 	
-	\HRule\\[1.5cm]
+	\HRule\\[1.5cm]	
 	
 	%------------------------------------------------
 	%	Author(s)
