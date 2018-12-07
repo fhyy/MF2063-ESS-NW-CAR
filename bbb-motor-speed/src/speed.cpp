@@ -88,7 +88,7 @@ int readSensorValue(unsigned int fd)
 int main(void)
 {
         unsigned int fd,i;
-        char receivedMessage, controlValue;
+        char receivedMessage, targetSpeed, currentSpeed;
         bool canSend = 0;
 
         fd = open(SPI_PATH, O_RDWR);
@@ -117,9 +117,9 @@ int main(void)
                 if(DEBUG){
 		    printf("######## Sensor value was: %d\n", receivedMessage);
                 }
-
-
-
+                // update current speed in each iteration
+                currentSpeed = (1<<7) | receivedMessage;
+                sendMotorValue(fd, currentSpeed);
                 //write to the named pipe to send the information over vsomeip
                 shmMemory_sp.Lock();
                 circBuffer_sp.write((int) receivedMessage);
@@ -128,20 +128,16 @@ int main(void)
                 shmMemory_mo.Lock();
                 if(circBuffer_mo.getUnreadValues()>0){
                 int tmp = circBuffer_mo.read();
-                     controlValue = (char)tmp;
+                     targetSpeed = (char)tmp;
                      canSend = 1;
                 }
                 shmMemory_mo.UnLock();
 
                 //Send the values to the arduino motor controller
                 if(canSend){
-                    sendMotorValue(fd, controlValue);
-		    char currentSpeed = (1<<7) | receivedMessage;
-		    usleep(50000);
-	            sendMotorValue(fd, currentSpeed);
-                    canSend = 0;
+                        sendMotorValue(fd, targetSpeed);
+                        canSend = 0;
                 }
-
                 //We sleep so we dont interrupt the arduino to often and it never gets to do work
                 usleep(2000000);
         }
