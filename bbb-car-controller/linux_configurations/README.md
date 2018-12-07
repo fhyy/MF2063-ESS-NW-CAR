@@ -1,4 +1,5 @@
 This folder contains configuration files for the Beagle Bone Black with hostname bbb-car-controller
+Furthermore, make sure the sudoers file in the target beaglebone looks like the example sudoers file in this folder!
 
 FILE			PLACE IN LINUX FILESYSTEM
 hostname		/etc/hostname
