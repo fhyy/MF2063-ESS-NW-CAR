@@ -18,17 +18,16 @@ float timeBeforeLastEncoder = 0;
 
 long timeLastEncoderUpdate = 0;
 
+float PID_P = 0.005;
+float PID_I = 0.0005;
+
 float currentPWM = 0;
+float lastPWM = 0;
 float pwmLastEncoderVal;
 float pwmBeforeLastEncoderVal;
 float errorSum = 0;
 
 float encoderDiffPerPWMCycle = 0;
-
-
-
-float PID_P = 0.005;
-float PID_I = 0.50;
 
 /*
    dutyCycle of 0% => standing still
@@ -47,16 +46,29 @@ void setMotorPWM(float dutyCycle)
   
   //Serial.println(ESC_MIN + (ESC_MAX - ESC_MIN)*dutyCycle);
 
-  int pwm = (ESC_MIN + (ESC_MAX - ESC_MIN) * dutyCycle);
+  int pwm = (ESC_MIN + (ESC_MAX_CAP - ESC_MIN) * dutyCycle);
   if (pwm > ESC_MAX_CAP) {
     pwm = ESC_MAX_CAP;
   }
   esc.writeMicroseconds(pwm);
-  //Serial.println(pwm);
-  //Serial.println(lastEncoderVal);
-  //Serial.println(targetSpeed);
+  //if(lastPWM != pwm){
+    Serial.print("PWM: ");
+    Serial.println(pwm);
+    Serial.print("Target speed: ");
+    Serial.println((int)targetSpeed);
+    Serial.print("Current speed: ");
+    Serial.println((int)lastEncoderVal);
+    Serial.print("Error sum: ");
+    Serial.println(errorSum);
+  //}
+  lastPWM = pwm;
+  /*Serial.print("Target: ");
+  Serial.println(targetSpeed);
+  Serial.print("Current: ");
+  Serial.println(lastEncoderVal);
   //Serial.println(currentPWM);
-  //Serial.println(errorSum);
+  Serial.print("Error: ");
+  Serial.println(errorSum);*/
 }
 
 bool readSpeed = 0;
@@ -84,38 +96,23 @@ ISR(SPI_STC_vect)
   //while (!(SPSR & (1<<SPIF))){}; // Wait for the end of the transmission
   
   byte spi_in = SPDR;//SPI.transfer(0);
-  Serial.print((spi_in&0x80)>>7);
-  Serial.print((spi_in&0x40)>>6);
-  Serial.print((spi_in&0x20)>>5);
-  Serial.print((spi_in&0x10)>>4);
-  Serial.print(" ");
-  Serial.print((spi_in&0x08)>>3);
-  Serial.print((spi_in&0x04)>>2);
-  Serial.print((spi_in&0x02)>>1);
-  Serial.print(spi_in&0x01);
-  Serial.println();
   if(spi_in & 0x80){
     // Assume cm/s
-    lastEncoderVal = spi_in;
+    lastEncoderVal = spi_in & 0x7F;
   }else{
     // Assume cm/s
     targetSpeed = spi_in;
   }
- 
-	Serial.print("Target: ");
-  Serial.println((int)targetSpeed);
-	Serial.print("Current: ");
-  Serial.println((int)lastEncoderVal);
-	
-	// Variables used for predicting speed change
-	float timeDiff = ((float)millis()-timeLastEncoderUpdate)/1000.0;
-	timeBeforeLastEncoder = timeSinceLastEncoder;
-	timeSinceLastEncoder = timeDiff;
-	pwmBeforeLastEncoderVal = pwmLastEncoderVal;
-	pwmLastEncoderVal = currentPWM;
+  
+  // Variables used for predicting speed change
+  float timeDiff = ((float)millis()-timeLastEncoderUpdate)/1000.0;
+  timeBeforeLastEncoder = timeSinceLastEncoder;
+  timeSinceLastEncoder = timeDiff;
+  pwmBeforeLastEncoderVal = pwmLastEncoderVal;
+  pwmLastEncoderVal = currentPWM;
 
-	setApproximationParameters();
-	timeLastEncoderUpdate = millis();
+  setApproximationParameters();
+  timeLastEncoderUpdate = millis();
 }
 
 char setupComplete = 0;
@@ -123,22 +120,17 @@ void setupAndCallibrateESC()
 {
   esc.attach(MOTOR_PIN);  // Attach servo to pin
 
-  esc.writeMicroseconds(ESC_MIN);  // Send minimum signal value for calibration
-
-  /*delay(ESC_CALIBRATION_DELAY); // Wait for ESC to acknowledge signal
-  
-  esc.writeMicroseconds(ESC_MAX); // Send calibration signal to ESC (also max value)
+  //esc.writeMicroseconds(ESC_MAX); // Send calibration signal to ESC (also max value)
 
   // Start ESC during this time
-  delay(ESC_CALIBRATION_DELAY);   // Wait for ESC to acknowledge calibration signal
+  //delay(ESC_CALIBRATION_DELAY);   // Wait for ESC to acknowledge calibration signal
 
   esc.writeMicroseconds(ESC_MIN);  // Send minimum signal value for calibration
 
   delay(ESC_CALIBRATION_DELAY); // Wait for ESC to acknowledge signal
 
-  esc.writeMicroseconds(ESC_ARM); // Send arm signal to ESC
+  //esc.writeMicroseconds(ESC_ARM); // Send arm signal to ESC
   delay(1000);
-  */
   setupComplete = 1;
 }
 
@@ -161,13 +153,20 @@ void setup()
   startSPI();
 }
 
+float floatMax(float val1, float val2){
+  if(val1 < val2){
+    return val2;
+  }
+  return val1;
+}
+
 unsigned long time_last;
 unsigned long time_new;
 
 // the loop function runs over and over again forever
 void loop()
 {
-  if(time_last == time_new){
+  if(time_last == 0){
     time_last = millis();
     return;
   }
@@ -182,10 +181,25 @@ void loop()
   // PID controlling
   float error = ((float)(targetSpeed - approximateEncoderVal));
   errorSum += error*timeDiffS;
-  currentPWM = error*PID_P + errorSum*PID_I;
+  currentPWM = floatMax(error*PID_P  + ((errorSum)*PID_I), targetSpeed > 1 ? 0.025:0.0);
+
+  int errorSumMax = ((ESC_MAX_CAP-ESC_MIN)-125.0f/PID_I)*PID_I;
+  if(errorSum > errorSumMax){
+    errorSum = errorSumMax;
+  }else if(errorSum < 0){
+    errorSum = 0;
+  }
+  
+  if(currentPWM > 1){
+    currentPWM = 1.0;
+  }
+  if(currentPWM < 0){
+    currentPWM = 0.0;
+  }
   setMotorPWM(currentPWM);
 
   time_last = time_new;
 
   delay(10);
 }
+
