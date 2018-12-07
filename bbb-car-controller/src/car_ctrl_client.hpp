@@ -15,40 +15,175 @@
 #include "SharedMemory.hpp"
 #include "CyclicBuffer.hpp"
 
+
+/**
+ * @brief
+ *
+ *
+ */
 class CarCTRLClient {
 public:
 
+    /**
+     * @brief
+     *
+     *
+     */
     CSharedMemory shm_mo;
+
+    /**
+     * @brief
+     *
+     *
+     */
     Buffer buf_mo;
 
+    /**
+     * @brief
+     *
+     *
+     */
     CSharedMemory shm_st;
+
+    /**
+     * @brief
+     *
+     *
+     */
     Buffer buf_st;
 
+    /**
+     * @brief
+     *
+     *
+     */
     CSharedMemory shm_sp;
+
+    /**
+     * @brief
+     *
+     *
+     */
     Buffer buf_sp;
 
+    /**
+     * @brief
+     *
+     *
+     */
     CSharedMemory shm_di;
+
+    /**
+     * @brief
+     *
+     *
+     */
     Buffer buf_di;
 
+    /**
+     * @brief
+     *
+     *
+     */
     CSharedMemory shm_go;
+
+    /**
+     * @brief
+     *
+     *
+     */
     Buffer buf_go;
 
+    /**
+     * @brief
+     *
+     *
+     */
     CSharedMemory shm_setmin;
+
+    /**
+     * @brief
+     *
+     *
+     */
     Buffer buf_setmin;
 
+    /**
+     * @brief
+     *
+     *
+     */
     CSharedMemory shm_cam;
+
+    /**
+     * @brief
+     *
+     *
+     */
     Buffer buf_cam;
 
+    /**
+     * @brief
+     *
+     *
+     */
     CSharedMemory shm_shutdown;
+
+    /**
+     * @brief
+     *
+     *
+     */
     Buffer buf_shutdown;
 
+    /**
+     * @brief
+     *
+     *
+     */
     CarCTRLClient(uint32_t mo_sleep, uint32_t di_sleep, uint32_t setmin_sleep, bool skip_go);
+
+    /**
+     * @brief
+     *
+     *
+     */
     bool init();
+
+    /**
+     * @brief
+     *
+     *
+     */
     void start();
+
+    /**
+     * @brief
+     *
+     *
+     */
     void stop();
 private:
+
+    /**
+     * @brief
+     *
+     *
+     */
     bool run_;
+
+    /**
+     * @brief
+     *
+     *
+     */
     bool go_;
+
+    /**
+     * @brief
+     *
+     *
+     */
     bool skip_go_;
     bool app_busy_;
     bool is_ava_di_;
