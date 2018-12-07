@@ -1,5 +1,6 @@
 #! /bin/sh
 
+sudo usermod -aG sudo debian
 sudo cp hostname /etc/hostname
 sudo cp hosts /etc/hosts
 sudo cp interfaces /etc/network/interfaces
