@@ -14,6 +14,7 @@ mkdir /home/debian/someip/vsomeip/build
 cd /home/debian/someip/vsomeip/build
 cmake -DENABLE_SIGNAL_HANDLING=1 ..
 make
+sudo make install
 sudo swapoff /swapfile
 sudo rm /swapfile
 

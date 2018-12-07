@@ -11,7 +11,6 @@ include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
 add_executable(camera-service "${PROJECT_SOURCE_DIR}/src/camera_service.cpp")
 target_link_libraries(camera-service vsomeip ${Boost_LIBRARIES})
-install(TARGETS camera-service DESTINATION bin)
 
 #########################################################################################
 
