@@ -21,6 +21,12 @@ string decodeFlag(Flag f);
 
 using namespace std;
 
+/**
+ * @brief Simple program for interactively testing the most
+ *        basic car functionality.
+ *
+ * @author Leon Fernandez
+ */
 int main() {
     ESSPrototype proto;
 
