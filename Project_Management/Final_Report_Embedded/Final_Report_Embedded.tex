@@ -46,6 +46,7 @@
 
 \usepackage{lastpage}
 \usepackage{rotating}
+\usepackage{textcomp} %get the correct micro sec display
 %---------- Enable IEEEtran.bst configurations ------
 \usepackage{IEEEtrantools}
 %----------------------------------------------------
@@ -232,7 +233,12 @@ maybe put communication diagram here
 \subsection{Communication between Beaglebone and Arduino ?}
 
 \subsection{Sensors}
+Three categories of sensors are implemented in the prototype vehicle to monitor its surrounding environments. Data from distance sensors and speed sensor will be sent to an Arduino initially, then sent to corresponding Beaglebone. Data from Pi Camera will be sent to the Raspberry Pi which is directly connected to the main network.
 \subsubsection{Ultrasonic sensor}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% put why we choose HC-SR04 in other chapter, e.g. methdology
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+To get data from HC-SR04, 10\textmu s 
 \subsubsection{Reflective object sensor}
 \subsubsection{Camera}
 
