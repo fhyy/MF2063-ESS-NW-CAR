@@ -1,6 +1,7 @@
 #! /bin/sh
 
 sudo usermod -aG sudo debian
+sudo echo "export PATH=$PATH:/home/debian" >> /etc/environment
 sudo cp hostname /etc/hostname
 sudo cp hosts /etc/hosts
 sudo cp interfaces /etc/network/interfaces
