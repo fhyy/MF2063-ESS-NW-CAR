@@ -53,10 +53,9 @@ ssh debian@192.168.0.2 << EOF
   rm -r /home/debian/bbb-distance-steering/doc # Remove doc folder if it got copied
 
   cd /home/debian/bbb-distance-steering/build
-  cmake -DCMAKE_INSTALL_PREFIX=/home/debian ..
-  cd /home/debian/bbb-distance-steering/build
   make
-  make install
+  ln -s /home/debian/bbb-distance-steering/build/dist-steer-service /home/debian/bin
+  ln -s /home/debian/bbb-distance-steering/build/distance /home/debian/bin
 
   # Create a script that launches the required programs simultaneously
   if [ ! -f /home/debian/bin/run_dist_steer.sh ]; then
@@ -92,9 +91,9 @@ ssh debian@192.168.0.3 << EOF
 
   cd /home/debian/bbb-motor-speed/build
   cmake -DCMAKE_INSTALL_PREFIX=/home/debian ..
-  cd /home/debian/bbb-motor-speed/build
   make
-  make install
+  ln -s /home/debian/bbb-motor-speed/build/motor-speed-service /home/debian/bin
+  ln -s /home/debian/bbb-motor-speed/build/speed /home/debian/bin
 
   # Create a script that launches the required programs simultaneously
   if [ ! -f /home/debian/bin/run_motor_speed.sh ]; then
@@ -130,14 +129,14 @@ ssh pi@192.168.0.4 << EOF
 
   cd /home/pi/rpi-vision/build
   cmake -DCMAKE_INSTALL_PREFIX=/home/pi ..
-  cd /home/pi/rpi-vision/build
   make
-  make install
+  ln -s /home/pi/rpi-vision/build/camera-service /home/pi/bin
+  ln -s /home/pi/rpi-vision/src/color_detection_cpp.py /home/pi/bin
 
   # Create a script that launches the required programs simultaneously
   if [ ! -f /home/pi/bin/run_camera.sh ]; then
     echo "#!/bin/bash" >> /home/pi/bin/run_camera.sh
-    echo "python3 /home/pi/rpi-vision/src/color_detection_cpp.py | camera_service" >> /home/pi/bin/run_camera.sh
+    echo "python3 color_detection_cpp.py | camera-service" >> /home/pi/bin/run_camera.sh
     chmod +x /home/pi/bin/run_camera.sh
   fi
 EOF
@@ -161,9 +160,10 @@ ssh debian@192.168.0.10 << EOF
 
   cd /home/debian/bbb-car-controller/build
   cmake -DCMAKE_INSTALL_PREFIX=/home/debian ..
-  cd /home/debian/bbb-car-controller/build
   make
-  make install
+  ln -s /home/debian/bbb-car-contoller/build/car-ctrl-client /home/debian/bin
+  ln -s /home/debian/bbb-car-controller/build/ess_shell /home/debian/bin
+  ln -s /home/debian/bbb-car-controller/build/main /home/debian/bin
 
   # Create a script that launches the shell and vsomeip simultaneously
   if [ ! -f /home/debian/bin/run_ess_shell.sh ]; then

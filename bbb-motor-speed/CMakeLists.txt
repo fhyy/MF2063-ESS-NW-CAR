@@ -16,11 +16,9 @@ add_subdirectory(lib/simple_gpio)
 
 add_executable(motor-speed-service "${PROJECT_SOURCE_DIR}/src/motor_speed_service.cpp")
 target_link_libraries(motor-speed-service vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
-install(TARGETS motor-speed-service DESTINATION bin)
 
 add_executable(speed "${PROJECT_SOURCE_DIR}/src/speed.cpp")
 target_link_libraries(speed gpio cbuf shm pthread rt)
-install(TARGETS speed DESTINATION bin)
 #########################################################################################
 
 
