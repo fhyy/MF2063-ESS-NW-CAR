@@ -140,6 +140,7 @@ int main(void)
 
                 //Send the values to the arduino motor controller
                 if(canSend){
+                        targetSpeed = targetSpeed >> 1;
                         sendMotorValue(fd, targetSpeed);
                         canSend = 0;
                 }
