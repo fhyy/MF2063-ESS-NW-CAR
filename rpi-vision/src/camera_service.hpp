@@ -5,6 +5,7 @@
     #include <csignal>
 #endif
 
+#include "py_detector.hpp"
 #include <iostream>
 #include <sstream>
 #include <thread>
