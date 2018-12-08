@@ -270,6 +270,12 @@ void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg
                         EMERGENCY_BREAK_EVENT_ID,
                         payload,
                         true, true);
+
+        // Set speed to 0
+        shm_mo.Lock();
+        buf_mo.write(0);
+        shm_mo.UnLock();
+
         #if (DEBUG)
         	std::cout << "## DEBUG ## Embreak event sent! Min distance threshold: " << (int) min_dist_ 
                       << " ## DEBUG ##" << std::endl;
