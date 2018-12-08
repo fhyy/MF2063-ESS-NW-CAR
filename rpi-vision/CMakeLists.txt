@@ -7,12 +7,17 @@ set(CMAKE_CXX_FLAGS "-g -std=c++0x")
 find_package(vsomeip 2.6.0 REQUIRED)
 find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 
-find_package(Python3 COMPONENTS Interpreter)
-
 include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
+include_directories("${PROJECT_SOURCE_DIR}/src/python")
+add_subdirectory(src/python)
+
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_DIRS})
+
 add_executable(camera-service "${PROJECT_SOURCE_DIR}/src/camera_service.cpp")
-target_link_libraries(camera-service vsomeip ${Boost_LIBRARIES})
+target_link_libraries(camera-service vsomeip ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} pydetect)
+
 
 #########################################################################################
 

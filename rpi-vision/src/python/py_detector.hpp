@@ -35,13 +35,13 @@ public:
      * @brief Constructor that also initializes the Python-objects.
      *
      */
-    pyDetector();
+    PyDetector();
 
     /**
      * @brief Destructor that also properly destroys the Python-objects.
      *
      */
-    ~pyDetector();
+    ~PyDetector();
 
     /**
      * @brief Method that does a feature extraction.
@@ -51,4 +51,4 @@ public:
      * "color_detection_cpp.py" by using the Python/C API.
      */
     int pyDetectFlag();
-}
+};
