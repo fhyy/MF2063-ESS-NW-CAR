@@ -244,6 +244,29 @@ An Arduino Micro handles both the generating the trig pulse and interpreting the
 \subsubsection{Reflective object sensor}
 \subsubsection{Camera}
 
+In computer vision part, we tried to compare the performance of two different methods, which are object detection based on neural network and color detection using OpenCV.
+\newline 
+The technique of transfer learning is used to apply MobileNet on RPI, which is an efficient model for mobile and embedded vision applications. The speed remains slow although hardware acceleration and multiprocessing have been carried out to improve.
+\newline
+By using OpenCV’s DNN module, we are able to pass input images through the deep neural network and get a output image with bounding box of specific object and label.
+\newline
+Since we are working on source constrained device Raspberry Pi, we need to make the network simple and decrease the computational cost, so we combined MobileNet with Single Shot Detector.
+\newline
+In order to optimize the Raspberry efficiently and use sufficiently limited resource and memory on it when running neural network, we firstly apply hardware optimization which is to install optimized OpenCV complie. So, ARM NEON as an optimization architecture extension for ARM processors is used. It is used for faster video stream processing, image analysis and speech recognition that is exactly what we are look for in our application. This architecture can execute multiple processing in the pipeline by a single instruction. Besides, VFPV3 as a floating point optimization is also used. After the first stage improvement, we get a 30 percent speed increase since we have make full use of the 4× ARM Cortex-A53, 1.2GHz processor on Raspberry Pi, now the network is able to classify an object in 1.5 seconds. 
+\newline
+When it comes to second stage of optimization, multiprocessing is used to increase the speed of processing video stream. The I/O tasks, dislike CPU bound operations, always take lots of time and delay the process. So moving the reading of frames to a separate thread from frame processing can obtain higher speed. Otherwise, every time I/O port access Pi camera, the main thread of script is blocked until the frame is captured and return to script. Multiprocessing can decrease the influence of I/O on CPU heavy application like video stream processing, especially in our real-time case. Now we can obtain a detection result within 1 second.
+\newline
+Additionally, there is a trade off between accuracy and output speed. In our application, we set a threshold for the output, in more details, only when the confidence score of detection result is high enough (above the specified threshold), the result can be output as a signal to steer the car. Otherwise, it will grab another frame and do the object detection for the other iteration. As a result, if the threshold confidence score of output increase, the output speed will decrease.
+\newline
+Since the object detection method outputs result slowly, we move on to the other method which is color detection using OpenCV to see whether the  speed is fast enough to be applied on a car prototype.
+\newline
+We define the upper and lower limits for pixel values to classify three colors. Then specify which pixels fall into specified upper and lower range by masking. The speed of color detection is fast and also accurate enough for real-time application.
+\newline
+So we finally apply the color detection on our car, we use the result of detection to steer the car.
+\newline
+
+
+
 \subsection{Controlling actuators}
 \subsubsection{Steering servo}
 \subsubsection{Motor ESC}
