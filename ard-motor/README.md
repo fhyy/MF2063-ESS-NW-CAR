@@ -51,4 +51,4 @@ __Variable definition__
 
 |Name|Range|Description|  
 |:---:|:---:|:---|  
-|TargetSpeed </br>CurrentSpeed|[Bit 0 --> 7]</br> (0,125) |(Bit 8 = 0):The target speed in cm/s </br> (Bit 8 = 1): The latest encoder readings in cm/s|  
+|TargetSpeed </br>CurrentSpeed|[Bit 0 --> 7]</br> (0,125) |(Bit 8 = 0):The target speed in 2cm/s (receiving x means x*2 cm/s) </br> (Bit 8 = 1): The latest encoder readings in 2cm/s|  
