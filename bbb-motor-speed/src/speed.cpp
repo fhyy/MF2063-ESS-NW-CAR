@@ -123,7 +123,7 @@ int main(void)
 		    printf("######## Half of Sensor value was: %d\n", receivedMessage);
                 }
                 // update current speed in each iteration
-                currentSpeed = (1<<7) | currentSpedd;
+                currentSpeed = (1<<7) | currentSpeed;
                 sendMotorValue(fd, currentSpeed);
                 //write to the named pipe to send the information over vsomeip
                 shmMemory_sp.Lock();
