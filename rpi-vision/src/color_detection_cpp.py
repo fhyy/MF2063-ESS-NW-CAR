@@ -49,11 +49,11 @@ def detection():
 
             M = cv2.moments(c)
             (a, b) = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            if a < 300:
+            if a <= 200:
                 loc = '1'
-            if a > 300:
+            if a >= 400:
                 loc = '2'
-            if a == 300:
+            if (a > 200 and a <400):
                 loc = '3'
             # only proceed if the radius meets a minimum size. Correct this value for your obect's size
             if radius > 0.5:
