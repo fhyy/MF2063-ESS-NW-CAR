@@ -58,7 +58,7 @@
 %%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \setlength{\headheight}{53pt}
 \lhead{MF2063 Embedded Systems Design Project \\		 
-       ESS-CAR/ESS-NW \\
+       ESS-NW/ESS-CAR \\
        Leon Fernandez, leonfe@kth.se}
 \rhead{Final Report \\
        Version 1 \\
@@ -238,7 +238,9 @@ Three categories of sensors are implemented in the prototype vehicle to monitor 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % put why we choose HC-SR04 in other chapter, e.g. methdology
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-To get data from HC-SR04, 10\textmu s 
+To get data from HC-SR04, a short 10\textmu s pulse should be supplied to the trig pin of ultrasonic sensor, then the sensor will send out an 8 cycle burst of ultrasound at 40 kHz and raise echo. The echo signal we get is a distance object which is pulse width and the range of the signal is in proportion. 
+
+An Arduino Micro handles both the generating the trig pulse and interpreting the echo signal. After the Arduino sends out the trig pulse, it waits for 2 ms, then reads the value from the pin connected to sensor's echo pin.
 \subsubsection{Reflective object sensor}
 \subsubsection{Camera}
 
@@ -262,15 +264,14 @@ To get data from HC-SR04, 10\textmu s
 %-------------------------------------------------------------------------
 \clearpage
 \section{Future Work}
-
+%-------------------------------------------------------------------------
 \clearpage
 %TODO reference
 \clearpage
-
+%-------------------------------------------------------------------------
 \clearpage
 %TODO appendix
 \appendix
-
 \clearpage
 
 \end{document}
