@@ -114,11 +114,16 @@ int main(void)
 
                 //Read the sensor value given by the spedometer
                 receivedMessage = readSensorValue(fd);
+                // the 7th bit of receivedMessage should be 1
+                currentSpeed = receivedMessage >> 1;
+                if(currentSpeed > 125){
+                        currentSpeed = 125;
+                }
                 if(DEBUG){
-		    printf("######## Sensor value was: %d\n", receivedMessage);
+		    printf("######## Half of Sensor value was: %d\n", receivedMessage);
                 }
                 // update current speed in each iteration
-                currentSpeed = (1<<7) | receivedMessage;
+                currentSpeed = (1<<7) | currentSpedd;
                 sendMotorValue(fd, currentSpeed);
                 //write to the named pipe to send the information over vsomeip
                 shmMemory_sp.Lock();
