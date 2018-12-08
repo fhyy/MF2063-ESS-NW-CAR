@@ -26,10 +26,10 @@
 |:---| :---: |
 |Connect and start affected nodes properly| --- |
 |Read correctly formated data via SPI interface from node| Data received (Can be verified by adding logging and reading logs on the receiver node) |
-|Keep the wheel still|The node continously sends a speed value of 0|
+|Keep the wheel still|The node continuously sends a speed value of 0|
 |Start turning the wheel at some approximate rate|The node sends speed value of X cm/s where X is the distance in cm traveled per second if the wheel would turn at the current rate and be placed on the ground|
 |Start turning the wheel at some other approximate rate|The node sends speed value of X cm/s where X is the distance in cm traveled per second if the wheel would turn at the current rate and be placed on the ground|
-|Keep the wheel still|The node starts to continously send a speed value of 0 within one second|
+|Keep the wheel still|The node starts to continuously send a speed value of 0 within one second|
 
 ## Motor node
 | Action | Expected outcome |
@@ -38,33 +38,52 @@
 |Send correctly formated data via SPI interface to node| Data transmitted (Can be verified by adding logging and reading logs via the serial port of the motor node) |
 |Send target speed value 10 with the current speed value 0 | The motor starts running and runs faster and faster with time, but stops before it reaches less than half of its maximum power|
 |Stop, connect to a fully functioning speed sensing node and add speed data to the data sent via SPI, and start the motor node|The speed sensor starts logging values in cm/s|
-|Send a target speed value of 10 with the meassured speed values and continously send meassured speed values and the target speed values as soon as they are updated by the speed sensor node|The motor starts running and modulates itself until the speed of 10 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation |
-|Send a target speed value of 0 with the meassured speed values and continously send meassured speed values as before|The motor slows down to a halt in less than a second|
+|Send a target speed value of 10 with the meassured speed values and continuously send meassured speed values and the target speed values as soon as they are updated by the speed sensor node|The motor starts running and modulates itself until the speed of 10 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation |
+|Send a target speed value of 0 with the meassured speed values and continuously send meassured speed values as before|The motor slows down to a halt in less than a second|
 |Send a target speed value of 120 cm/s with the meassured speed values as before|The motor starts running and | The motor starts running and modulates itself until a steady speed of something less than 120 cm/s is read by the speed sensor, due to limitations set in the motor node, and maintains this speed after at most 1 second of modulation |
 |Send a target speed value of 20 with the meassured speed values as before|The motor slows down and modulates itself until the speed of 20 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation|
-|Send a target speed value of 0 with the meassured speed values and continously send meassured speed values as before|The motor slows down to a halt in less than a second|
+|Send a target speed value of 0 with the meassured speed values and continuously send meassured speed values as before|The motor slows down to a halt in less than a second|
 
 ## Distance-Steering controller
-_TODO_
+| Action | Expected outcome |
+|:---| :---: |
+|Connect and start affected nodes and VSOME/IP clients properly| --- |
+| Read SPI messages and messages on the VSOME/IP protocol for speed data, sent by the node | A continuous stream of 0x42 (50 in decimal) will be read |
 
 ## Motor-Speed controller
-_TODO_
+| Action | Expected outcome |
+|:---| :---: |
+|Connect and start affected nodes and VSOME/IP clients properly| --- |
+| Read SPI messages and messages on the VSOME/IP protocol for speed data, sent by the node | A continuous stream of 0x80 will be read (due to the first bit acting as a data type id)|
+| Prepare a byte 0x10 to send over the other SPI channel to the node | The first SPI channel will read a continuous stream of 0x90 (due to the first bit acting as a data type id). </br> The VSOME/IP message for speed data will read the value 16|
+| Send a value of 0x20 over the VSOME/IP protocol for target speed | The first SPI channel will read 0x20 followed by a continuous stream of 0x90 (as before) |  
+| Prepare a byte 0x00 to send over the other SPI channel to the node | The first SPI channel will read a continuous stream of 0x80 (due to the first bit acting as a data type id). </br> The VSOME/IP message for speed data will read the value 0 |
+| Send a value of less than 0x16 (30 in decimal) on the VSOME/IP protocol for distance | The first SPI channel will read a 0x00 within less than a second |
+| Send a value of more than 0x64 (100 in decimal) on the VSOME/IP protocol for distance | The first SPI channel will read a 0x20 within less than a second |
+| Send a value of 0x64 (100 decimal) on the VSOME/IP protocol for minimum distance | No change |
+| Send a value of less than 0x64 (100 in decimal) and more than 0x16 on the VSOME/IP protocol for distance | The first SPI channel will read a 0x00 within less than a second |
+| Send a value of 0x30 over the VSOME/IP protocol for target speed | No change |  
+| Send a value of more than 0x64 (100 in decimal) on the VSOME/IP protocol for distance | The first SPI channel will read a 0x30 within less than a second |
+| Send a value of 0x00 over the VSOME/IP protocol for target speed| The first SPI channel will read 0x00 followed by a continuous stream of 0x80 (as before) |  
 
 ## Vision controller  
 | Action | Expected outcome |
 |:---| :---: |
 |Connect and start affected nodes properly| --- |
-|Hold something with a red color infront of the camera (Android app, or mobile webpage can be found in the project git repositories)|The vision controller should send the message "1*X* " within 1 second, where 1 means red, and X is any direction towards the red thing|
-|Hold something with a green color infront of the camera but a bit to the left|The vision controller sends the message "21" within 1 second, where 2 means green, and 1 means left|
-|Hold something with a green color infront of the camera but a bit to the right|The vision controller sends the message "22" within 1 second, where 2 means green, and the second 2 means right|
-|Hold something with a green color infront of the camera but center in view|The vision controller sends the message "23" within 1 second, where 2 means green, and the 3 means center|
-|Hold something with a red color infront of the camera but a bit to the left|The vision controller sends the message "11" within 1 second, where 1 means red, and the second 1 means left|
-|Hold something with a red color infront of the camera but a bit to the right|The vision controller sends the message "12" within 1 second, where 1 means red, and the 2 means right|
-|Hold something with a red color infront of the camera but center in view|The vision controller sends the message "13" within 1 second, where 1 means red, and the 3 means center|
-|Hold something with a yellow color infront of the camera but a bit to the left|The vision controller sends the message "31" within 1 second, where 1 means red, and the 1 means left|
-|Hold something with a yellow color infront of the camera but a bit to the right|The vision controller sends the message "32" within 1 second, where 1 means red, and the 2 means right|
-|Hold something with a yellow color infront of the camera but center in view|The vision controller sends the message "33" within 1 second, where 1 means red, and the second 3 means center|
-|Keep very green, very red, and very yellow colored object away from the camera field of view|The vision controller sends "00", which represents no control flag object in view|
+|Hold something with a red colour in front of the camera (Android app, or mobile webpage can be found in the project git repositories)|The vision controller should send the message "1*X* " within 1 second, where 1 means red, and X is any direction towards the red thing|
+|Hold something with a green colour in front of the camera but a bit to the left|The vision controller sends the message "21" within 1 second, where 2 means green, and 1 means left|
+|Hold something with a green colour in front of the camera but a bit to the right|The vision controller sends the message "22" within 1 second, where 2 means green, and the second 2 means right|
+|Hold something with a green colour in front of the camera but center in view|The vision controller sends the message "23" within 1 second, where 2 means green, and the 3 means center|
+|Hold something with a red colour in front of the camera but a bit to the left|The vision controller sends the message "11" within 1 second, where 1 means red, and the second 1 means left|
+|Hold something with a red colour in front of the camera but a bit to the right|The vision controller sends the message "12" within 1 second, where 1 means red, and the 2 means right|
+|Hold something with a red colour in front of the camera but center in view|The vision controller sends the message "13" within 1 second, where 1 means red, and the 3 means center|
+|Hold something with a yellow colour in front of the camera but a bit to the left|The vision controller sends the message "31" within 1 second, where 1 means red, and the 1 means left|
+|Hold something with a yellow colour in front of the camera but a bit to the right|The vision controller sends the message "32" within 1 second, where 1 means red, and the 2 means right|
+|Hold something with a yellow colour in front of the camera but center in view|The vision controller sends the message "33" within 1 second, where 1 means red, and the second 3 means center|
+|Keep very green, very red, and very yellow coloured object away from the camera field of view|The vision controller sends "00", which represents no control flag object in view|
 
 ## Car controller  
-_TODO_
+| Action | Expected outcome |
+|:---| :---: |
+|Connect and start affected nodes properly| --- |
+| _TODO_ ||

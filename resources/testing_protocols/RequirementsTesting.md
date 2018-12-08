@@ -1,7 +1,7 @@
 ## Car start up
 | Action | Expected outcome |
 |:---| :---: |
-|Turn on power of the car| Blinky lights on the hardware turns on. ESC makes beeping noise within 5 seconds. Front wheels are centered if start orientation is off-center. |
+|Turn on power of the car| Blinky lights on the hardware turns on. ESC makes beeping noise within 5 seconds (the pattern should be _beep-beep-boooop_ if a 2-cell battery is used). Front wheels are centered if start orientation is off-center. |
 
 ## Flag following
 | Action | Expected outcome |
