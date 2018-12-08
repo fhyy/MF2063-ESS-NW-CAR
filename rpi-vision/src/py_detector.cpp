@@ -2,6 +2,8 @@
 
 PyDetector::PyDetector() {
     Py_Initialize();
+    sysPath = PySys_GetObject((char*)"path");
+    PyList_Append(sysPath, PyString_FromString("."));
     PyObject *pName = PyUnicode_DecodeFSDefault("color_detection_cpp");
     pModule = PyImport_Import(pName);
     Py_DECREF(pName);
@@ -13,6 +15,7 @@ PyDetector::~PyDetector() {
     Py_DECREF(pValue);
     Py_DECREF(pFunc);
     Py_DECREF(pModule);
+    Py_DECREF(sysPath);
 }
 
 int PyDetector::pyDetectFlag() {

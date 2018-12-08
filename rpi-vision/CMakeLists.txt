@@ -7,6 +7,8 @@ set(CMAKE_CXX_FLAGS "-g -std=c++0x")
 find_package(vsomeip 2.6.0 REQUIRED)
 find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 
+find_package(Python3 COMPONENTS Interpreter)
+
 include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
 add_executable(camera-service "${PROJECT_SOURCE_DIR}/src/camera_service.cpp")

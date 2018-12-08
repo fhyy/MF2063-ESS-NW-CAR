@@ -15,7 +15,8 @@ CameraService::CameraService(uint32_t cam_sleep, bool skip_go) :
     run_(false),
     go_(false),
     skip_go_(skip_go),
-    pub_cam_sleep_(cam_sleep)
+    pub_cam_sleep_(cam_sleep),
+    detector_(PyDetector())
 {}
 
 /*

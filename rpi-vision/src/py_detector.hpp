@@ -8,6 +8,12 @@
 class PyDetector {
 public:
     /**
+     * @brief Object representing the path that Python looks in for files.
+     *
+     */
+    PyObject *sysPath;
+
+    /**
      * @brief Object representing the Python module that has been loaded.
      *
      */
