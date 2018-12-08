@@ -122,6 +122,13 @@ private:
     std::shared_ptr<vsomeip::payload> payload_;
 
     /**
+     * @brief Object that wraps aroound a Python script.
+     *
+     * For more info see @ref PyDetector.
+     */
+    PyDetector detector_;
+
+    /**
      * @brief This method is the method run by @ref pub_cam_thread_.
      *
      * It basically waits for the initialization to complete then enters an

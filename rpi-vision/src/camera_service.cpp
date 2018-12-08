@@ -196,29 +196,9 @@ void CameraService::run_cam() {
         // Pause here if !go_.
         while(!(go_ || skip_go_));
 
-        int camera_data;
-        std::vector<int> camera_vector;
-	std::stringstream conv;
-        while(true) {
-            std::string camera_data_raw;
-            getline(std::cin, camera_data_raw);
-            conv << camera_data_raw;
-            conv >> camera_data;
-            if (camera_data == 44 || camera_data_raw.empty()){
-                break;
-            }
-            camera_vector.push_back(camera_data);
-        }
+        // Use wrapper detector_ to invoke Python script.
+        int sensor_data_latest = detector_.pyDetectFlag();
 
-        int sensor_data_latest;
-        if (camera_vector.size() > 0) {
-            // Use only newest sensor value for transmission.
-            sensor_data_latest = camera_vector.back();
-        }
-        else {
-            // TODO Send this packet only one
-            sensor_data_latest = 0;
-        }
         // turn int into std::vector of four vsomeip::byte_t.
         std::vector<vsomeip::byte_t> sensor_data_formatted;
         char byte;
