@@ -125,42 +125,32 @@
 %----------------------------------------------------------------------------------------
 
 \section{Introduction and background} 
-\begin{frame}
+\subsection{Autonomous vehicles}
+\begin{frame}{Autonomous vehicles}
     \begin{figure}
-        \includegraphics[width=1.2\linewidth]{articles.jpg}
+        \includegraphics[width=1.1\linewidth]{articles.jpg}
     \end{figure}
 \end{frame}
 
 %------------------------------------------------
-\subsection{Autonomous Driving}
 \begin{frame}{Autonomous vehicles}
-    \begin{itemize}
-        \item Autonomous Driving (AD) and Advandced Driving Assistance Systems (ADAS)
-        \item Common services:
-            \begin{itemize}
-                \item Object detection
-                \item Speedometer
-                \item Distance meter
-                \item Cruise control
-                \item Steering control
-                \item Central decision making
-            \end{itemize}
-        \item Intelligent system monitoring:
-            \begin{itemize}
-                \item Startup
-                \item Fault detection
-                \item Communication surveilance
-            \end{itemize}
-        \item Dynamic adaptation:
-            \begin{itemize}
-                \item Failsafe behaviour
-                \item Adaptive communication
-            \end{itemize}
-    \end{itemize}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{driving.png}
+    \end{figure}
 \end{frame}
 
+\begin{frame}{Autonomous vehicles}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{monitoring.png}
+    \end{figure}
+\end{frame}
 
-%------------------------------------------------
+\begin{frame}{Autonomous vehicles}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{networking.png}
+    \end{figure}
+\end{frame}
+
 
 \subsection{Communication technologies}
 \begin{frame}{The problem with existing communication technologies}
@@ -171,54 +161,33 @@
                 \item LIN (19.2 Kilobit/s)
                 \item FlexRay (10 Megabit/s)
             \end{itemize}
-
-        \item Increased demand of bandwidth because of increased number of services in autnomous vehicles puts high demands on communication technologies.
-        \item An interesting area of research is to use regular \textbf{ethernet }to replace existing communication technologies for cars.
-            \begin{itemize}
-                \item Current ethernet speeds reach into the Gigabit/s range.
-            \end{itemize}
+        \item Too slow for autonomous cars!
+        \item Regular internet based technologies can be a solution for communication in cars.
+        \item Wired ethernet speeds reach into the Gigabit/s range.
     \end{itemize}
     \begin{figure}
         \includegraphics[width=0.3\linewidth]{ethernet_cable.jpg}
     \end{figure}
 \end{frame}
 
-%------------------------------------------------
-
-\subsection{Ethernet}
-\begin{frame}{The problem with ethernet}
-    \begin{itemize}
-        \item Ethernet is not developed for time-critical applications.
-            \begin{itemize}
-                \item Messages can take any road through the network.
-                \item There is no way to give precedence for certain messages.
-                \item Ethernet has no way to control for message congestion in the network.
-                \item Worst-case latencies for messages can be to long because of congestion.
-                    %Client server is slower than publish-subscribe
-                \item Messaging is usually implemented using the client-server model.
-                    %We cant do anything to change the control layer depending on existing circumstances
-                \item Ethernet is unadaptive to real-time events.
-            \end{itemize}
-        \item An interesting area of research to tackle these problems is to use \textbf{Software Defined Networking }(SDN).
-    \end{itemize}
-\end{frame}
-
-%------------------------------------------------
-
-\subsection{Software defined networking}
-\begin{frame}{Software defined networking}
-    \begin{itemize}
-        \item Builds onto the theory of regular ethernet.
-        \item Move the intelligence from the switches to a central controller.
-        \item The controller gather information from the switches.
-        \item The controller decides how the traffic should be directed in the network.
-        \item The SDN-controller allows for more adaptation in the network based on real-time events.
-    \end{itemize}
+\begin{frame}{The problem with existing communication technologies}
     \begin{figure}
-        \includegraphics[width=0.55\linewidth]{sdn_info.png}
+        \includegraphics[width=0.7\linewidth]{congesting.png}
     \end{figure}
 \end{frame}
 
+\subsection{Software-Defined Networking}
+\begin{frame}{Software-Defined Networking (SDN)}
+    \begin{figure}
+        \includegraphics[width=0.75\linewidth]{routing.png}
+    \end{figure}
+\end{frame}
+
+\begin{frame}{Software-Defined Networking (SDN)}
+    \begin{figure}
+        \includegraphics[width=0.7\linewidth]{cooperating.png}
+    \end{figure}
+\end{frame}
 %------------------------------------------------
 
 \section{Our project}
@@ -252,12 +221,22 @@
         \item Cruise control
         \item Steering
         \item Object recognition
-        \item 
+        \item Distance measurement
     \end{itemize}
+    \begin{figure}
+        \includegraphics[width=0.2\linewidth]{robocar.png}
+    \end{figure}
 \end{frame}
 
-\subsection{Hardware platform}
-
+\begin{frame}{Network surveillance}
+    \begin{figure}
+        \includegraphics[width=1.05\linewidth]{netstat1.png}
+    \end{figure}
+    \begin{figure}
+        \includegraphics[width=0.6\linewidth]{netstat2.png}
+        \includegraphics[width=0.2\linewidth]{robonet.png}
+    \end{figure}
+\end{frame}
 %------------------------------------------------
 
 \section{Conclusion}
@@ -270,120 +249,6 @@
     \end{itemize}
 
 \end{frame}
-
-%------------------------------------------------
-
-\section{old-slides}
-\subsection{VSome/IP}
-\begin{frame}{VSOME/IP}
-    \begin{figure}
-        \includegraphics[width=\linewidth]{vsomeip.png}
-    \end{figure}    
-\end{frame}
-%------------------------------------------------
-
-\section{Control and sensors }
-\subsection{Sensors}
-
-\begin{frame}{Services}
-    \begin{itemize}
-        \item Ultrasonic sensor
-            \begin{figure}
-                \includegraphics[width=0.2\linewidth, left]{ultrasonic.jpg}
-            \end{figure}
-        \item Reflective object sensor
-            \begin{figure}
-                \includegraphics[width=0.2\linewidth, left]{ir.jpg}
-            \end{figure}
-        \item Camera
-            \begin{figure}
-                \includegraphics[width=0.2\linewidth, left]{camera.jpg}
-            \end{figure}
-
-    \end{itemize}
-
-\end{frame}
-%------------------------------------------------
-
-
-\subsection{Actutators}
-\begin{frame}{Actuators}
-    \begin{itemize}
-        \item Motor controller
-        \item Steering controller
-    \end{itemize}
-    \begin{figure}
-        \includegraphics[width=0.6\linewidth, right]{car.jpg}
-    \end{figure}
-\end{frame}
-%------------------------------------------------
-\subsection{Autonomous behaviour}
-
-\begin{frame}{Autonomous behaviour}
-    \begin{itemize}
-        \item Services
-        \item State machine
-            \begin{figure}
-                \includegraphics[width=0.7\linewidth]{statemachine.png}
-                \caption{State machine}
-            \end{figure}
-    \end{itemize}
-
-\end{frame}
-%------------------------------------------------
-
-
-\section{Assembly}
-\subsection{Mounting}
-\begin{frame}{The platform}
-
-    \begin{columns}
-        \begin{column}{0.47\textwidth}
-            \begin{itemize}
-                \item  Designed in Fusion 360
-                \item  Cut out in the laser cutter
-                \item  The idea of the design was to build up to get access to everything and to be modular
-                \item Mounted on the car via two holes 
-            \end{itemize}
-        \end{column}
-        \begin{column}{0.5\textwidth}
-            \includegraphics[width=0.7\linewidth]{platform.jpg}
-            \label{fig:platform}
-            %\caption{Platform}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-%------------------------------------------------
-\subsection{Power}
-\begin{frame}{Power}
-    \begin{itemize}
-        \item We hade designed PCBs to mount the Arduinos on and to power the other devices
-        \item Could not order PCB
-        \item The machine PCB mill was broken both the one Mentorspace and proto Prototype Center
-        \item Had to use breadboard 
-    \end{itemize}
-\end{frame}
-
-
-
-
-
-
-
-%------------------------------------------------
-
-
-%\begin{frame}
-%\frametitle{References}
-%\footnotesize{
-%\begin{thebibliography}{99} % Beamer does not support BibTeX so %references must be inserted manually as below
-%\bibitem[Smith, 2012]{p1} John Smith (2012)
-%\newblock Title of the publication
-%\newblock \emph{Journal Name} 12(3), 45 -- 678.
-%\end{thebibliography}
-%}
-%\end{frame}
 
 %------------------------------------------------
 
