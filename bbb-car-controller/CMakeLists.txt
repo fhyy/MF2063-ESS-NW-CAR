@@ -26,24 +26,6 @@ add_executable(ess_shell "${PROJECT_SOURCE_DIR}/src/ess_shell.cpp")
 target_link_libraries(ess_shell cbuf shm essproto pthread rt)
 #########################################################################################
 
-
-################### Build Docs ##########################################################
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    set(DOXYGEN_IN ${CMAKE_CURRENT_LIST_DIR}/Doxyfile.in)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_LIST_DIR}/doc/Doxyfile)
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-    add_custom_target(doxygen-doc ALL
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-        COMMENT "Doxygen is working..."
-	SOURCES ${DOXYGEN_OUT})
-
-else()
-  message("Doxygen not found. No documentation will be generated")
-endif()
-#########################################################################################
-
 ################### Link to vsomeip.json ################################################
 set(target ${CMAKE_CURRENT_LIST_DIR}/vsomeip.json)
 set(link ${CMAKE_CURRENT_LIST_DIR}/build/vsomeip.json)
