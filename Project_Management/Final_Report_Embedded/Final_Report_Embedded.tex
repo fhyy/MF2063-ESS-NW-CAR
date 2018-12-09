@@ -47,6 +47,7 @@
 \usepackage{lastpage}
 \usepackage{rotating}
 \usepackage{textcomp} %get the correct micro sec display
+\usepackage{float}
 %---------- Enable IEEEtran.bst configurations ------
 \usepackage{IEEEtrantools}
 %----------------------------------------------------
@@ -228,13 +229,15 @@ sources !!!
 Serial Peripheral Interface (SPI) is a synchronous serial interface specification for short distance communication. SPI supports full duplex mode using a master-slave architecture with one single master, and the SPI master originates the whole communication. The SPI bus has four logic signals: serial clock (SCK), master output slave input (MOSI), master input and slave output (MISO), slave select (SS). The detailed pin mapping of SPI master and slaves is shown in figure ??.
 
 % figure: one master and multiple slave connection
+\begin{figure}[H]
+	\centering
+   	\includegraphics[scale=0.5]{spi-literature.jpg}
+   	\caption{Connection of one SPI master and two SPI slaves}
+    \label{fig:spi-literature}
+\end{figure}
 
 SPI has a higher throughput than those traditional transaction protocols, e.g. $I^{2}$C, UART, as it is not limited to any maximum clock speed enabling potentially high speed. And the hardware interface is pretty simple where slaves only use master's clock and are able to share the other three signals but the SS. Meanwhile, the software is not hard to implementation. For the opposite side, SPI has its limitations. There is no slave acknowledgement or hand-shaking mechanism in SPI, so the master could keep sending data to nowhere and not know it.
 
-
-
-
-%TODO spi communication figure
 
 %-------------------------------------------------------------------------
 \subsection{Assembly of the car}
