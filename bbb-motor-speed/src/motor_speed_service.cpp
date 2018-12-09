@@ -22,12 +22,17 @@ MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist, bool s
                   << std::endl;
     #endif
 
-    int *p;
+
     // Initialize consumer memory (where input is read from).
-    shm_sp.Create(BUFFER_SIZE, O_RDWR);
-    shm_sp.Attach(PROT_WRITE);
-    p = (int*) shm_sp.GetData();
-    buf_sp = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    try {
+        shm_sp.Create(BUFFER_SIZE, O_RDWR);
+        shm_sp.Attach(PROT_WRITE);
+    }
+    catch (CSharedMemoryException& e) {
+        std::cout << e.what() << std::endl;
+    }
+    int *p_sp = (int*) shm_sp.GetData();
+    buf_sp = Buffer(BUFFER_SIZE, p_sp, B_CONSUMER);
 
     // Sleep so the program on the other end of the shared memory
     // gets a chance to initialize its consumers.
@@ -40,10 +45,15 @@ MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist, bool s
 
     // Initialize producer memory (where output is written). Hopefully consumers of this memory
     // have been initialized properly while we where sleeping a couple of lines above.
-    shm_mo.Create(BUFFER_SIZE, O_RDWR);
-    shm_mo.Attach(PROT_WRITE);
-    p = (int*) shm_mo.GetData();
-    buf_mo = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    try {
+        shm_mo.Create(BUFFER_SIZE, O_RDWR);
+        shm_mo.Attach(PROT_WRITE);
+    }
+    catch (CSharedMemoryException& e) {
+        std::cout << e.what() << std::endl;
+    }
+    int *p_mo = (int*) shm_mo.GetData();
+    buf_mo = Buffer(BUFFER_SIZE, p_mo, B_PRODUCER);
 
 }
 
