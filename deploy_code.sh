@@ -47,6 +47,7 @@
 ssh debian@192.168.0.2 "rm -r /home/debian/bbb-distance-steering"
 scp -r bbb-distance-steering debian@192.168.0.2:/home/debian/
 scp -r lib debian@192.168.0.2:/home/debian/bbb-distance-steering
+ssh debian@192.168.0.2 "mkdir /home/debian/bbb-distance-steering/linux_configurations"
 scp cfg_bbb/* debian@192.168.0.2/home/debian/bbb-distance-steering/linux_configurations
 
 # Build the system and create a script that launches the required programs
@@ -82,6 +83,7 @@ EOF
 ssh debian@192.168.0.3 "rm -r /home/debian/bbb-motor-speed"
 scp -r bbb-motor-speed debian@192.168.0.3:/home/debian/
 scp -r lib debian@192.168.0.3:/home/debian/bbb-motor-speed
+ssh debian@192.168.0.3 "mkdir /home/debian/bbb-motor-speed/linux_configurations"
 scp cfg_bbb/* debian@192.168.0.3/home/debian/bbb-motor-speed/linux_configurations
 
 # Build the system and create a script that launches the required programs
@@ -152,6 +154,7 @@ EOF
 ssh debian@192.168.0.10 "rm -r  /home/debian/bbb-car-controller"
 scp -r bbb-car-controller debian@192.168.0.10:/home/debian
 scp -r lib debian@192.168.0.10:/home/debian/bbb-car-controller
+ssh debian@192.168.0.10 "mkdir  /home/debian/bbb-car-controller/linux_configurations"
 scp cfg_bbb/* debian@192.168.0.10/home/debian/bbb-car-controller/linux_configurations
 
 # Build the system and create a script that launches the required programs
