@@ -66,8 +66,8 @@ ssh debian@192.168.0.2 << EOF
   # Create a script that launches and kills the required programs simultaneously
   if [ ! -f /home/debian/bin/run_dist_steer.sh ]; then
     echo "#!/bin/bash" >> /home/debian/bin/run_dist_steer.sh
-    set VSOMEIP_CONFIGURATION="/home/debian/bbb-distance-steering/vsomeip.json"
-    echo "dist-steer-service & sudo distance" >> /home/debian/bin/run_dist_steer.sh
+    echo "set VSOMEIP_CONFIGURATION="/home/debian/bbb-distance-steering/vsomeip.json"" >> /home/debian/bin/run_dist_steer.sh
+    echo "sudo dist-steer-service & sudo distance" >> /home/debian/bin/run_dist_steer.sh
     chmod +x /home/debian/bin/run_dist_steer.sh
   fi
 EOF
@@ -102,8 +102,8 @@ ssh debian@192.168.0.3 << EOF
   # Create a script that launches the required programs simultaneously
   if [ ! -f /home/debian/bin/run_motor_speed.sh ]; then
     echo "#!/bin/bash" >> /home/debian/bin/run_motor_speed.sh
-    set VSOMEIP_CONFIGURATION="/home/debian/bbb-motor-speed/vsomeip.json"
-    echo "motor-speed-service & sudo speed" >> /home/debian/bin/run_motor_speed.sh
+    echo "set VSOMEIP_CONFIGURATION="/home/debian/bbb-motor-speed/vsomeip.json"" >> /home/debian/bin/run_motor_speed.sh
+    echo "sudo motor-speed-service & sudo speed" >> /home/debian/bin/run_motor_speed.sh
     chmod +x /home/debian/bin/run_motor_speed.sh
   fi
 EOF
@@ -136,7 +136,7 @@ ssh pi@192.168.0.4 << EOF
   # Create a script that launches the required programs simultaneously
   if [ ! -f /home/pi/bin/run_camera.sh ]; then
     echo "#!/bin/bash" >> /home/pi/bin/run_camera.sh
-    set VSOMEIP_CONFIGURATION="/home/pi/rpi-vision/vsomeip.json"
+    echo "set VSOMEIP_CONFIGURATION="/home/pi/rpi-vision/vsomeip.json"" >> /home/pi/bin/run_camera.sh
     echo "python3 /home/pi/bin/color_detection_cpp.py | camera-service" >> /home/pi/bin/run_camera.sh
     chmod +x /home/pi/bin/run_camera.sh
   fi
@@ -173,13 +173,14 @@ ssh debian@192.168.0.10 << "EOF"
   # Create a script that launches the shell and vsomeip simultaneously
   if [ ! -f /home/debian/bin/run_ess_shell.sh ]; then
     echo "#!/bin/bash" >> /home/debian/bin/run_ess_shell.sh
+    echo "set VSOMEIP_CONFIGURATION="/home/debian/bbb-car-controller/vsomeip.json"" >> /home/debian/bin/run_ess_shell.sh
     echo "car-ctrl-client & ess_shell" >> /home/debian/bin/run_ess_shell.sh
     chmod +x /home/debian/bin/run_ess_shell.sh
   fi
   # Create a script that launches the auto-driver and vsomeip simultaneously
   if [ ! -f /home/debian/bin/run_ess_auto.sh ]; then
     echo "#!/bin/bash" >> /home/debian/bin/run_ess_auto.sh
-    set VSOMEIP_CONFIGURATION="/home/debian/bbb-car-controller/vsomeip.json"
+    echo "set VSOMEIP_CONFIGURATION="/home/debian/bbb-car-controller/vsomeip.json"" >> /home/debian/bin/run_ess_auto.sh
     echo "car-ctrl-client & main" >> /home/debian/bin/run_ess_auto.sh
     chmod +x /home/debian/bin/run_ess_auto.sh
   fi
