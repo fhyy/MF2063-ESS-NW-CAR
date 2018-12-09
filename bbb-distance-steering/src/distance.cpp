@@ -40,7 +40,7 @@ int compareDistance(unsigned int fd){
 
 // SS init, all SS pins are ouput and high at the start point
 void spiSSInit(int gpio1, int gpio2){
-       gpio_unexport(gpio1);
+       /*gpio_unexport(gpio1);
        gpio_export(gpio1);
        gpio_unexport(gpio2);
        gpio_export(gpio2);
@@ -49,7 +49,7 @@ void spiSSInit(int gpio1, int gpio2){
        gpio_set_dir(gpio2, OUTPUT_PIN);
 
        gpio_set_value(gpio1, HIGH);
-       gpio_set_value(gpio2, HIGH);
+       gpio_set_value(gpio2, HIGH);*/
 }
 
 

@@ -7,11 +7,12 @@
  */
 class PyDetector {
 public:
+
     /**
-     * @brief Object representing the path that Python looks in for files.
+     * @brief An error message that will be printed if initialization failed.
      *
      */
-    PyObject *sysPath;
+    std::string err_msg_;
 
     /**
      * @brief Object representing the Python module that has been loaded.

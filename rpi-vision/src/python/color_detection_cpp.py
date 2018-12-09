@@ -22,19 +22,19 @@ def detection():
     biggestRadius = 0
 
     # for each color in dictionary check object in frame
-    for key, value in self.upper.items():
-
+    for key, value in upper.items():
         # construct a mask for the color from dictionary`1, then perform
         # a series of dilations and erosions to remove any small
         # blobs left in the mask
         kernel = np.ones((9, 9), np.uint8)
+        mask = cv2.inRange(hsv, lower[key], upper[key])
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
 
         # find contours in the mask and initialize the current
         # (x, y) center of the ball
         cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
-                                    cv2.CHAIN_APPROX_SIMPLE)[-2]
+                                cv2.CHAIN_APPROX_SIMPLE)[-2]
         center = None
 
         # only proceed if at least one contour was found
@@ -47,11 +47,11 @@ def detection():
 
             M = cv2.moments(c)
             (a, b) = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            if a < 200:
+            if a <= 200:
                 loc = '1'
-            elif a > 400:
+            if a >= 400:
                 loc = '2'
-            else: # 200 <= a <= 400
+            if (a > 200 and a <400):
                 loc = '3'
             # only proceed if the radius meets a minimum size. Correct this value for your obect's size
             if (radius > 0.5) and radius > biggestRadius:

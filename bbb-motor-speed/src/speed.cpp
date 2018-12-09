@@ -23,10 +23,10 @@
 //Initialize a GPIO-pin to act as a Slave Select (SS)
 void spiSSInit(int gpio)
 {
-        gpio_unexport(gpio);
+        /*gpio_unexport(gpio);
         gpio_export(gpio);
         gpio_set_dir(gpio, OUTPUT_PIN);
-        gpio_set_value(gpio, HIGH);
+        gpio_set_value(gpio, HIGH);*/
 }
 
 // SPI parameter setup, takes a file descriptor to the SPI interface
@@ -114,11 +114,16 @@ int main(void)
 
                 //Read the sensor value given by the spedometer
                 receivedMessage = readSensorValue(fd);
+                // the 7th bit of receivedMessage should be 1
+                currentSpeed = receivedMessage >> 1;
+                if(currentSpeed > 125){
+                        currentSpeed = 125;
+                }
                 if(DEBUG){
-		    printf("######## Sensor value was: %d\n", receivedMessage);
+		    printf("######## Half of Sensor value was: %d\n", receivedMessage);
                 }
                 // update current speed in each iteration
-                currentSpeed = (1<<7) | receivedMessage;
+                currentSpeed = (1<<7) | currentSpeed;
                 sendMotorValue(fd, currentSpeed);
                 //write to the named pipe to send the information over vsomeip
                 shmMemory_sp.Lock();
@@ -135,6 +140,7 @@ int main(void)
 
                 //Send the values to the arduino motor controller
                 if(canSend){
+                        targetSpeed = targetSpeed >> 1;
                         sendMotorValue(fd, targetSpeed);
                         canSend = 0;
                 }
