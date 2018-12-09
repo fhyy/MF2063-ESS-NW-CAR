@@ -180,7 +180,7 @@ void CarCTRLClient::update_go_status() {
     int service_status = (is_ava_mo_ << 0) |
                          (is_ava_st_ << 1) |
                          (is_ava_sp_ << 2) |
-                         (is_ava_mo_ << 3) |
+                         (is_ava_di_ << 3) |
                          (is_ava_cam_<< 4);
 
     shm_go.Lock();

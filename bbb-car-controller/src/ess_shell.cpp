@@ -166,7 +166,7 @@ string decodeFlag(Flag f) {
                          break;
         case Flag::Green : msg += "Flag is green and ";
                            break;
-        case Flag::Yellow : msg += "Flag is yellow and";
+        case Flag::Yellow : msg += "Flag is yellow and ";
                             break;
         default : msg += "Flag has no color and is ";
                   break;
