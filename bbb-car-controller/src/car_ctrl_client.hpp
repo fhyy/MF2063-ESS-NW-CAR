@@ -17,148 +17,155 @@
 
 
 /**
- * @brief
+ * @brief This class is the client that controls the car
  *
- *
+ * This class handles the VSOMEIP communication between nodes. It
+ * subscribes to a number of event publishers and requests association with
+ * the steering service and the motor service. For communicating with the
+ * higher-level library @ref ESSPrototype it uses a number of shared memory
+ * locations to write and read sensor values and requests, respectively.
+ * It is worth noting that ESSPrototype can be replaced with some other software
+ * as long as that software still writes to the same shared memories.
+ * @author Leon Fernandez
  */
 class CarCTRLClient {
 public:
 
     /**
-     * @brief
+     * @brief Shared memory for reading motor requests, which are then sent.
      *
      *
      */
     CSharedMemory shm_mo;
 
     /**
-     * @brief
+     * @brief Buffer for keeping track of motor requests.
      *
      *
      */
     Buffer buf_mo;
 
     /**
-     * @brief
+     * @brief Shared memory for reading steering requests, which are then sent.
      *
      *
      */
     CSharedMemory shm_st;
 
     /**
-     * @brief
+     * @brief Buffer for keeping track of steering requests.
      *
      *
      */
     Buffer buf_st;
 
     /**
-     * @brief
+     * @brief Shared memory to which speed sensor data is written.
      *
      *
      */
     CSharedMemory shm_sp;
 
     /**
-     * @brief
+     * @brief Buffer for keeping track of speed data values.
      *
      *
      */
     Buffer buf_sp;
 
     /**
-     * @brief
+     * @brief Shared memory to which distance sensor data is written.
      *
      *
      */
     CSharedMemory shm_di;
 
     /**
-     * @brief
+     * @brief Buffer for keeping track of distance data values.
      *
      *
      */
     Buffer buf_di;
 
     /**
-     * @brief
+     * @brief Shared memory to which the service status is written.
      *
      *
      */
     CSharedMemory shm_go;
 
     /**
-     * @brief
+     * @brief Buffer for keeping track of service status data.
      *
      *
      */
     Buffer buf_go;
 
     /**
-     * @brief
+     * @brief Shared memory for reading setmin requests, which are then sent.
      *
      *
      */
     CSharedMemory shm_setmin;
 
     /**
-     * @brief
+     * @brief Buffer for keeping track of setmin values
      *
      *
      */
     Buffer buf_setmin;
 
     /**
-     * @brief
+     * @brief Shared memory to which camera sensor data is written.
      *
      *
      */
     CSharedMemory shm_cam;
 
     /**
-     * @brief
+     * @brief  Buffer for keeping track of camera sensor data.
      *
      *
      */
     Buffer buf_cam;
 
     /**
-     * @brief
+     * @brief Shared memory for reading shutdown requests, which are then sent.
      *
      *
      */
     CSharedMemory shm_shutdown;
 
     /**
-     * @brief
+     * @brief Buffer for keeping track of shutdown requests.
      *
      *
      */
     Buffer buf_shutdown;
 
     /**
-     * @brief
+     * @brief Constructor for the class. Also initializes the shared memory.
      *
      *
      */
     CarCTRLClient(uint32_t mo_sleep, uint32_t di_sleep, uint32_t setmin_sleep, bool skip_go);
 
     /**
-     * @brief
+     * @brief Initializes the vsomeip application.
      *
      *
      */
     bool init();
 
     /**
-     * @brief
+     * @brief Registers the vsomeip application to the vsomeip RTE.
      *
      *
      */
     void start();
 
     /**
-     * @brief
+     * @brief Closes down the application.
      *
      *
      */
@@ -166,7 +173,7 @@ public:
 private:
 
     /**
-     * @brief
+     * @brief Main on/off switch for the threads.
      *
      *
      */
