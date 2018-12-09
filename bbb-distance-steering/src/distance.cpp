@@ -43,13 +43,13 @@ void spiSSInit(int gpio1, int gpio2){
        /*gpio_unexport(gpio1);
        gpio_export(gpio1);
        gpio_unexport(gpio2);
-       gpio_export(gpio2);
+       gpio_export(gpio2);*/
 
        gpio_set_dir(gpio1, OUTPUT_PIN);
        gpio_set_dir(gpio2, OUTPUT_PIN);
 
        gpio_set_value(gpio1, HIGH);
-       gpio_set_value(gpio2, HIGH);*/
+       gpio_set_value(gpio2, HIGH);
 }
 
 

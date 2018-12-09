@@ -24,9 +24,9 @@
 void spiSSInit(int gpio)
 {
         /*gpio_unexport(gpio);
-        gpio_export(gpio);
+        gpio_export(gpio);*/
         gpio_set_dir(gpio, OUTPUT_PIN);
-        gpio_set_value(gpio, HIGH);*/
+        gpio_set_value(gpio, HIGH);
 }
 
 // SPI parameter setup, takes a file descriptor to the SPI interface
