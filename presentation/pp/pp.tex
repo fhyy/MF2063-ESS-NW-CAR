@@ -19,67 +19,80 @@
 
 \mode<presentation> {
 
-% The Beamer class comes with a number of default slide themes
-% which change the colors and layouts of slides. Below this is a list
-% of all the themes, uncomment each in turn to see what they look like.
+    % The Beamer class comes with a number of default slide themes
+    % which change the colors and layouts of slides. Below this is a list
+    % of all the themes, uncomment each in turn to see what they look like.
 
-%\usetheme{default}
-%\usetheme{AnnArbor}
-%\usetheme{Antibes}
-%\usetheme{Bergen}
-%\usetheme{Berkeley}
-%\usetheme{Berlin}
-%\usetheme{Boadilla}
-%\usetheme{CambridgeUS}
-%\usetheme{Copenhagen}
-%\usetheme{Darmstadt}
-%\usetheme{Dresden}
-%\usetheme{Frankfurt}
-%\usetheme{Goettingen}
-%\usetheme{Hannover}
-%\usetheme{Ilmenau}
-%\usetheme{JuanLesPins}
-%\usetheme{Luebeck}
-\usetheme{Madrid}
-%\usetheme{Malmoe}
-%\usetheme{Marburg}
-%\usetheme{Montpellier}
-%\usetheme{PaloAlto}
-%\usetheme{Pittsburgh}
-%\usetheme{Rochester}
-%\usetheme{Singapore}
-%\usetheme{Szeged}
-%\usetheme{Warsaw}
+    %\usetheme{default}
+    %\usetheme{AnnArbor}
+    %\usetheme{Antibes}
+    %\usetheme{Bergen}
+    %\usetheme{Berkeley}
+    %\usetheme{Berlin}
+    %\usetheme{Boadilla}
+    %\usetheme{CambridgeUS}
+    %\usetheme{Copenhagen}
+    %\usetheme{Darmstadt}
+    %\usetheme{Dresden}
+    %\usetheme{Frankfurt}
+    %\usetheme{Goettingen}
+    %\usetheme{Hannover}
+    %\usetheme{Ilmenau}
+    %\usetheme{JuanLesPins}
+    %\usetheme{Luebeck}
+    \usetheme{Madrid}
+    %\usetheme{Malmoe}
+    %\usetheme{Marburg}
+    %\usetheme{Montpellier}
+    %\usetheme{PaloAlto}
+    %\usetheme{Pittsburgh}
+    %\usetheme{Rochester}
+    %\usetheme{Singapore}
+    %\usetheme{Szeged}
+    %\usetheme{Warsaw}
 
-% As well as themes, the Beamer class has a number of color themes
-% for any slide theme. Uncomment each of these in turn to see how it
-% changes the colors of your current slide theme.
+    % As well as themes, the Beamer class has a number of color themes
+    % for any slide theme. Uncomment each of these in turn to see how it
+    % changes the colors of your current slide theme.
 
-%\usecolortheme{albatross}
-%\usecolortheme{beaver}
-%\usecolortheme{beetle}
-%\usecolortheme{crane}
-%\usecolortheme{dolphin}
-%\usecolortheme{dove}
-%\usecolortheme{fly}
-%\usecolortheme{lily}
-%\usecolortheme{orchid}
-%\usecolortheme{rose}
-%\usecolortheme{seagull}
-%\usecolortheme{seahorse}
-%\usecolortheme{whale}
-%\usecolortheme{wolverine}
+    %\usecolortheme{albatross}
+    %\usecolortheme{beaver}
+    %\usecolortheme{beetle}
+    %\usecolortheme{crane}
+    %\usecolortheme{dolphin}
+    %\usecolortheme{dove}
+    %\usecolortheme{fly}
+    %\usecolortheme{lily}
+    %\usecolortheme{orchid}
+    %\usecolortheme{rose}
+    %\usecolortheme{seagull}
+    %\usecolortheme{seahorse}
+    %\usecolortheme{whale}
+    %\usecolortheme{wolverine}
 
-%\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
-%\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
+    %\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+    %\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
 
-%\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+    %\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
 }
 
 \usepackage[export]{adjustbox}
 \usepackage{graphicx} % Allows including images
 \usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
 \graphicspath{ {./figures/} }
+
+
+% Insert title slides
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -90,83 +103,177 @@
 \author{ Leon Fernandez, Jonas Ekman, Fredrik Hyyrynen, Jacob Kimblad, Yini Gao and  Yifan Ruan} % Your name
 \institute[KTH] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
 {
-MF2063 \\ % Your institution for the title page
-\medskip
+    MF2063 \\ % Your institution for the title page
+    \medskip
 
 }
-\date{\today} % Date, can be changed to a custom date
+\date{December 10, 2018} % Date, can be changed to a custom date
 
 \begin{document}
 
 \begin{frame}
-\titlepage % Print the title page as the first slide
+    \titlepage % Print the title page as the first slide
 \end{frame}
 
 \begin{frame}
-\frametitle{Overview} % Table of contents slide, comment this block out to remove it
-\tableofcontents % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+    \frametitle{Overview} % Table of contents slide, comment this block out to remove it
+    \tableofcontents % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
 \end{frame}
 
 %----------------------------------------------------------------------------------------
 %	PRESENTATION SLIDES
 %----------------------------------------------------------------------------------------
 
+\section{Introduction and background} 
+\begin{frame}
+    \begin{figure}
+        \includegraphics[width=1.2\linewidth]{articles.jpg}
+    \end{figure}
+\end{frame}
+
 %------------------------------------------------
-\section{Introduction} 
-    
-\begin{frame}{Introduction}
+\subsection{Autonomous Driving}
+\begin{frame}{Autonomous vehicles}
     \begin{itemize}
         \item Autonomous Driving (AD) and Advandced Driving Assistance Systems (ADAS)
-        \item Communication in self driving cars
-        \begin{itemize}
-            \item CAN
-            \item LIN
-            \item FlexRay
-            \item Ethernet
-        \end{itemize}
-        \item Intelligent system monitoring
-        \begin{itemize}
-            \item Startup
-            \item Fault detection
-            \item Network statistics
-        \end{itemize}
-        \item Adaptation services
-        \begin{itemize}
-            \item Failsafe
-            \item Network reconfiguration
-        \end{itemize}
-
+        \item Common services:
+            \begin{itemize}
+                \item Object detection
+                \item Speedometer
+                \item Distance meter
+                \item Cruise control
+                \item Steering control
+                \item Central decision making
+            \end{itemize}
+        \item Intelligent system monitoring:
+            \begin{itemize}
+                \item Startup
+                \item Fault detection
+                \item Communication surveilance
+            \end{itemize}
+        \item Dynamic adaptation:
+            \begin{itemize}
+                \item Failsafe behaviour
+                \item Adaptive communication
+            \end{itemize}
     \end{itemize}
 \end{frame}
 
 
 %------------------------------------------------
 
-\section{Network}
-\subsection{SDN}
-\begin{frame}{Network}
+\subsection{Communication technologies}
+\begin{frame}{The problem with existing communication technologies}
     \begin{itemize}
-        \item Software defined Network (SDN)
+        \item Existing communication technologies between internal computers in cars:
+            \begin{itemize}
+                \item CAN (1 Megabit/s)
+                \item LIN (19.2 Kilobit/s)
+                \item FlexRay (10 Megabit/s)
+            \end{itemize}
+
+        \item Increased demand of bandwidth because of increased number of services in autnomous vehicles puts high demands on communication technologies.
+        \item An interesting area of research is to use regular \textbf{ethernet }to replace existing communication technologies for cars.
+            \begin{itemize}
+                \item Current ethernet speeds reach into the Gigabit/s range.
+            \end{itemize}
     \end{itemize}
     \begin{figure}
-        \includegraphics[width=0.6\linewidth]{network.png}
-        \caption{Network}
+        \includegraphics[width=0.3\linewidth]{ethernet_cable.jpg}
     \end{figure}
 \end{frame}
 
 %------------------------------------------------
 
-\begin{frame}{SDN}
+\subsection{Ethernet}
+\begin{frame}{The problem with ethernet}
     \begin{itemize}
-        \item Move the intelligence from the switches to a controller
-        \item The controller gather information from the switches
-        \item The controller decides how the traffic should be send in the network
-        \item Scalable
-        \item Ryu controller is the SDN frame work we used, python based and well documented.          
+        \item Ethernet is not developed for time-critical applications.
+            \begin{itemize}
+                \item Messages can take any road through the network.
+                \item There is no way to give precedence for certain messages.
+                \item Ethernet has no way to control for message congestion in the network.
+                \item Worst-case latencies for messages can be to long because of congestion.
+                    %Client server is slower than publish-subscribe
+                \item Messaging is usually implemented using the client-server model.
+                    %We cant do anything to change the control layer depending on existing circumstances
+                \item Ethernet is unadaptive to real-time events.
+            \end{itemize}
+        \item An interesting area of research to tackle these problems is to use \textbf{Software Defined Networking }(SDN).
     \end{itemize}
-    
-\end{frame}{}
+\end{frame}
 
+%------------------------------------------------
+
+\subsection{Software defined networking}
+\begin{frame}{Software defined networking}
+    \begin{itemize}
+        \item Builds onto the theory of regular ethernet.
+        \item Move the intelligence from the switches to a central controller.
+        \item The controller gather information from the switches.
+        \item The controller decides how the traffic should be directed in the network.
+        \item The SDN-controller allows for more adaptation in the network based on real-time events.
+    \end{itemize}
+    \begin{figure}
+        \includegraphics[width=0.55\linewidth]{sdn_info.png}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\section{Our project}
+\subsection{Goals}
+\begin{frame}{Goals of the project}
+    \begin{itemize}
+        \item Produce a prototype of an SDN-based communication infrastructure for automotive vehicles.
+        \item Produce a prototype of intelligent system monitoring and adaptation service for automotive vehicles.
+        \begin{figure}
+            \includegraphics[width=0.5\linewidth]{turnigy_car.jpg}
+            \caption{RC-car model kit used for the prototype}
+        \end{figure}
+    \end{itemize}
+\end{frame}
+
+%------------------------------------------------
+
+\subsection{System architecture}
+\begin{frame}{System architecture}
+    \begin{figure}
+        \includegraphics[width=0.75\linewidth]{network.png}
+    \end{figure}
+\end{frame}
+
+%------------------------------------------------
+
+\subsection{Implemented services}
+\begin{frame}{Implemented services}
+    \begin{itemize}
+        \item Speedometer
+        \item Cruise control
+        \item Steering
+        \item Object recognition
+        \item 
+    \end{itemize}
+\end{frame}
+
+\subsection{Hardware platform}
+
+%------------------------------------------------
+
+\section{Conclusion}
+\begin{frame}{Conclusion}
+    \begin{itemize}
+        \item Ethernet is a promising candidate for increasing demand on bandwidth for communication in autonomous cars
+        \item Ethernet is not without problems, many of which a SDN can help to solve.
+        \item SDN networks allow for safe communications on autonomous vehicles by being fast, adaptive and customisable
+        \item Fault detection and failsafe behaviour is a \textbf{must} in autonomous vehicles.
+    \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------
+
+\section{old-slides}
 \subsection{VSome/IP}
 \begin{frame}{VSOME/IP}
     \begin{figure}
@@ -178,20 +285,20 @@ MF2063 \\ % Your institution for the title page
 \section{Control and sensors }
 \subsection{Sensors}
 
-\begin{frame}{Sensors}
+\begin{frame}{Services}
     \begin{itemize}
-     \item Ultrasonic sensor
-    \begin{figure}
-        \includegraphics[width=0.2\linewidth, left]{ultrasonic.jpg}
-    \end{figure}
-    \item Reflective object sensor
-    \begin{figure}
-        \includegraphics[width=0.2\linewidth, left]{ir.jpg}
-    \end{figure}
-    \item Camera
-    \begin{figure}
-        \includegraphics[width=0.2\linewidth, left]{camera.jpg}
-    \end{figure}
+        \item Ultrasonic sensor
+            \begin{figure}
+                \includegraphics[width=0.2\linewidth, left]{ultrasonic.jpg}
+            \end{figure}
+        \item Reflective object sensor
+            \begin{figure}
+                \includegraphics[width=0.2\linewidth, left]{ir.jpg}
+            \end{figure}
+        \item Camera
+            \begin{figure}
+                \includegraphics[width=0.2\linewidth, left]{camera.jpg}
+            \end{figure}
 
     \end{itemize}
 
@@ -201,10 +308,10 @@ MF2063 \\ % Your institution for the title page
 
 \subsection{Actutators}
 \begin{frame}{Actuators}
- \begin{itemize}
-  \item Motor controller
-  \item Steering controller
- \end{itemize}
+    \begin{itemize}
+        \item Motor controller
+        \item Steering controller
+    \end{itemize}
     \begin{figure}
         \includegraphics[width=0.6\linewidth, right]{car.jpg}
     \end{figure}
@@ -213,14 +320,14 @@ MF2063 \\ % Your institution for the title page
 \subsection{Autonomous behaviour}
 
 \begin{frame}{Autonomous behaviour}
- \begin{itemize}
-  \item Services
-  \item State machine
-  \begin{figure}
-    \includegraphics[width=0.7\linewidth]{statemachine.png}
-    \caption{State machine}
-  \end{figure}
- \end{itemize}
+    \begin{itemize}
+        \item Services
+        \item State machine
+            \begin{figure}
+                \includegraphics[width=0.7\linewidth]{statemachine.png}
+                \caption{State machine}
+            \end{figure}
+    \end{itemize}
 
 \end{frame}
 %------------------------------------------------
@@ -229,7 +336,7 @@ MF2063 \\ % Your institution for the title page
 \section{Assembly}
 \subsection{Mounting}
 \begin{frame}{The platform}
-    
+
     \begin{columns}
         \begin{column}{0.47\textwidth}
             \begin{itemize}
@@ -246,6 +353,7 @@ MF2063 \\ % Your institution for the title page
         \end{column}
     \end{columns}
 \end{frame}
+
 %------------------------------------------------
 \subsection{Power}
 \begin{frame}{Power}
@@ -261,19 +369,6 @@ MF2063 \\ % Your institution for the title page
 
 
 
-
-%------------------------------------------------
-
-\section{Conclusion}
-\begin{frame}{Conclusion}
-    \begin{itemize}
-        \item Ethernet is a promising candidate for increasing demand on bandwidth for communication in autonomous cars.
-        \item Ethernet is not without problems, many of which a SDN might be able to solve.
-        \item SDN networks allow for safe, fast and customisable communication on autonomous vehicles.
-        \item Thanks to our project owners! 
-    \end{itemize}
-    
-\end{frame}
 
 
 %------------------------------------------------
@@ -293,9 +388,10 @@ MF2063 \\ % Your institution for the title page
 %------------------------------------------------
 
 \begin{frame}
-\Huge{\centerline{The End}}
+    \Huge{\centerline{Come check out our DEMO in the}} 
+    \Huge{\centerline{prototyping lab on floor 3!}} 
 \end{frame}
 
 %----------------------------------------------------------------------------------------
 
-\end{document}
+        \end{document}
