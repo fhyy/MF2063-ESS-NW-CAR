@@ -302,12 +302,15 @@ In the beginning of the project was floodlight that SDN controller framework we 
 
 \subsection{Communication between Beaglebone and Arduino ?}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SPI introduction in literature review
+% SPI introduction in literature review, pros over UART
 %TODO reference to the simple gpio library (github page)
+% NOT SURE: PUT simple gpio lib to management chapter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 As the Beaglebone only supports to be the master in a SPI connection, so we have two beaglebones with SPI configurations and each of them has two Arduino slaves. One Beaglebone has two spi devices: SPIDEV0 and SPIDEV1, and the SPIDEV1 device is disabled initially but is used for HDMI interface. 
 
-In order to have one SPI device on Beaglebone connecting to multiple Arduino slaves, we use a third party C++ library called SimpleGPIO which enables us to use other general purpose pins as slave select of the SPI connection. 
+In order to have one SPI device on Beaglebone connecting to multiple Arduino slaves, we use a third party C++ library called SimpleGPIO which enables us to use other general purpose pins as slave select of the SPI connection. Before we start communication with a specific Arduino slave, the corresponding slave select will be set to low, then we get access to that Arduino slave.
+
+In the Arduino side, the communication request from the Beaglebone is treated as an interrupt. Then the Arduino writes/reads to/from the Serial Peripheral Data Register (SPDR). 
 \subsection{Sensors}
 Three categories of sensors are implemented in the prototype vehicle to monitor its surrounding environments. Data from distance sensors and speed sensor will be sent to an Arduino initially, then sent to corresponding Beaglebone. Data from Pi Camera will be sent to the Raspberry Pi which is directly connected to the main network.
 %-------------------------------------------------------------------------
