@@ -224,6 +224,19 @@ Then the controller send directives to the switches uses it OpenFlow and it as a
 
 sources !!!
 %-------------------------------------------------------------------------
+\subsection{Serial Peripheral Interface}
+Serial Peripheral Interface (SPI) is a synchronous serial interface specification for short distance communication. SPI supports full duplex mode using a master-slave architecture with one single master, and the SPI master originates the whole communication. The SPI bus has four logic signals: serial clock (SCK), master output slave input (MOSI), master input and slave output (MISO), slave select (SS). The detailed pin mapping of SPI master and slaves is shown in figure ??.
+
+% figure: one master and multiple slave connection
+
+SPI has a higher throughput than those traditional transaction protocols, e.g. $I^{2}$C, UART, as it is not limited to any maximum clock speed enabling potentially high speed. And the hardware interface is pretty simple where slaves only use master's clock and are able to share the other three signals but the SS. Meanwhile, the software is not hard to implementation. For the opposite side, SPI has its limitations. There is no slave acknowledgement or hand-shaking mechanism in SPI, so the master could keep sending data to nowhere and not know it.
+
+
+
+
+%TODO spi communication figure
+
+%-------------------------------------------------------------------------
 \subsection{Assembly of the car}
  To make the car moving all the devices and components on the car has to placed on the car and because there many devices on the car that communicates via SDN and has all of them be placed in a efficient way. To do that needs some kind of platform be created to mount all the devices on and they are close to the other devices its depended on. 
 
@@ -239,6 +252,8 @@ To generate a voltage at 9V from 5V or 7.2V has some kind of DC-DC converter be 
 %-------------------------------------------------------------------------
 \clearpage
 \section{Methodology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%TODO chapter overview
 %-------------------------------------------------------------------------
 \subsection{Network}
 %-------------------------------------------------------------------------
@@ -250,11 +265,9 @@ Mininet is a Python-based application what an SDN network topology can be create
 
 The car network topology was simulated in Mininet to analyse its behaviour, and to develop code for the controller. Under this test did we discover what that Mininet simulation had a much lower delay then the real implementation had, even then the extra setings on the links and nodes was added. This resulted that Mininet could not be used to analyse the best topology for the car. It was instead used to simulate the network to create a code for the Ryu controller. 
 
-
-
-
+%-------------------------------------------------------------------------
 \subsection{VSOME/IP}
-
+%-------------------------------------------------------------------------
 \subsection{Engineering approaches ?}
 \subsection{Tool-chains ?}
 \subsection{Project management}
