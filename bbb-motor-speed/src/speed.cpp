@@ -145,7 +145,7 @@ int main(void)
                         canSend = 0;
                 }
                 //We sleep so we dont interrupt the arduino to often and it never gets to do work
-                usleep(2000000);
+                usleep(200000);
         }
 
         return 1;
