@@ -123,7 +123,7 @@ int main(){
                      canSend = 0;
               }
 
-              usleep(500000); // half seconds
+              usleep(180000); 
        }
        close(fd);
        return 0;
