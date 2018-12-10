@@ -7,11 +7,11 @@
 
 #define TARGET_SPEED_STEP 5
 #define TARGET_SPEED_STOP 0
-#define TARGET_SPEED_MAX 100 // cm/s
+#define TARGET_SPEED_MAX 200 // cm/s
 
-#define DISTANCE_STOP 50   //cm
+#define DISTANCE_STOP 30   //cm
 
-#define SPEED_OK 50 // cm/s, just set for test currently 
+#define SPEED_OK 160 // cm/s, just set for test currently 
 
 #define DISTANCE_PRIO 0
 #define DIRECTION_PRIO 0
