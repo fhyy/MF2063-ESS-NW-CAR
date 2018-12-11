@@ -124,7 +124,7 @@ void CameraService::on_state(vsomeip::state_type_e state) {
         // Request the go-service in order to be able to see if bbb-car-controller is ready to go.
         app_->request_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
-    else if (state == vsomeip::state_type_e::ST_REGISTERED) {
+    else if (state == vsomeip::state_type_e::ST_DEREGISTERED) {
         // Stop the camera event group.
         app_->stop_offer_event(CAM_SERVICE_ID, CAM_INSTANCE_ID, CAM_EVENT_ID);
         app_->stop_offer_service(CAM_SERVICE_ID, CAM_INSTANCE_ID);
