@@ -275,7 +275,6 @@ The car network topology was simulated in Mininet to analyse its behaviour, and 
 %-------------------------------------------------------------------------
 \subsection{Engineering approaches ?}
 \subsection{Tool-chains ?}
-
 \subsection{Project management}
 Scrum project management is used during the process of our projects.
 The scrum framework has been adopted for use in this process because of it being agile as well as the fact that most group members had some type of previous experience or knowledge with it. Both software and physical tools were used for monitoring the projects progression. Excel was for example used to keep track of milestones, earned value and the resource plan and the online tool trello was used alongside a physical whiteboard to keep track of scrum sprints and the project backlog as depicted in figure \ref{fig:scrum-board}. A lot of design was also produced and kept on whiteboards as to promote discussion within the group and to keep everyone updated with updates or changes to design or models.
@@ -284,8 +283,7 @@ As with all projects where the team members have no previous experience in worki
 
 Setting up clear milestones for the project was very benificial in managemnt as it helped to divide the project into different phases in time with each ones having clear expected outcomes. This helped the project stay on track with regards to time as it could easily be followed what needed to be done and when.
 
-To ensure smooth progress it was deceided to have weekly meetings with the stakeholders were all group members could go through what they had done the previous week and receive feedback from the stakeholders. The feedback could be general tips and aid on the current assignment or that they wanted to steer a part of the project in a different direction or note that there might have been some part or parts that have been overlooked in the design or implementation.
-
+To ensure smooth progress it was deceided to have weekly meetings with the stakeholders were all group members could go through what they had done the previous week and receive feedback from the stakeholders. The feedback could be general tips and aid on the current assignment or that they wanted to steer a part of the project in a different direction or note that there might have been some part or parts that have been overlooked in the design or implementation. These meetings were also usefull for rasising issues that were encountered during the development with our project sponsors. The messaging app called Slack which is often used by development teams in industry was also used by the project group including the sponsors. This allowed the group to bring up urgent issues with the project sponsors directly, without having to wait until the next weekly meeting, and getting a quick response as soon as possible.
 
 
 \begin{figure}[]
@@ -552,9 +550,11 @@ The result of the prototyping is shown in figure \ref{fig:board_ultra_steering},
 
 \clearpage
 \section{Verification and Validation}
+
 \subsection{State machine}
 The state machine was modelled and verified using the tool NuSMV which is a symbolic model checker that is used for formal verification of finite state systems. Since NuSMV allows for the models to be checked using linear temporal logic the state machine could be checked for node coverage and edge coverage. NuSMV also allows for exhaustive analysis meaning that each set of combinations of the state variables needs to have a defined behavioiur in each state of the model.
 
+\subsection{Requirements and functionality}
 The requirements and some of the system functionalities has been tested by following a set of test protocols and comparing the results with the expected outcomes. The protocols takes care of the communication between sensors and Arduinos, Arduinos and actuators, the SPI communication between Arduinos and BeagleBones, and the VSOME/IP packages to and from BeagleBones. The requirements tested was the ability to start the car, the flag following system, the collision avoidance system, and some of the fault states of nodes.
 
 %TODO results
