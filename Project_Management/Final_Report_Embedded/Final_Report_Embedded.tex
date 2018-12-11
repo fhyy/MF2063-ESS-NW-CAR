@@ -455,25 +455,97 @@ One limitation with this approach is that the speedometer becomes less acurate t
 An idea for future implementation would be to dynamically adjust the amount of reflective strips that needs to be detected before calculating the speed depending on the current speed to both increase accuracy when going slow and fast. Future implementations couls also allow for more than just one byte of data to be transfered over the SPI, not limiting the max read speed without loosing accuracy.
 
 \subsubsection{Pi Camera}
-In computer vision part, we tried to compare the performance of two different methods, which are object detection based on neural network and color detection using OpenCV.
+In Pi’s vision part, we tried to compare the performance of two different methods, which are object detection based on neural network and traditional computer vision technique using OpenCV.
 
-The technique of transfer learning is used to apply MobileNet on RPI, which is an efficient model for mobile and embedded vision applications. The speed remains slow although hardware acceleration and multiprocessing have been carried out to improve.
+To improve the accuracy of the deep learning part, we investigated if transfer learning techniques can be applied on the specific problem. On the other hand, to improve the real time performance, we think that model compression should be evaluated to fit the network into a smaller and faster net topology, without losing significant accuracy. 
 
-By using OpenCV’s DNN module, we are able to pass input images through the deep neural network and get a output image with bounding box of specific object and label.
+We have chosen several different pre-trained network to meet our demands. Including “shape-detection” network and MobileNet. Shape detection network is a very simple and fast deep neural network which simply detect the shape of the object. But in the real test we found that this network is not robustness enough for our fast-moving scene since it frequently predict wrong results.
 
-Since we are working on source constrained device Raspberry Pi, we need to make the network simple and decrease the computational cost, so we combined MobileNet with Single Shot Detector.
+Apart from using pretrained neural network, we have also train a Convolutional Neural Network to do the classification using online open source labeled dataset. The German Traffic Sign Detection Benchmark (GTSDB) is a labeled dataset for AI researchers who work on computer vision-based driver assistance. It contains 900 images, which divided in 600 images for training and 300 images for testing process. figure \ref{fig:GTSDB1} and figure \ref{fig:GTSDB2} are example images in dataset.
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.3]{GTSDB1.jpg}
+   	\caption{Example image from dataset}
+   	\label{fig:GTSDB1}
+\end{figure}
 
-In order to optimize the Raspberry efficiently and use sufficiently limited resource and memory on it when running neural network, we firstly apply hardware optimization which is to install optimized OpenCV complie. So, ARM NEON as an optimization architecture extension for ARM processors is used. It is used for faster video stream processing, image analysis and speech recognition that is exactly what we are look for in our application. This architecture can execute multiple processing in the pipeline by a single instruction. Besides, VFPV3 as a floating point optimization is also used. After the first stage improvement, we get a 30 percent speed increase since we have make full use of the 4× ARM Cortex-A53, 
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.3]{GTSDB2.png}
+   	\caption{Example image from dataset}
+   	\label{fig:GTSDB2}
+\end{figure}
+In the neural network that we trained ourselves, we first down-sampling the images to 32*32 as input, then use 4 convolutional layers to extract the image features and use additional residual stack and dense layer to do the classification. The structure of neural network is shown in figure \ref{fig:network}. The overall accuracy is good using these network because of the powerful prediction ability of DNN. However, the model is not that fast to deal with our car and it takes a lot of time for this network to process one video frame and produce output. 
 
-When it comes to second stage of optimization, multiprocessing is used to increase the speed of processing video stream. The I/O tasks, dislike CPU bound operations, always take lots of time and delay the process. So moving the reading of frames to a separate thread from frame processing can obtain higher speed. Otherwise, every time I/O port access Pi camera, the main thread of script is blocked until the frame is captured and return to script. Multiprocessing can decrease the influence of I/O on CPU heavy application like video stream processing, especially in our real-time case. Now we can obtain a detection result within 1 second.
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.6]{network.png}
+   	\caption{Structure of network}
+   	\label{fig:network}
+\end{figure}
 
-Additionally, there is a trade off between accuracy and output speed. In our application, we set a threshold for the output, in more details, only when the confidence score of detection result is high enough (above the specified threshold), the result can be output as a signal to steer the car. Otherwise, it will grab another frame and do the object detection for the other iteration. As a result, if the threshold confidence score of output increase, the output speed will decrease.
+Finally, we decided to use the technique of transfer learning to apply MobileNet on RPI, which is an efficient model for mobile and embedded vision applications. The speed remains slow although multiprocessing and hardware acceleration have been carried out to improve.
 
-Since the object detection method outputs result slowly, we move on to the other method which is color detection using OpenCV to see whether the  speed is fast enough to be applied on a car prototype.
+By using OpenCV’s DNN module to apply a pretrained object detection network. Then we are able to pass input images through the deep neural network and get a output image with bounding box of specific object and label.
 
-We define the upper and lower limits for pixel values to classify three colors. Then specify which pixels fall into specified upper and lower range by masking. The speed of color detection is fast and also accurate enough for real-time application.
+The distinct feature of MobileNet is that the core layer of it is depthwise separable filters. Depthwise separable convolution have different structure from a standard convolution since the standard one put both filters and combines as inputs and get outputs in a single step, whereas depthwise separable one separate these two into two different layers, one of them as filter and the other one for combining. This specific structure can largely reduce the computation cost and model size. The structure of these two convolution filters are demonstrated in figure \ref{fig:convolution1} and figure \ref{fig:convolution2}.
 
-So we finally apply the color detection on our car, we use the result of detection to steer the car.
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.5]{convolution1.png}
+   	\caption{Standard convolution}
+   	\label{fig:convolution1}
+\end{figure}
+
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.5]{convolution2.png}
+   	\caption{Depthwise separable convolution}
+   	\label{fig:convolution2}
+\end{figure}
+The layer of standard convolution and of depthwise separable convolution are shown in figure \ref{fig:convolution3} and figure \ref{fig:convolution4}. More details, figure \ref{fig:convolution3} shows a standard convolution layer, following by batch normalization and ReLU. Batch normalization makes the learning of layers in the network more independent of each other. It is a technique to address the problem that the distribution of each layer’s inputs changes during training, as the parameters of the previous layers change. The technique consists of adding an operation in the model just before the activation function of each layer. Then add a ReLU activation function, which is rectified linear unit to define the positive part of its argument and negative part of 0. Figure \ref{fig:convolution5}  shows the plot of ReLU.
+
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.5]{convolution3.png}
+   	\caption{Standard convolution layer}
+   	\label{fig:convolution3}
+\end{figure}
+
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.5]{convolution4.png}
+   	\caption{Depthwise Separable convolution layers}
+   	\label{fig:convolution4}
+\end{figure}
+
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.3]{convolution5.png}
+   	\caption{plot of ReLU activation function}
+   	\label{fig:convolution5}
+\end{figure}
+
+Figure\ref{fig:convolution4} describes depthwise separable convolution layers with 3 x 3 depthwise convolution and 1 × 1 pointwise convolution following by batch normalization and ReLU activation function after each of the convolutional layer.
+
+Since we are working on source constrained device Raspberry Pi, we need to make the network simple and decrease computational cost, so we combined MobileNet with Single Shot Detector.
+
+Additionally, in order to optimize the Raspberry efficiently and use sufficiently limited resource and memory on it when running neural network, we did some optimizations. We firstly applied hardware optimization which is to install optimized OpenCV complie. ARM NEON, as an optimization architecture extension for ARM processors is installed. It is used for faster video stream processing, image analysis and speech recognition that is exactly what we are look for in our application. This architecture can execute multiple processing in the pipeline by a single instruction. Besides, VFPV3 as a floating point optimization is also used. After the first stage improvement, we get a 30 percent speed increase since we have make full use of the 4× ARM Cortex-A53, 1.2GHz processor on Raspberry Pi, now the network is able to classify an object in 1.5 seconds. 
+
+When it comes to second stage of optimization, multiprocessing is used to increase the speed of processing video stream. The I/O tasks, dislike CPU bound operations, always take lots of time and delay the process. So moving the reading of frames to a separate thread from processing the frame can obtain higher speed. Otherwise, every time I/O port access Pi camera, the main thread of script is blocked until the frame is captures and return to script. Multiprocessing can decrease the influence of I/O on CPU heavy application like video stream processing, especially in our real-time case. Now we can obtain a classification result in 1 second.
+
+Moreover, there is a tradeoff between accuracy and output speed. In our application, we set a threshold for the output, in more details, only when the confidence score of detection result is high enough (above the specified threshold), the result can be output as a signal to steer the car. Otherwise, it will grab another frame and do the object detection for the other iteration. As a result, if the threshold confidence score of output increase, the output speed will decrease. 
+
+After several tests, we found that it is not feasible to use DNN on the RPI because of the predicting speed, RPI has really limited computational capability and has no GPU that can be used to do the DNN-accelerate. After the mid-term, we decided to try another strategy which using the traditional computer vision technique offered by OpenCV.
+
+Then we try to process video stream by using OpenCV. OpenCV has offered many traditional and start-of-art computer vision techniques which can be used . We tried several algorithms for the detection in our specific scenario, including SIFT/SURF keypoint detection, mog2 background subtraction, hough transform, and color detection using HSV space. Among these methods, we eventually chose color detection as our camera detection algorithm.
+
+The color detection algorithm can be separated to different phases. First, we need to do the image pre-processing: we down sampling the images using different scaling factors since we want both processing speed and accuracy optimized. Then we transfer the RGB color space to the HSV color space to make the color easy to be identified. We define the upper and lower limits for pixel values to classify three colors. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV color space value and output both the color and position information. The speed of color detection is fast and also accurate enough for real-time application.
+
+To enable our model communicate with the VsomeIP perfectly and precisely. We tried several methods to connect Python program and C++ program, including using Google protocol buffers and RAM pipe transfer. We have to ensure that both of programs can communicate simultaneously without block. 
+
+Apart from outputting the detection result and communicate with the SDN network, we have also tried to send the video stream through WIFI or Bluetooth to Android application so that we can know what the camera sees through smartphone. Although the real-time video stream can be sent to a web browser, the sending script cannot run when the detection script is running since they will block each other.
+
 
 \subsection{Controlling actuators}
 \subsubsection{Steering servo}
