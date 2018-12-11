@@ -295,7 +295,7 @@ Software-defined network (SDN) is a type of network where a controller decides h
 
 %-------------------------------------------------------------------------
 \subsection{Serial Peripheral Interface}
-Serial Peripheral Interface (SPI) is a synchronous serial interface specification for short distance communication. SPI supports full duplex mode using a master-slave architecture with one single master, and the SPI master originates the whole communication. The SPI bus has four logic signals: serial clock (SCK), master output slave input (MOSI), master input and slave output (MISO), slave select (SS). The detailed pin mapping of SPI master and slaves is shown in figure ??.
+Serial Peripheral Interface (SPI) is a synchronous serial interface specification for short distance communication. SPI supports full duplex mode using a master-slave architecture with one single master, and the SPI master originates the whole communication. The SPI bus has four logic signals: serial clock (SCK), master output slave input (MOSI), master input and slave output (MISO), slave select (SS). The detailed pin mapping of SPI master and slaves is shown in figure~\ref{fig:spi-literature}.
 
 % figure: one master and multiple slave connection
 \begin{figure}[H]
@@ -493,9 +493,8 @@ All the powering of the car's devices should be handled by one PCB board, that c
 
 \begin{figure}
 	\includegraphics[width=0.3\textwidth]{power_board_layout.png}
-	\label{fig:power_pcb_layout}
 	\caption{Layout of Power PCB board}
-	
+    \label{fig:power_pcb_layout}
 \end{figure}
 
 For the Arduinos was two PCB boards made to easily connect the SPI connection between the Beaglebones and the Arduinos, and to connect external sensors. The first board was designed to easily connect the ultrasonic sensors and the steering servo with correct Arduino. The schematic and layout of this board was also made in Eagle and is shown in figure \ref{fig:board_layout_ultra_servo}. The board is powered via a power via the DC power jack, to supply the Arduinos. On the top of the board is three connectors and they are for the Ultrasonic to be connected, and in the bottom is the connector for the steering servo. In the middle of the board is the connection to add the Logic level converter and the pins to connect the connection from the Beaglebone. 
@@ -543,8 +542,8 @@ To monitor the traffic load on the network was a webpage made to present the use
 
 \begin{figure}
 	\includegraphics[width=0.3\textwidth]{webpage.PNG}
-	\label{fig:webpage_sdn}
 	\caption{Webpage to monitor the SDN network}
+	\label{fig:webpage_sdn}
 \end{figure}
 
 
@@ -750,7 +749,7 @@ The implementation on the prototype board was built from the same concept the PC
 
 The Arduino boards hade also be made at prototyping board. They received the same functionality as the PCB version should have, but it takes larger space due to the cable wiring. This lead to one of the board could not be placed at its position on the platform. 
 
-The result of the prototyping is shown in figure \ref{fig:board_ultra_steering}, \ref{fig:board_speed_engine} and \ref{fig:Power_board}. All of them has the functionality has the same PCBs should have had. 
+The result of the prototyping is shown in figure \ref{fig:board_ultra_steering}, \ref{fig:board_speed_engine} and \ref{fig:power_board}. All of them has the functionality has the same PCBs should have had. 
 
 
 \begin{figure}
@@ -767,8 +766,8 @@ The result of the prototyping is shown in figure \ref{fig:board_ultra_steering},
 
 \begin{figure}
 	\includegraphics[width=0.3\textwidth]{power_board.jpg}
-	\label{fig:Power_board}
 	\caption{Power board}
+	\label{fig:power_board}
 \end{figure}
 
 
