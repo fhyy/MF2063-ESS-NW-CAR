@@ -221,7 +221,7 @@ Chapter 1 describes the projects' background and gives an introduction to the tw
 \clearpage
 \section{Literature Review and State of the Art}
 
-\section{Network}
+\subsection{Network}
 %-------------------------------------------------------------------------
 \subsection{Software defined network}
 Software-defined network (SDN) is a type of network where a controller decides how the traffic in the network should go. In a traditional network is the intelligence in the switches and they decided on what port the package should be sent out on. In SDN is a device called controller connected to all switches and monitors the traffic load on the links and find the most optimal path between node A to node B. The controller’s task is to request information from the switches about what links are up or down and the traffic load with this information and decides how packages should be forwarded on the switch. Because the controller can monitor the topology of the network is it easy to scale the network with new nodes and switches\cite{doi:10.1002/sec.1737}. 
@@ -275,8 +275,29 @@ The car network topology was simulated in Mininet to analyse its behaviour, and 
 %-------------------------------------------------------------------------
 \subsection{Engineering approaches ?}
 \subsection{Tool-chains ?}
+
 \subsection{Project management}
 Scrum project management is used during the process of our projects.
+The scrum framework has been adopted for use in this process because of it being agile as well as the fact that most group members had some type of previous experience or knowledge with it. Both software and physical tools were used for monitoring the projects progression. Excel was for example used to keep track of milestones, earned value and the resource plan and the online tool trello was used alongside a physical whiteboard to keep track of scrum sprints and the project backlog as depicted in figure \ref{fig:scrum-board}. A lot of design was also produced and kept on whiteboards as to promote discussion within the group and to keep everyone updated with updates or changes to design or models.
+
+As with all projects where the team members have no previous experience in working with eachother there will be a roll-seeking phase where the dynamic of the group is slowly figured out and which different positions the team members fit in. To make the group get into the process of working quickly the group deceided to follow the results given by the belin test which was performed by all group members.
+
+Setting up clear milestones for the project was very benificial in managemnt as it helped to divide the project into different phases in time with each ones having clear expected outcomes. This helped the project stay on track with regards to time as it could easily be followed what needed to be done and when.
+
+To ensure smooth progress it was deceided to have weekly meetings with the stakeholders were all group members could go through what they had done the previous week and receive feedback from the stakeholders. The feedback could be general tips and aid on the current assignment or that they wanted to steer a part of the project in a different direction or note that there might have been some part or parts that have been overlooked in the design or implementation.
+
+
+
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.5]{scrum-board.jpg}
+   	\caption{Scrum board continously used throughout the project}
+    \label{fig:scrum-board}
+\end{figure}
+
+% informal leadership (good group dynamic required less leadership)
+
+
 %-------------------------------------------------------------------------
 \subsection{Assembly of the car}
 
@@ -400,6 +421,30 @@ An Arduino Micro handles both the generating the trig pulse and interpreting the
 %TODO distance sensor working process figure
 
 \subsubsection{Reflective object sensor}
+A reflective object sensor consists of an IR-diode and an IR-receiver encapsulated in a houseing and detects reflective material (such as white paper) placed perpendicular in front of its front. The sensor chosen was the OPB715Z from TT electronics and is characterised to detect white paper up to a distance of 12.7mm.
+
+The relfective object sensor was used to implement the cars speedometer. It works as a type of RPM meter which measures the rotation of an object over a time period. It is then possible to extract the speed of the rotation given the amount of rotation and the time period. To gather the amount of rotation the sensor is mounted on the axis of the wheel aimed towards the inside of the wheels rim. A number of strips of reflective aluminum tape have been mounted on the inside of the rim, with equal distance between them, to trigger reliable readings from the sensor. The physical setup is depicted in figure \ref{fig:speedometer}.
+
+The sensor is connected to an Arduino using a Vcc, a ground and a data cable. The data cable continously transmitis digital information by either being logical zero equalling ground when no reflective obejct is detected and a logic one equalling Vcc (5V) when a reflective object is detected. It is therefor needed that the sensor is connected to an arduino that processes this data further. The arduino is triggered by an interrupt when the sensor detects a reflective strip attached to the wheel. The arduino then fetches the amount of time since the last interrupt and calculates the current velocity.
+
+One limitation with this approach is that the speedometer becomes less acurate the slower the car is going. An analysis of the case of standing still shows that a relfective strip inside the tire will never pass the sensor. This could be solved by allowing some amount of time to pass without detecting a strip before assuming that the acutal speed is zero. It is however impossible beneath some speed to distinguish if the car is traveling very slowly or if it is standing still. To tackle this problem a total of ten strips were added to the inside of the rim such that strips will be detected more often thus increasing the accuracy of the speedometer at slow speeds. A new speed is also calculated each time a strip is detected which is something that has its trade-offs. It may result in more noise when travelling at higher speeds, but by instead waiting for more than one strip to be detected it becomes type of running-average filter which helps to reduce noise that may be induced by uneven spacing of the reflective strips.
+
+    Using the timing data and the physical propertis of the wheel the velocity is calculated according to equation (\ref{eq:velocity}) where steps is the amount of reflective strips detected since the last calculation and the stepdistance is the physical distance traveled between two strips. The result can then also be manipulated to get the desired unit, which in this case was centimeters per second. The calculation is done on the Arduino before transmitted to a BeagleBone via an SPI interface. Since SPI transmits one byte of information at a time, and this specific implementation is limited to transfer no more, the maximum speed that can be measured is 255cm/s before the value wraps around.
+
+\begin{figure}[]
+	\centering
+   	\includegraphics[scale=0.5]{speedometer.jpg}
+   	\caption{Sensor mounted to the wheel axis on the left and the reflective strips mounted inside the wheel on the right.}
+    \label{fig:speedometer}
+\end{figure}
+
+\begin{equation}
+    velocity = \frac{(steps*stepdistance)}{time}
+    \label{eq:velocity}
+\end{equation}
+
+An idea for future implementation would be to dynamically adjust the amount of reflective strips that needs to be detected before calculating the speed depending on the current speed to both increase accuracy when going slow and fast. Future implementations couls also allow for more than just one byte of data to be transfered over the SPI, not limiting the max read speed without loosing accuracy.
+
 \subsubsection{Pi Camera}
 In computer vision part, we tried to compare the performance of two different methods, which are object detection based on neural network and color detection using OpenCV.
 
@@ -482,6 +527,9 @@ The result of the prototyping is shown in figure \ref{fig:board_ultra_steering},
 
 \clearpage
 \section{Verification and Validation}
+\subsection{State machine}
+The state machine was modelled and verified using the tool NuSMV which is a symbolic model checker that is used for formal verification of finite state systems. Since NuSMV allows for the models to be checked using linear temporal logic the state machine could be checked for node coverage and edge coverage. NuSMV also allows for exhaustive analysis meaning that each set of combinations of the state variables needs to have a defined behavioiur in each state of the model.
+
 
 %-------------------------------------------------------------------------
 \clearpage
