@@ -1,47 +1,58 @@
 #include <Servo.h>
 #include <SPI.h>
 
-#define MOTOR_PIN 10 //digital pin 12 Mega, digital pin 10 Micro
+/** \def MOTOR_PIN
+	The pin number of which the ESC data pin should be connected to.
+*/
+/** \def ESC_MAX
+	Maximum PWM for ESC.
+*/
+/** \def ESC_MIN
+	Minimum PWM for ESC for a neutral state.
+*/
+/** \def ESC_MAX_CAP
+	A hard coded maximum PWM for the ESC.
+	Adjust this to account for different loads.
+*/
+/** \def ESC_CALIBRATION_DELAY
+	Time in ms before any PWM is sent to the motor on boot.
+*/
+
+
+#define MOTOR_PIN 10
 #define ESC_MAX 2000
-#define ESC_MAX_CAP 1200 //Change this, to account for load
+#define ESC_MAX_CAP 1300
 #define ESC_MIN 1000
-#define ESC_ARM 500
 #define ESC_CALIBRATION_DELAY 5000
 
-//Adjust these PID parameters as needed
-float PID_P = 0.005;
-float PID_I = 0.005;
+float PID_P = 0.005;	/**< Used for the proportional control in the PID controller. Adjust this as necessary */
+float PID_I = 0.005;	/**< Used for the integral term in the PID controller. Adjust this as necessary */
 
-Servo esc;
+Servo esc;	/** < Used to to send PWM signals to the ESC */
 
-byte intermediateTargetSpeed = 0;
-byte targetSpeed = 0;
-byte lastEncoderVal = 0;
-byte encoderValBeforeLast = 0;
+byte intermediateTargetSpeed = 0; /**< Used to smoothen speed changes */
+byte targetSpeed = 0; /**< Set through SPI to define the target speed */
+byte lastEncoderVal = 0; /**< Set through SPI for encoder feedback, used by PID controller */
 
+float lastPWM = 0; /**< Used to check the state of motor and to handle the ESC safety measures described in \ref loop "loop()"*/
+float errorSum = 0; /**< Used with the integral term in the PID controller */
 
+/** 
+	\brief A function for setting the motor PWM from a percentage value.
 
-float targetPWM = 0;
-float currentPWM = 0;
-float lastPWM = 0;
-float errorSum = 0;
-
-/*
-   dutyCycle of 0% => standing still
-   dutyCycle of 0% < x < 100% => driving forward
-   dutyCycle of 100% => driving forward full speed
+	This function is used to convert a percentage into a PWM signal in the valid range.
+	
+	dutyCycle == 0.0 => standing still \n
+	0.0 < dutyCycle < 1.0 => driving forward \n	
+	dutyCycle == 1.0 => driving forward full speed \n
 */
 void setMotorPWM(float dutyCycle)
 { 
-  if (dutyCycle < 0)
+  if (dutyCycle < 0){
     dutyCycle = 0.0f;
-  if (dutyCycle > 1) {
+  }else if (dutyCycle > 1) {
     dutyCycle = 1.0f;
   }
-
-  currentPWM = dutyCycle;
-  
-  //Serial.println(ESC_MIN + (ESC_MAX - ESC_MIN)*dutyCycle);
 
   int pwm = (ESC_MIN + (ESC_MAX_CAP - ESC_MIN) * dutyCycle);
   if (pwm > ESC_MAX_CAP) {
@@ -50,33 +61,12 @@ void setMotorPWM(float dutyCycle)
   
   esc.writeMicroseconds(pwm);
   
-  //if(lastPWM != pwm){
-    /*Serial.println("---");
-    Serial.print("PWM: ");
-    Serial.println(pwm);
-    Serial.print("Target speed: ");
-    Serial.println((int)targetSpeed);
-    Serial.print("intermediate target speed: ");
-    Serial.println((int)intermediateTargetSpeed);
-    Serial.print("Current speed: ");
-    Serial.println((int)lastEncoderVal);
-    Serial.print("encoderValBeforeLast: ");
-    Serial.println(encoderValBeforeLast);
-    Serial.print("Error sum: ");
-    Serial.println(errorSum);
-    Serial.print("currentDuty: ");
-    Serial.println(currentPWM);
-    Serial.print("targetDuty: ");
-    Serial.println(targetPWM);*/
-  //}
-  
-  lastPWM = currentPWM;
+  lastPWM = dutyCycle;
 }
 
-bool readSpeed = 0;
-bool readEncoder = 0;
-
-// Initialize spi
+/**
+	\brief A function for setting up the SPI communication using interrupts.
+*/
 void startSPI()
 {
   SPCR |= (1 << SPE) | (1 << SPIE); //SPI control register ,enable spi interrupt and spi
@@ -87,10 +77,12 @@ void startSPI()
   Serial.println("Spi set up!");
 }
 
+/**
+	\brief An interrupt handler for SPI communication.
+*/
 ISR(SPI_STC_vect)
-{
-  //while (!(SPSR & (1<<SPIF))){}; // Wait for the end of the transmission
-  
+{  
+  //Serial.println("SPI interrupt");
   byte spi_in = SPDR;//SPI.transfer(0);
   if(spi_in & 0x80){
     // Assume cm/s
@@ -101,26 +93,23 @@ ISR(SPI_STC_vect)
   }
 }
 
-char setupComplete = 0;
+/**
+	\brief A function for setting up communication with the ESC.
+*/
 void setupAndCallibrateESC()
 {
   esc.attach(MOTOR_PIN);  // Attach servo to pin
 
-  //esc.writeMicroseconds(ESC_MAX); // Send calibration signal to ESC (also max value)
-
-  // Start ESC during this time
-  //delay(ESC_CALIBRATION_DELAY);   // Wait for ESC to acknowledge calibration signal
-
   esc.writeMicroseconds(ESC_MIN);  // Send minimum signal value for calibration
 
-  delay(ESC_CALIBRATION_DELAY); // Wait for ESC to acknowledge signal
-
-  //esc.writeMicroseconds(ESC_ARM); // Send arm signal to ESC
-  delay(1000);
-  setupComplete = 1;
+  // Start ESC before this step
+  // Wait for ESC to acknowledge signal
+  delay(ESC_CALIBRATION_DELAY);
 }
 
-// the setup function runs once when you press reset or power the board
+/**
+	\brief Ardunino setup function. Runs once when the board is started.
+*/
 void setup()
 {
   // initialize digital pin LED_BUILTIN as an output.
@@ -139,24 +128,26 @@ void setup()
   startSPI();
 }
 
-float floatMax(float val1, float val2){
-  if(val1 < val2){
-    return val2;
-  }
-  return val1;
-}
+unsigned long time_last;	/**< Used by the program to calculate time difference */
 
-unsigned long time_last;
-unsigned long time_new;
+int iterationsFromStop = 0;	/**< Used for handling ESC safety measures and avoiding noisy data from SPI */
 
-int iterationsFromStop = 0;
-
-// the loop function runs over and over again forever
+/**
+	\brief Arduino loop function. Runs over and over, until the Arduino is turned off. Starts after the \ref setup "setup()" has finished.
+	
+	This loop can be configured in the source code to do one of two things:
+	1. Calculate a PID signal used for setting the target PWM signal, so that the car maintains a set speed.
+	2. Translate the given target speed into a target PWM signal, in case the PID parameters are not set up properly.
+	
+	The PWM signal sent to the motor is a signal that is incremented or decremented each step to try and become equal to the set target PWM. This makes the motor run more smoothly and reduces the wear-out time.
+	
+	The ESC has a specific case where if the PWM is set to something higher than the neutral value (somewhere between 1000 and 1100) and the motor can't turn due to some load and friction, the ESC will set the motor PWM to neutral by itself to avoid tear. To be able to start the motor again, you have to send the ESC a neutral PWM for a few milliseconds, and then continue with your higher values. This is taken care of in the loop as well.
+*/
 void loop()
 {
-  /* 
-   * The ESC has some safety meassures implemented in this case.
-   * We have to set the pwm to 0 before we can set it to anything else.
+  /*
+	The ESC has some safety measures implemented.
+	In the given case, we have to set the pwm to 0 before we can set it to anything else.
    */
   if(targetSpeed > 0 &&
     lastEncoderVal == 0 &&
@@ -178,15 +169,19 @@ void loop()
     return;
   }
 
+  /*
+	  Enable this block of code to read target speed from the serial interface (e.g. serial monitor in Arduino studio)
+  */
+  /* TO ENABLE, SET A / BEFORE /*, REMOVE TO DISABLE
   if (Serial.available()){
     int input = Serial.parseInt();
     targetSpeed = input;
   }
+  //*/
 
-  time_new = millis();
+  unsigned long time_new = millis();
   float timeDiffS = ((float)(time_new-time_last))/1000;
 
-  // Climb towards target speed, intermediateTargetSpeed used in PID, Loop more for faster climb
   for(int i = 0; i < 2; ++i){
     if(intermediateTargetSpeed < targetSpeed){
       ++intermediateTargetSpeed;
@@ -195,13 +190,11 @@ void loop()
     }
   }
 
-  // PID controlling
+  /*
+	PID controlling
+   */
   float error = ((float)(intermediateTargetSpeed  - lastEncoderVal));
   errorSum += error*timeDiffS;
-
-  // Switch between these if no PID is wanted
-  //targetPWM = ((float)intermediateTargetSpeed)/127.0f;
-  targetPWM = error*PID_P  + ((errorSum)*PID_I);
 
   int errorSumMax = (1.5f/PID_I);
   if(errorSum > errorSumMax){
@@ -210,22 +203,14 @@ void loop()
     errorSum = 0;
   }
 
-  if(currentPWM < targetPWM){
-    currentPWM += 0.01f;
-  }
-  if(currentPWM > targetPWM){
-    currentPWM -= 0.01f;
-  }
-  
-  if(currentPWM > 1){
-    currentPWM = 1.0;
-  }
-  if(currentPWM < (targetSpeed > 1 ? 0.0:0.0)){
-    currentPWM = (targetSpeed > 1 ? 0.0:0.0);
-  }
-  setMotorPWM(targetPWM);
+  /* 
+    Switch between these lines if PID is wanted or not
+   */
+  float targetPWM = ((float)intermediateTargetSpeed)/100.0f; // NO PID
+  //targetPWM = error*PID_P  + ((errorSum)*PID_I);     // PID
 
-  encoderValBeforeLast = lastEncoderVal;
+  setMotorPWM(targetPWM);
+  
   time_last = time_new;
 
   delay(20);
