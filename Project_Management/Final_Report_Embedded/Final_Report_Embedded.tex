@@ -345,6 +345,36 @@ The second converter is to generate the 9V and this is done via a DC-DC converte
 All the powering of the car's devices should be handled by one PCB board, that contained USB ports and the boost converter to power the external switch. There the USB-A type ports should be used to power the Arduinos, Beaglebones, Raspberry Pi and Zodiac FX. For the powering of the external switch should a cable be connected from the PCB to the switch, it also to power outlets to power the PCB board for the Arduinos. This PCB board was designed in Eagle and the result is shown in figure \ref{fig:power_pcb_layout}. 
 
 \begin{figure}
+=======
+
+\begin{equation}
+	9V < 1.245 * \frac{67k \Omega * (R5 + R6) }{15k \Omega * R6}	
+	\label{eq:ovp} 	
+\end{equation}
+
+\begin{equation}
+	V_{out} = V_{ref} * (\frac{R1}{R2} + 1)
+	\label{eq:vout}
+\end{equation}
+
+
+
+\begin{figure}
+	\includegraphics[width=0.9\textwidth]{boost_converter_curcuit.pdf}
+	\caption{Circuit of the boost converter}
+	\label{fig:circuit_boost_converter}
+\end{figure}
+
+\begin{figure}
+	\includegraphics{graph_of_boost_out.png}
+	\caption{Out puth grapth of the Boost converter}
+	\label{fig:graph_boost}
+\end{figure}
+
+All the powering of the car's devices should be handled by one PCB board, that contained USB ports and the boost converter to power the external switch. There the USB-A type ports should be used to power the Arduinos, Beaglebones, Raspberry Pi and Zodiac FX. For the powering of the external switch should a cable be connected from the PCB to the switch, it also to power outlets to power the PCB board for the Arduinos. This PCB board was designed in Eagle and the result is shown in figure \ref{fig:power_pcb_layout}. 
+
+\begin{figure}
+>>>>>>> fce23f5... ignores final report pdf
 	\includegraphics[width=0.3\textwidth]{power_board_layout.png}
 	\label{fig:power_pcb_layout}
 	\caption{Layout of Power PCB board}

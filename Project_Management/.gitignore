@@ -12,6 +12,8 @@
 *.cb2
 .*.lb
 
+Final_Report_Embedded.pdf
+
 ## Files for status reports
 evm.pdf
 resource_plan.pdf
