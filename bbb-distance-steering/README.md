@@ -1,3 +1,4 @@
+
 # Startup
 
 To start the processes it is sufficient to build the executables using cmake and executing /bbb-distance-steering/autostart.sh
@@ -11,3 +12,6 @@ when logged in as debian user and paste
 @reboot /path/to/bbb-distance-steering/autostart.sh
 ```
 into the file replacing "/path/to/" accordingly.
+
+# Pin mapping
+![Pin mapping](https://raw.githubusercontent.com/fhyy/MF2063-ESS-NW-CAR/master/resources/diagrams/distance-steering-node.svg?sanitize=true)
