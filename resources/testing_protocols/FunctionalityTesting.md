@@ -47,8 +47,13 @@
 ## Distance-Steering controller
 | Action | Expected outcome |
 |:---| :---: |
-|Connect and start affected nodes and VSOME/IP clients properly| --- |
-| Read SPI messages and messages on the VSOME/IP protocol for speed data, sent by the node | A continuous stream of 0x42 (50 in decimal) will be read |
+|Connect and start affected nodes and VSOME/IP clients properly (assume functioning distance node) | --- |
+| Read SPI messages and messages on the VSOME/IP protocol for distance data, sent by the node | A stream of distances correlating to the closets obstacle in front of the car will be read |
+| Put something in front of the car at some approximate distance | A stream of distances correlating to the closets obstacle in front of the car will be read on the VSOME/IP channel for distance data |
+| Repeat last step to verify it works for a set of approximate distances | --- |
+| Send a value of 0 over the VSOME/IP protocol for steering | The SPI channel for steering will read 0x00 |
+| Send a value of 100 over the VSOME/IP protocol for steering | The SPI channel for steering will read 0x64 (100 in decimal) |
+| Send a value of 50 over the VSOME/IP protocol for steering | The SPI channel for steering will read 0x32 (50 in decimal) |
 
 ## Motor-Speed controller
 | Action | Expected outcome |
