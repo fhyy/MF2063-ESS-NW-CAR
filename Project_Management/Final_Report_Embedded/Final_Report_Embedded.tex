@@ -177,16 +177,23 @@
 
 \clearpage
 \section*{Abstract}
-Abstract starts here,
-what should be included:
+Ethernet is emerging as an interest for use in communication between computers in autonomous vehicles. 
+Software defined networking seeks to solve the types of problems that emerges when using ethernet in a time-critial system.
+This report proposes a small scale prototype of an autonomoous vehicle running a local ethernet network between four devices running embedded linux.
+The prototype also aims to also incorporate 
+There are five different services implemented that have been implemented to populate the network.
+These services has shown to pass x out of y tests that were aimed to fulfill the given requirements of the vehicle which included time-criticality aspects.
+The results shows a promising prototype but also that a lot more research needs to go into verification and validation of the time-criticality before such a system can be used in actual autonomous vehicles.
+%Abstract starts here,
+%what should be included:
 
-The problem issue subject being addressed
+%The problem issue subject being addressed
 
-How the problem is tackled
+%How the problem is tackled
 
-Overview of the results, and indication as to what level they solve the problem.
+%Overview of the results, and indication as to what level they solve the problem.
 
-Implications of the results
+%Implications of the results
 
 %-------------------------------------------------------------------------
 \clearpage
@@ -201,13 +208,16 @@ Implications of the results
 \listoftables
 
 %-------------------------------------------------------------------------
-
+\clearpage
 \section*{List of Acronyms and Abbreviations}
 \begin{itemize}
-	\item SDN : Software Defined Network
+        \item ESC : Electronic Speed Controller
+        \item FIFO : First In First Out
+        \item IR : Infra Red
+        \item PCB : Printed Circuit Board
 	\item PWM : Pulse-width modulation
+	\item SDN : Software Defined Network
 	\item SPI : Serial Peripheral Interface
-	\item ESC : Electronic Speed Control 
 \end{itemize}
 %-------------------------------------------------------------------------
 
@@ -759,6 +769,8 @@ Because we hade to use prototyping boards and the platform was designed to have 
 2.	Improve the communication between the colour detection python code and VsomeIP, which causes some delay in our current version application. One possible solution is convert the python code into C++, so that the communication protocol will be simple and feasible.
 \newline
 3.	Although we have already tried to send the camera video stream to Android phone through WIFI so that we can directly see what the car is facing during running. We failed since the scripts of sending stream and colour detection always block each other, it would be feasible to copy the video stream captured from Pi camera and one of them used as colour detection, the other one can be sent to phone.
+\newline
+4. A more advanced monitor of the controller and lets the user to modified the network from it. 
 %-------------------------------------------------------------------------
 \clearpage
 
