@@ -337,10 +337,13 @@ Mininet is a Python-based application what an SDN network topology can be create
 The car network topology was simulated in Mininet to analyse its behaviour, and to develop code for the controller. Under this test did we discover what that Mininet simulation had a much lower delay then the real implementation had, even then the extra settings on the links and nodes were added. This resulted that Mininet could not be used to analyse the best topology for the car. It was instead used to simulate the network to create a code for the Ryu controller. To analyse the Car network was two different Mininet scripts created, one was to use the physical raspberry pi controller and the second one was to use the internal version of Ryu in the Mininet VM. For the external simulation to work has the script be configured with the right IP-address to the raspberry pi. 
 
 \subsection{Software Architecture}
-The driving system consists of several layers of software and communication. Figure~\ref{fig:bbb_arch} and~\ref{fig:rpi_arch} give a broad overview
-of how the software is structured. A custom driving software is running on the client BeagleBone. This can be either an interactive shell or a test suite
-of commands for testing and debugging basic functionality or a more intelligent autonomous driving software. The custom driving software controls
-the car through a library called ESSPrototype.
+The driving system consists of several layers of software and communication.
+Figure~\ref{fig:bbb_arch} and~\ref{fig:rpi_arch} give a broad overview
+of how the software is structured. A custom driving software is running on the
+client BeagleBone. This can be either an interactive shell or a test suite of commands
+for testing and debugging basic functionality or a more intelligent autonomous
+driving software. The custom driving software controls the car through a library
+called ESSPrototype.
 
 ESSPrototype is a C++ library that represent fundamental functionality for manoeuvring and monitoring
 the car. Some examples include controlling the steering, getting speedometer readings and checking if the distance sensors are online.
