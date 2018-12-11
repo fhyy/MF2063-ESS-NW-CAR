@@ -177,13 +177,20 @@
 
 \clearpage
 \section*{Abstract}
-Ethernet is emerging as an interest for use in communication between computers in autonomous vehicles. 
-Software defined networking seeks to solve the types of problems that emerges when using ethernet in a time-critial system.
-This report proposes a small scale prototype of an autonomous vehicle running a local ethernet network between four devices running embedded linux.
-The prototype also aims to also incorporate 
-There are five different services implemented that have been implemented to populate the network.
-These services has shown to pass x out of y tests that were aimed to fulfill the given requirements of the vehicle which included time-criticality aspects.
-The results shows a promising prototype but also that a lot more research needs to go into verification and validation of the time-criticality before such a system can be used in actual autonomous vehicles.
+Autonomous vehicles are extremely complex computing systems. A large amount of computing
+nodes are embedded in every vehicle in order to achieve the desired functionality and
+reliability. Due to the number of nodes reuquired, traditional on-board car communication
+schemes are no longer sufficient. Ethernet is emerging as an interesting alternative 
+for use in communication between computers in autonomous vehicles due to its large bandwidth.
+Unfortunately, Ethernet is not optimal for use in time-critical systems, and in an autonomous
+car, this could be fatal. Software-defined networking seeks to solve the types of problems
+that emerges when using ethernet in a time-critial system. This report proposes a small
+scale prototype of an autonomous vehicle running a local ethernet network between four devices
+running embedded linux. The prototype incorporates five different services whose messages
+populate the network. These services has shown to pass 54 out of 84 tests that were aimed to fulfill
+the given requirements of the vehicle which included time-criticality aspects. The results shows a
+promising prototype but also that a lot more research needs to go into verification and validation of
+the time-criticality before such a system can be used in actual autonomous vehicles.
 %Abstract starts here,
 %what should be included:
 
