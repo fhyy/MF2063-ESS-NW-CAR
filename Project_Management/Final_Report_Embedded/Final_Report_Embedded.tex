@@ -205,8 +205,9 @@ Implications of the results
 \section*{List of Acronyms and Abbreviations}
 \begin{itemize}
 	\item SDN : Software Defined Network
-	\item PWM :  Pulse-width modulation
-	\item SPI: Serial Peripheral Interface
+	\item PWM : Pulse-width modulation
+	\item SPI : Serial Peripheral Interface
+	\item ESC : Electronic Speed Control 
 \end{itemize}
 %-------------------------------------------------------------------------
 
@@ -375,7 +376,7 @@ To place all the required components on the car had some kind of platform be cre
 To make this platform was it first draw in a Cad Fusion 360 to make a 3D model of the car. This model could then be used to add models of the devices used in the car to find the optimal place for them, so the are places in at an easy position to get access too and close to its devices its depended on. The result of the design is shown in figure \ref{fig:3d_platform}. 
 
 \begin{figure}
-	\includegraphics{platform.png}
+	%\includegraphics{platform.png}
 	\caption{3D model of the platform}
 	\label{fig:3d_platform}
 \end{figure}
@@ -400,14 +401,14 @@ The second converter is to generate the 9V and this is done via a DC-DC converte
 
 
 \begin{figure}
-	\includegraphics[width=0.9\textwidth]{boost_converter_curcuit.pdf}
+	\includegraphics[width=0.7\textwidth]{boost_converter_curcuit.pdf}
 	\caption{Circuit of the boost converter}
 	\label{fig:circuit_boost_converter}
 \end{figure}
 
 \begin{figure}
 	\includegraphics{graph_of_boost_out.png}
-	\caption{Out puth grapth of the Boost converter}
+	\caption{Output graph of the Boost converter}
 	\label{fig:graph_boost}
 \end{figure}
 
@@ -529,11 +530,7 @@ To improve the accuracy of the deep learning part, we investigated if transfer l
 
 We have chosen several different pre-trained network to meet our demands, including shape-detection network and MobileNet. Shape detection network is a very simple and fast deep neural network which simply detect the shape of the object. But in the real test we found that this network is not robustness enough for our fast-moving scene since it frequently predicts wrong results.
 
-<<<<<<< HEAD
-Apart from using pretrained neural network, we have also trained a Convolutional Neural Network to do the classification using online open source labeled dataset. The German Traffic Sign Detection Benchmark (GTSDB) is a labeled dataset for AI researchers who work on computer vision-based driver assistance. It contains 900 images, which divided in 600 images for training and 300 images for testing process. figure \ref{fig:GTSDB1} and figure \ref{fig:GTSDB2} are example images in dataset.
-=======
 Apart from using pretrained neural network, we have also train a Convolutional Neural Network to do the classification using online open source labelled dataset. The German Traffic Sign Detection Benchmark (GTSDB) is a labelled dataset for AI researchers who work on computer vision-based driver assistance. It contains 900 images, which divided in 600 images for training and 300 images for testing process. figure \ref{fig:GTSDB1} and figure \ref{fig:GTSDB2} are example images in dataset.
->>>>>>> ff294aa7519778e5dc146ce6929c058e156d666c
 \begin{figure}[]
 	\centering
    	\includegraphics[scale=0.4]{GTSDB1.jpg}
@@ -606,17 +603,11 @@ When it comes to second stage of optimization, multiprocessing is used to increa
 
 Moreover, there is a tradeoff between accuracy and output speed. In our application, we set a threshold for the output, in more details, only when the confidence score of detection result is high enough (above the specified threshold), the result can be output as a signal to steer the car. Otherwise, it will grab another frame and do the object detection for the other iteration. As a result, if the threshold confidence score of output increase, the output speed will decrease. 
 
-<<<<<<< HEAD
-After several tests, we found that it is not feasible to use DNN on the RPI because of the predicting speed, RPI has really limited computational capability and has no GPU that can be used to do the DNN-accelerate. After the mid-term, we decided to try another strategy which using the traditional computer vision technique offered by OpenCV. OpenCV has offered many traditional and start-of-art computer vision techniques. We tried several algorithms for the detection in our specific scenario, including SIFT/SURF keypoint detection, mog2 background subtraction, hough transform, and color detection using HSV space. Among these methods, we eventually chose color detection as our camera detection algorithm.
-
-The color detection algorithm can be separated into following phases. First, we need to do the image pre-processing. We downsampling the images using different scaling factors since we want to get a balance between both processing speed and detection accuracy. Then we transfer the RGB color space to the HSV color space to make the color easy to be identified. We define the upper and lower limits for pixel values to classify three colors. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV color space value and output both the color and position information. The speed of color detection is fast and also accurate enough for real-time application.
-=======
 After several tests, we found that it is not feasible to use DNN on the RPI because of the predicting speed, RPI has really limited computational capability and has no GPU that can be used to do the DNN-accelerate. After the mid-term, we decided to try another strategy which using the traditional computer vision technique offered by OpenCV.
 
 Then we try to process video stream by using OpenCV. OpenCV has offered many traditional and start-of-art computer vision techniques which can be used . We tried several algorithms for the detection in our specific scenario, including SIFT/SURF key point detection, mog2 background subtraction, hough transform, and colour detection using HSV space. Among these methods, we eventually chose colour detection as our camera detection algorithm.
 
 The colour detection algorithm can be separated to different phases. First, we need to do the image pre-processing: we down sampling the images using different scaling factors since we want both processing speed and accuracy optimized. Then we transfer the RGB colour space to the HSV colour space to make the colour easy to be identified. We define the upper and lower limits for pixel values to classify three colours. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV colour space value and output both the colour and position information. The speed of colour detection is fast and also accurate enough for real-time application.
->>>>>>> ff294aa7519778e5dc146ce6929c058e156d666c
 
 To enable our model communicate with the VsomeIP perfectly and precisely, we tried several methods to connect Python program and C++ program, including using Google protocol buffers and RAM pipe transfer. We have to ensure that both of programs can communicate simultaneously without block. 
 
@@ -737,18 +728,11 @@ Because we hade to use prototyping boards and the platform was designed to have 
 %-------------------------------------------------------------------------
 \clearpage
 \section{Future Work}
-<<<<<<< HEAD
-1.	In our current version, the Pi camera is used to detect color and steer the car. Actually, it can also output the distance, so that it can work as an alternative of the ultrasonic sensor. Since we are attempting to build a fault tolerant and self-adaptive system, we need the car be able to get the required data even when some sensors break down. Additionally, we can also take the distance into account when steering the car. For example, only when the distance from the car to the signal up to a specific value, the car start to follow the signal. Otherwise, it receive the signal but not carry out steering.
-\newline
-2.	The communication between the color detection python code and VsomeIP can be improved because the communication process causes some delay in our current version application. One possible solution is convert the python code into C++, so that the communication protocol will be simple and feasible.
-\newline3.	Although we have already tried to send the camera video stream to Android phone through WIFI, we failed since the scripts of sending stream and color detection always block each other. It would be feasible to copy the video stream captured from Pi camera, one of them used as color detection, the other one can be sent to phone.
-=======
 1.	The Pi camera can also output the distance, so that it can work as an alternative of the ultrasonic sensor. Since we are attempting to build a fault tolerant and self-adaptive system, we need the car be able to get the required data even when some sensors break down. Additionally, we can also take the distance into account when steering the car. For example, only when the distance from the car to the signal up to a specific value, the car start to follow the signal. Otherwise, it receive the signal but not carry out steering.
 \newline
 2.	Improve the communication between the colour detection python code and VsomeIP, which causes some delay in our current version application. One possible solution is convert the python code into C++, so that the communication protocol will be simple and feasible.
 \newline
 3.	Although we have already tried to send the camera video stream to Android phone through WIFI so that we can directly see what the car is facing during running. We failed since the scripts of sending stream and colour detection always block each other, it would be feasible to copy the video stream captured from Pi camera and one of them used as colour detection, the other one can be sent to phone.
->>>>>>> ff294aa7519778e5dc146ce6929c058e156d666c
 %-------------------------------------------------------------------------
 \clearpage
 
