@@ -17,8 +17,8 @@ add_subdirectory(lib/simple_gpio)
 add_executable(dist-steer-service "${PROJECT_SOURCE_DIR}/src/dist_steer_service.cpp")
 target_link_libraries(dist-steer-service vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
 
-add_executable(distance "${PROJECT_SOURCE_DIR}/src/dist_steer.cpp")
-target_link_libraries(distance gpio cbuf shm pthread rt)
+add_executable(dist_steer "${PROJECT_SOURCE_DIR}/src/dist_steer.cpp")
+target_link_libraries(dist_steer gpio cbuf shm pthread rt)
 #########################################################################################
 
 ################### Link to vsomeip.json ################################################

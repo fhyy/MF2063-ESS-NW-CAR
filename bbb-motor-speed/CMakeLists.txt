@@ -17,8 +17,8 @@ add_subdirectory(lib/simple_gpio)
 add_executable(motor-speed-service "${PROJECT_SOURCE_DIR}/src/motor_speed_service.cpp")
 target_link_libraries(motor-speed-service vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
 
-add_executable(speed "${PROJECT_SOURCE_DIR}/src/motor_speed.cpp")
-target_link_libraries(speed gpio cbuf shm pthread rt)
+add_executable(motor_speed "${PROJECT_SOURCE_DIR}/src/motor_speed.cpp")
+target_link_libraries(motor_speed gpio cbuf shm pthread rt)
 #########################################################################################
 
 ################### Link to vsomeip.json ################################################
