@@ -111,7 +111,7 @@ void setup()
  */
 void loop() 
 {
-  setSteeringPWM(((float)lastSignal)/100.0f);
+  //setSteeringPWM(((float)lastSignal)/100.0f);
   delay(500);
 }
 
