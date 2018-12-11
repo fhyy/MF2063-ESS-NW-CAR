@@ -263,7 +263,7 @@ services to achieve a failsafe behaviour, this project aims to provide a proof-o
 that ethernet can be used for communication in autonomous cars.
 
 \subsection{Project Description}
-The two projects "ESS-Car Embedded Services for Self-Adaptive Car" and "ESS-Network Embedded Services for Self-Adaptive Network" were provided by professor De-Jiu Chen at KTH Royal Institute of Technology. The idea of the two projects are from Viktor Karlquist's master thesis [??] where he presented a design and an implementation of an automotive experimental platform for ADAS. And the "ESS-Car" team from last year's MF2063 course has already implemented an autonomous vehicle prototype based on the thesis. Our projects are focused on the development and extension of the prototype.
+The two projects "ESS-Car Embedded Services for Self-Adaptive Car" and "ESS-Network Embedded Services for Self-Adaptive Network" were provided by professor De-Jiu Chen at KTH Royal Institute of Technology. The idea of the two projects are from Viktor Karlquist's master thesis \cite{Karlquist} where he presented a design and an implementation of an automotive experimental platform for ADAS. And the "ESS-Car" team from last year's MF2063 course has already implemented an autonomous vehicle prototype based on the thesis. Our projects are focused on the development and extension of the prototype.
 
 \subsubsection{Project Goals}
 The goals of the two projects could be divided into two parts, goals concerning the network implementation and goals concerning the remaining hardware and software system architecture.
@@ -308,7 +308,8 @@ Serial Peripheral Interface (SPI) is a synchronous serial interface specificatio
 SPI has a higher throughput than those traditional transaction protocols, e.g. $I^{2}$C, UART, as it is not limited to any maximum clock speed enabling potentially high speed. And the hardware interface is pretty simple where slaves only use master's clock and are able to share the other three signals but the SS. Meanwhile, the software is not hard to implementation. For the opposite side, SPI has its limitations. There is no slave acknowledgement or hand-shaking mechanism in SPI, so the master could keep sending data to nowhere and not know it.
 
 \subsection{SOME/IP}
-
+SOME/IP is a client/server protocol originally developed by BMW. Its official website can be found at \cite{someip}.
+SOME/IP support two modes
 
 %-------------------------------------------------------------------------
 \subsection{Assembly of the car}
