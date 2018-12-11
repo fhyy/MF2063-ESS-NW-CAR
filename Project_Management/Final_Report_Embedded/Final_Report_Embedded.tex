@@ -291,15 +291,15 @@ Mininet is a Python-based application what an SDN network topology can be create
 The car network topology was simulated in Mininet to analyse its behaviour, and to develop code for the controller. Under this test did we discover what that Mininet simulation had a much lower delay then the real implementation had, even then the extra settings on the links and nodes were added. This resulted that Mininet could not be used to analyse the best topology for the car. It was instead used to simulate the network to create a code for the Ryu controller. To analyse the Car network was two different Mininet scripts created, one was to use the physical raspberry pi controller and the second one was to use the internal version of Ryu in the Mininet VM. For the external simulation to work has the script be configured with the right IP-address to the raspberry pi. 
 
 \subsection{Software Architecture}
-The driving system consists of several layers of software and communication. Figure~\ref{fig:bbb_arch}
-and~\ref{fig:rpi_arch} give a broad overview of how the software is structured. A custom driving software
-is running on the client BeagleBone. This can be either an interactive shell or a test suite
-of commands for testing and debugging basic functionality or a more intelligent autonomous driving
-software. The custom driving software controls the car through a library called ESSPrototype.
+The driving system consists of several layers of software and communication. Figure~\ref{fig:bbb_arch} and~\ref{fig:rpi_arch} give a broad overview
+of how the software is structured. A custom driving software is running on the client BeagleBone. This can be either an interactive shell or a test suite
+of commands for testing and debugging basic functionality or a more intelligent autonomous driving software. The custom driving software controls
+the car through a library called ESSPrototype.
 
 ESSPrototype is a C++ library that represent fundamental functionality for manoeuvring and monitoring
 the car. Some examples include controlling the steering, getting speedometer readings and checking if the distance sensors are online.
-Input and output to ESSPrototype is done via a UNIX shared memory and the IO packets can be seen in Figure~\ref{fig:packets}. Table~\ref{tab:packets} contain brief descriptions of the packets.
+Input and output to ESSPrototype is done via a UNIX shared memory and the IO packets can be seen in Figure~\ref{fig:packets}. Table~\ref{tab:packets}
+contain brief descriptions of the packets.
 
 At the other end of the UNIX shared memory that ESSPrototype uses, a client/server software
 runs and it is based on an application-layer protocol called SOME/IP \cite{someip}. The C++ implementation of the 
@@ -628,12 +628,9 @@ Moreover, there is a tradeoff between accuracy and output speed. In our applicat
 
 The color detection algorithm can be separated into following phases. First, we need to do the image pre-processing. We downsampling the images using different scaling factors since we want to get a balance between both processing speed and detection accuracy. Then we transfer the RGB color space to the HSV color space to make the color easy to be identified. We define the upper and lower limits for pixel values to classify three colors. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV color space value and output both the color and position information. The speed of color detection is fast and also accurate enough for real-time application.
 
-After several tests, we found that it is not feasible to use DNN on the RPI because of the predicting speed, RPI has really limited computational capability and has no GPU that can be used to do the DNN-accelerate. After the mid-term, we decided to try another strategy which using the traditional computer vision technique offered by OpenCV.
+After several tests, we found that it is not feasible to use DNN on the RPI because of the predicting speed, RPI has really limited computational capability and has no GPU that can be used to do the DNN-accelerate. After the mid-term, we decided to try another strategy which using the traditional computer vision technique offered by OpenCV. OpenCV has offered many traditional and start-of-art computer vision techniques. We tried several algorithms for the detection in our specific scenario, including SIFT/SURF keypoint detection, mog2 background subtraction, hough transform, and color detection using HSV space. Among these methods, we eventually chose color detection as our camera detection algorithm.
 
 Then we try to process video stream by using OpenCV. OpenCV has offered many traditional and start-of-art computer vision techniques which can be used . We tried several algorithms for the detection in our specific scenario, including SIFT/SURF key point detection, mog2 background subtraction, hough transform, and colour detection using HSV space. Among these methods, we eventually chose colour detection as our camera detection algorithm.
-
-The colour detection algorithm can be separated to different phases. First, we need to do the image pre-processing: we down sampling the images using different scaling factors since we want both processing speed and accuracy optimized. Then we transfer the RGB colour space to the HSV colour space to make the colour easy to be identified. We define the upper and lower limits for pixel values to classify three colours. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV colour space value and output both the colour and position information. The speed of colour detection is fast and also accurate enough for real-time application.
-
 
 To enable our model communicate with the VsomeIP perfectly and precisely, we tried several methods to connect Python program and C++ program, including using Google protocol buffers and RAM pipe transfer. We have to ensure that both of programs can communicate simultaneously without block. 
 
