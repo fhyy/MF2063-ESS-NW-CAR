@@ -309,7 +309,10 @@ SPI has a higher throughput than those traditional transaction protocols, e.g. $
 
 \subsection{SOME/IP}
 SOME/IP is a client/server protocol originally developed by BMW. Its official website can be found at \cite{someip}.
-SOME/IP support two modes
+SOME/IP support two paradigms of communication, Request/Respond and Publish/Subscribe. The SOME/IP implementation
+used for the project, VSOMEIP, has a built-in service detection and multicasting mechanisms and allows the user to
+define the behaviour of the program based on triggers such as the disconnection of a service, receiving a specific
+event message or seeing a service come online. VSOMEIP can be found and is documented at \cite{vsomeip}
 
 %-------------------------------------------------------------------------
 \subsection{Assembly of the car}
@@ -411,11 +414,6 @@ into the pipe.
     Go Status & Packet that shows what services are available (distance, speed, camera, motor, steering)  \\ \hline
      \end{tabular}
 \end{table}
-
-%-------------------------------------------------------------------------
-\subsection{VSOME/IP}
-
-%-------------------------------------------------------------------------
 
 \subsection{Project management}
 Scrum project management is used during the process of our projects.
