@@ -563,12 +563,8 @@ The interprocess communication is implemented using shared memory. This is a POS
 Using shared memory is not enough, the communication also needs to be defined such that all processes using the shared memory knows how it should be used. For the cars specific need a circular buffer is implemented on the shared memory. This is to have a type of flow control where the values in the buffer are always relatively fresh. If a FIFO buffer was used instead and it is not being read as often as it is written to  the buffer might overflow, whereas now the oldest values in the buffer is just overwritten. When values are read from a FIFO the oldest value is always read first. There is no guarantee of how old this data is and might not be useful to read any longer. With a circular buffer it is possible to adjust the size such that the oldest value is always relatively fresh.
 
 
-\subsection{Communication between Beaglebone and Arduino ?}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SPI introduction in literature review, pros over UART
-%TODO reference to the simple gpio library (github page)
-% NOT SURE: PUT simple gpio lib to management chapter
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Communication between Beaglebone and Arduino}
+
 As the Beaglebone only supports to be the master in a SPI connection, so we have two Beaglebones with SPI configurations and each of them has two Arduino slaves. One Beaglebone has two SPI devices: SPIDEV0 and SPIDEV1, and the SPIDEV1 device is disabled initially but is used for HDMI interface. 
 
 In order to have one SPI device on Beaglebone connecting to multiple Arduino slaves, we use a third party C++ library called SimpleGPIO which enables us to use other general purpose pins as slave select of the SPI connection. Before we start communication with a specific Arduino slave, the corresponding slave select will be set to low, then we get access to that Arduino slave.
