@@ -205,8 +205,8 @@ Implications of the results
 \section*{List of Acronyms and Abbreviations}
 \begin{itemize}
 	\item SDN : Software Defined Network
-	\item pwm :  Pulse-width modulation
-	\item spi: Serial Peripheral Interface
+	\item PWM :  Pulse-width modulation
+	\item SPI: Serial Peripheral Interface
 \end{itemize}
 %-------------------------------------------------------------------------
 
@@ -444,7 +444,7 @@ The second Arduino board has the same functionality as the previous one. The dif
 \subsection{System overview}
 The overall architecture of our system is shown in figure \ref{fig:system_overview}. Basically, it presents how the hardware is assembled in our system.The cloud which consists of three SDN switches and Raspberry Pi is our SDN network, which also called support network in this report. The three SDN switches are all connected to each other, as well as to the SDN controller.
 
-The System also have have three Beaglebone units and one Raspberry Pi. Two of the Beaglebone units are connected to two Arduino Micros each, so four Arduinos are assembled in the system. Theses Arduinos read sensor data or control the actuators and communicate with corresponding Beaglebone through SPI. Beaglebones connecting with Arduino receives the data from the Arduinos and posts it to the main network, Then the last Beaglebone, who  acts as controller and subscribes the data, makes decisions based on current environment and then sends commands to other Beaglebones who will decode the command and transfer it to Arduinos connecting to the actuators. The last node Raspberry Pi with Pi camera is used  to detect object in front of the prototype vehicle through which color and position of the flag are able to be detected.
+The System also have have three Beaglebone units and one Raspberry Pi. Two of the Beaglebone units are connected to two Arduino Micros each, so four Arduinos are assembled in the system. Theses Arduinos read sensor data or control the actuators and communicate with corresponding Beaglebone through SPI. Beaglebones connecting with Arduino receives the data from the Arduinos and posts it to the main network, Then the last Beaglebone, who  acts as controller and subscribes the data, makes decisions based on current environment and then sends commands to other Beaglebones who will decode the command and transfer it to Arduinos connecting to the actuators. The last node Raspberry Pi with Pi camera is used  to detect object in front of the prototype vehicle through which colour and position of the flag are able to be detected.
 
 \begin{figure}
 	\centering
@@ -471,11 +471,11 @@ To monitor the traffic load on the network was a webpage made to present the use
 
 %-------------------------------------------------------------------------
 \subsection{Interprocess communication}
-To increase coherency and decrease coupling in the software architecture we chose to have several running processes on all of the beaglebones. Each process is focused on doing a fewer amount of tasks which makes development easier. An example of this is the BeagleBone connected to the speedometer and the motor controller. It is running one process whose task is to talk to two Arduinos over SPI, where it sends information to the motor Arduino and gathers information from the speedometer Arduino. The other process on the BeagleBone is running the VsomeIP application. It is clear that these processes need to communicate with one another as the first process needs to access the ethernet.
+To increase coherency and decrease coupling in the software architecture we chose to have several running processes on all of the Beaglebones. Each process is focused on doing a fewer amount of tasks which makes development easier. An example of this is the BeagleBone connected to the speedometer and the motor controller. It is running one process whose task is to talk to two Arduinos over SPI, where it sends information to the motor Arduino and gathers information from the speedometer Arduino. The other process on the BeagleBone is running the VsomeIP application. It is clear that these processes need to communicate with one another as the first process needs to access the ethernet.
 
 The interprocess communication is implemented using shared memory. This is a POSIX concept which is implemented in Linux where more than one process can load in the same physical memory blocks into their own private virtual memory space. This is done using a few system functions and the operating system will make sure to take care of all the complex implementations.
 
-Using shared memory is not enough, the communication also needs to be defined such that all processes using the shared memory knows how it should be used. For the cars specific need a circular buffer is implemented on the shared memory. This is to have a type of flow control where the values in the buffer are always relatively fresh. If a FIFO buffer was used instead and it is not being read as often as it is written to  the buffer might overflow, whereas now the oldest values in the buffer is just overwritten. When values are read from a FIFO the oldest value is always read first. There is no guarantee of how old this data is and might not be usefull to read any longer. With a circular buffer it is possible to adjust the size such that the oldest value is always relatively fresh.
+Using shared memory is not enough, the communication also needs to be defined such that all processes using the shared memory knows how it should be used. For the cars specific need a circular buffer is implemented on the shared memory. This is to have a type of flow control where the values in the buffer are always relatively fresh. If a FIFO buffer was used instead and it is not being read as often as it is written to  the buffer might overflow, whereas now the oldest values in the buffer is just overwritten. When values are read from a FIFO the oldest value is always read first. There is no guarantee of how old this data is and might not be useful to read any longer. With a circular buffer it is possible to adjust the size such that the oldest value is always relatively fresh.
 
 
 \subsection{Communication between Beaglebone and Arduino ?}
@@ -484,7 +484,7 @@ Using shared memory is not enough, the communication also needs to be defined su
 %TODO reference to the simple gpio library (github page)
 % NOT SURE: PUT simple gpio lib to management chapter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-As the Beaglebone only supports to be the master in a SPI connection, so we have two Beaglebones with SPI configurations and each of them has two Arduino slaves. One Beaglebone has two spi devices: SPIDEV0 and SPIDEV1, and the SPIDEV1 device is disabled initially but is used for HDMI interface. 
+As the Beaglebone only supports to be the master in a SPI connection, so we have two Beaglebones with SPI configurations and each of them has two Arduino slaves. One Beaglebone has two SPI devices: SPIDEV0 and SPIDEV1, and the SPIDEV1 device is disabled initially but is used for HDMI interface. 
 
 In order to have one SPI device on Beaglebone connecting to multiple Arduino slaves, we use a third party C++ library called SimpleGPIO which enables us to use other general purpose pins as slave select of the SPI connection. Before we start communication with a specific Arduino slave, the corresponding slave select will be set to low, then we get access to that Arduino slave.
 
@@ -645,7 +645,7 @@ The ESC has a safety measure for when the motor PWM is set to anything higher th
 
 The Arduino program reads data for target speed and current speed through an SPI interface. This interface sends one byte at a time, where the most significant bit defines if the data is for target speed or current speed. This data structure puts a limit on the values as there are only 7 bits left for data. The data is defined as 2 centimetre per second to increase resolution; sending a 10 would mean a speed of 20 centimetres per second. This allows the controller to read and maintain speeds of at most 255 centimetres per second with the only limit being the frequency of the speed sensor. 
 
-The Arduino program has two possible implementation of speed keeping. To switch between these, one has to change a line in the source code. One implementation is a direct translation from target speed to motor pwm. If the pwm requirements for reaching a speed would change, this translation would not longer be valid. Driving on a flat surface would still be fine. The other implementation uses a PID controller which reads the current speed from the SPI. As the closed loop with data through SPI over two nodes, the data will be delayed by a couple of milliseconds, but tuning the PID parameters can result in a good PID controller.
+The Arduino program has two possible implementation of speed keeping. To switch between these, one has to change a line in the source code. One implementation is a direct translation from target speed to motor PWM. If the PWM requirements for reaching a speed would change, this translation would not longer be valid. Driving on a flat surface would still be fine. The other implementation uses a PID controller which reads the current speed from the SPI. As the closed loop with data through SPI over two nodes, the data will be delayed by a couple of milliseconds, but tuning the PID parameters can result in a good PID controller.
 
 A future implementation could focus on lowering the delay over SPI and tune the PID parameters properly. Sending multiple bytes over SPI at once would also remove the need of scaling the data before sending, and increase the resolution by at least one bit.
 
@@ -706,7 +706,7 @@ The result of the prototyping is shown in figure \ref{fig:board_ultra_steering},
 The state machine was modelled and verified using the tool NuSMV which is a symbolic model checker that is used for formal verification of finite state systems. Since NuSMV allows for the models to be checked using linear temporal logic the state machine could be checked for node coverage and edge coverage. NuSMV also allows for exhaustive analysis meaning that each set of combinations of the state variables needs to have a defined behaviour in each state of the model.
 
 \subsection{Requirements and functionality}
-The requirements and some of the system functionalities has been tested by following a set of test protocols and comparing the results with the expected outcomes. The protocols takes care of the communication between sensors and Arduinos, Arduinos and actuators, the SPI communication between Arduinos and BeagleBones, and the VSOME/IP packages to and from BeagleBones. The requirements tested was the ability to start the car, the flag following system, the collision avoidance system, and some of the fault states of nodes.
+The requirements and some of the system functionalities has been tested by following a set of test protocols and comparing the results with the expected outcomes. The protocols takes care of the communication between sensors and Arduinos, Arduinos and actuators, the SPI communication between Arduinos and Beaglebones, and the VSOME/IP packages to and from Beaglebones. The requirements tested was the ability to start the car, the flag following system, the collision avoidance system, and some of the fault states of nodes.
 
 %TODO results
 %-------------------------------------------------------------------------
@@ -723,7 +723,7 @@ The idea for the project was to design our own PCBs because the project should c
 
 Because we hade to use prototyping boards and the platform was designed to have PCB mounted to it and not prototyping boards. This led to the assembly of the car was not as optimal as it could have been and the placement of come components and boards had to be placed at a different location. If the car would have been able to move around all it would have been affected of this, due the cable wiring was not optimal and the reliability of connections and wound have affected the car's performance. 
 
-The next step from this project is to make is to integrate PCBs so the car easily drives around so it will not be affected by the bad cable wiring the prototype boards had resulted in. 
+ 
 
 
 %-------------------------------------------------------------------------
