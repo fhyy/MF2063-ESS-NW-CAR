@@ -60,14 +60,14 @@ ssh debian@192.168.0.2 << EOF
   make
 
   ln -sf /home/debian/bbb-distance-steering/build/dist-steer-service /home/debian/bin
-  ln -sf /home/debian/bbb-distance-steering/build/distance /home/debian/bin
+  ln -sf /home/debian/bbb-distance-steering/build/dist_steer /home/debian/bin
   ln -sf /home/debian/bbb-distance-steering/build/vsomeip.json /home/debian/bin
 
   # Create a script that launches and kills the required programs simultaneously
   if [ ! -f /home/debian/bin/run_dist_steer.sh ]; then
     echo "#!/bin/bash" >> /home/debian/bin/run_dist_steer.sh
     echo "cd /home/debian/bbb-distance-steering/" >> /home/debian/bin/run_dist_steer.sh
-    echo "sudo dist-steer-service & sudo distance" >> /home/debian/bin/run_dist_steer.sh
+    echo "sudo dist-steer-service & sudo dist_steer" >> /home/debian/bin/run_dist_steer.sh
     chmod +x /home/debian/bin/run_dist_steer.sh
   fi
 EOF
@@ -96,14 +96,14 @@ ssh debian@192.168.0.3 << EOF
   make
 
   ln -sf /home/debian/bbb-motor-speed/build/motor-speed-service /home/debian/bin
-  ln -sf /home/debian/bbb-motor-speed/build/speed /home/debian/bin
+  ln -sf /home/debian/bbb-motor-speed/build/motor_speed /home/debian/bin
   ln -sf /home/debian/bbb-motor-speed/build/vsomeip.json /home/debian/bin
 
   # Create a script that launches the required programs simultaneously
   if [ ! -f /home/debian/bin/run_motor_speed.sh ]; then
     echo "#!/bin/bash" >> /home/debian/bin/run_motor_speed.sh
     echo "cd /home/debian/bbb-motor-speed/" >> /home/debian/bin/run_motor_speed.sh
-    echo "sudo motor-speed-service & sudo speed" >> /home/debian/bin/run_motor_speed.sh
+    echo "sudo motor-speed-service & sudo motor_speed" >> /home/debian/bin/run_motor_speed.sh
     chmod +x /home/debian/bin/run_motor_speed.sh
   fi
 EOF
