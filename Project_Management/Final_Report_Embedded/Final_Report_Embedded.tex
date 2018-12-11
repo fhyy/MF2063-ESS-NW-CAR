@@ -466,14 +466,39 @@ We define the upper and lower limits for pixel values to classify three colors. 
 
 So we finally apply the color detection on our car, we use the result of detection to steer the car.
 
-
-
 \subsection{Controlling actuators}
-%-------------------------------------------------------------------------
 \subsubsection{Steering servo}
-%-------------------------------------------------------------------------
+A servo motor was connected on the front axis of the car to enable steering. The servo is connected to an Arduino using a Vcc, a ground and a data cable. To control the servo motor, a pulse of varying length should be applied on the data cable. A Arduino library for servo controllers was used as it has definitions for these pulse lengths and was compatible with the servo motor used in the project.
+
+One issue with the servo motor mount was that a direction change required the servo motor to turn a bit before it had any effect on the steering axis. This issue was fixed by changing the software implementation such that a direction change added or removed from the output pulse length.
+
 \subsubsection{Motor ESC}
-%-------------------------------------------------------------------------
+The motor mounted on the car is a \textit{TrackStar 17.5T "Outlaw" Sensored Brushless Motor V2} connected to a \textit{HobbyKing® ™ X-Car 45A Brushless Car ESC}. The ESC is connected to an Arduino using the RX signal and ground cable only.
+
+There are a few steps needed to setup the ESC before it can be controlled by the Arduino. For the set up in this project, follow these steps:
+\begin{itemize}
+	\item Connect the RX signal and ground pin to the Arduino
+	\item Load an Arduino program that allows you to manually send PWM signals on the signal pin. The program in mind uses the Arduino servo library function \textit{writeMicroseconds} and the PWM signal values will be defined according to the input values of that library function.
+	\item Start the Arduino program but keep the ESC off
+	\item Send a PWM signal of 2000
+	\item Hold down "set" button on the ESC switch and switch it on while still holding down the button
+	\item Wait for a solid orange light
+	\item Release the "set" button on the switch and wait for a solid red light
+	\item Send a PWM signal of 700
+	\item Wait for a solid orange light
+	\item Send a PWM signal of 1000
+	\item Wait for a beep and for the lights to turn off
+	\item Switch off the ESC
+	\item The set up is complete. When switching on the properly set up ESC, make sure that there are no PWM signals higher than 1000 sent on the data pin.
+\end{itemize}
+
+The ESC has a safety measure for when the motor PWM is set to anything higher than \textit{neutral} (a pulse width of around 1000 microseconds), and the motor is too weak to carry the load and thus will not spin. In this case, the ESC will not listen for any other PWM signal other than \textit{neutral}. Once a \textit{neutral} PWM signal is sent for a couple of milliseconds, the ESC will start handling higher PWM signals again. The Arduino program running the motor has means of dealing with this case.
+
+The Arduino program reads data for target speed and current speed through an SPI interface. This interface sends one byte at a time, where the most significant bit defines if the data is for target speed or current speed. This datastructure puts a limit on the values as there are only 7 bits left for data. The data is defined as 2 centimeter per second to increase resolution; sending a 10 would mean a speed of 20 centimeters per second. This allows the controller to read and maintain speeds of at most 255 centimeters per second with the only limit being the frequency of the speed sensor. 
+
+The Arduino prgram has two possible implementation of speed keeping. To switch between these, one has to change a line in the source code. One implementation is a direct translation from target speed to motor pwm. If the pwm requirments for reaching a speed would change, this translation would not longer be valid. Driving on a flat surface would still be fine. The other implementation uses a PID controller which reads the current speed from the SPI. As the closed loop with data through SPI over two nodes, the data will be delayed by a couple of milliseconds, but tuning the PID parameters can result in a good PID controller.
+
+A future implementation could focus on lowering the delay over SPI and tune the PID parameters properly. Sending multiple bytes over SPI at once would also remove the need of scaling the data before sending, and increase the resolution by at least one bit.
 
 \subsection{Assembly of the car}
 
@@ -530,7 +555,9 @@ The result of the prototyping is shown in figure \ref{fig:board_ultra_steering},
 \subsection{State machine}
 The state machine was modelled and verified using the tool NuSMV which is a symbolic model checker that is used for formal verification of finite state systems. Since NuSMV allows for the models to be checked using linear temporal logic the state machine could be checked for node coverage and edge coverage. NuSMV also allows for exhaustive analysis meaning that each set of combinations of the state variables needs to have a defined behavioiur in each state of the model.
 
+The requirements and some of the system functionalities has been tested by following a set of test protocols and comparing the results with the expected outcomes. The protocols takes care of the communication between sensors and Arduinos, Arduinos and actuators, the SPI communication between Arduinos and BeagleBones, and the VSOME/IP packages to and from BeagleBones. The requirements tested was the ability to start the car, the flag following system, the collision avoidance system, and some of the fault states of nodes.
 
+%TODO results
 %-------------------------------------------------------------------------
 \clearpage
 \section{Results}
