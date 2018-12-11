@@ -20,7 +20,7 @@ DistSteerService::DistSteerService(uint32_t di_sleep, bool skip_go) :
                   << std::endl;
     #endif
 
-    
+
     // Initialize consumer memory (where input is read from).
     try {
         shm_di.Create(BUFFER_SIZE, O_RDWR);
