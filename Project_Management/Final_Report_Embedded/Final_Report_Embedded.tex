@@ -244,6 +244,24 @@ provide data rates many times higher than that of traditional communication sche
 cars. Therefore, Ethernet is a promising candidate for providing the capacity needed for
 the autonomous car's network.
 
+Ethernet is, unfortunately, not without flaws. It has been adapted for systems where
+capacity and scalability have been favoured before robustness and predictability. Therefore,
+it does not naturally live up to the demands of an autonomous car. By employing a
+Software-Defined Network (SDN), it might be possible to mitigate the shortcomings of Ethernet.
+A SDN employs a central controller that arbitrates all the communication in the car. The
+SDN controller can for example reroute packages and drop packages, all to ensure that
+high priority communication reaches its target at the right time.
+
+Furthermore, Ethernet allows for sporadic connection and disconnention of nodes and thus
+provides no inherent way of detecting whether a node is missing due to, for instance, a
+faulty cable. Hence, the autonomous car needs to have some sort of way to perform a
+self-monitoring in order to ensure itself that the system status is acceptable
+for driving.
+
+By implementing a prototype of a vehicle that uses a SDN controller and self-monitoring
+services to achieve a failsafe behavior, this project aims to provide a proof-of-concept
+that ethernet can be used for communication in autonomous cars.
+
 \subsection{Project Description}
 The two projects "ESS-Car Embedded Services for Self-Adaptive Car" and "ESS-Network Embedded Services for Self-Adaptive Network" were provided by professor De-Jiu Chen at KTH Royal Institute of Technology. The idea of the two projects are from Viktor Karlquist's master thesis [??] where he presented a design and an implementation of an automotive experimental platform for ADAS. And the "ESS-Car" team from last year's MF2063 course has already implemented an autonomous vehicle prototype based on the thesis. Our projects are focused on the development and extension of the prototype.
 
