@@ -461,7 +461,13 @@ To monitor the traffic load on the network was a webpage made to present the use
 
 
 %-------------------------------------------------------------------------
-\subsection{shared memory things}
+\subsection{Interprocess communication}
+To increase coherency and decrease coupling in the software architecture we chose to have several running processes on all of the beaglebones. Each process is focused on doing a fewer amount of tasks which makes development easier. An example of this is the BeagleBone connected to the speedometer and the motor controller. It is running one process whose task is to talk to two Arduinos over SPI, where it sends information to the motor Arduino and gathers information from the speedometer Arduino. The other process on the BeagleBone is running the VsomeIP application. It is clear that these processes need to communicate with one another as the first process needs to access the ethernet.
+
+The interprocess communication is implemented using shared memory. This is a POSIX concept which is implemented in Linux where more than one process can load in the same physical memory blocks into their own private virtual memory space. This is done using a few system functions and the operating system will make sure to take care of all the complex implementations.
+
+Using shared memory is not enough, the communication also needs to be defined such that all processes using the shared memory knows how it should be used. For the cars specific need a circular buffer is implemented on the shared memory. This is to have a type of flow control where the values in the buffer are always relatively fresh. If a FIFO buffer was used instead and it is not being read as often as it is written to  the buffer might overflow, whereas now the oldest values in the buffer is just overwritten. When values are read from a FIFO the oldest value is always read first. There is no guarantee of how old this data is and might not be usefull to read any longer. With a circular buffer it is possible to adjust the size such that the oldest value is always relatively fresh.
+
 
 \subsection{Communication between Beaglebone and Arduino ?}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -719,6 +725,11 @@ The next step from this project is to make is to integrate PCBs so the car easil
 %-------------------------------------------------------------------------
 \clearpage
 \section{Future Work}
+1.	The Pi camera can also output the distance, so that it can work as an alternative of the ultrasonic sensor. Since we are attempting to build a fault tolerant and self-adaptive system, we need the car be able to get the required data even when some sensors break down. Additionally, we can also take the distance into account when steering the car. For example, only when the distance from the car to the signal up to a specific value, the car start to follow the signal. Otherwise, it receive the signal but not carry out steering.
+\newline
+2.	Improve the communication between the color detection python code and VsomeIP, which causes some delay in our current version application. One possible solution is convert the python code into C++, so that the communication protocol will be simple and feasible.
+\newline
+3.	Although we have already tried to send the camera video stream to Android phone through WIFI so that we can directly see what the car is facing during running. We failed since the scripts of sending stream and color detection always block each other, it would be feasible to copy the video stream captured from Pi camera and one of them used as color detection, the other one can be sent to phone.
 %-------------------------------------------------------------------------
 \clearpage
 
