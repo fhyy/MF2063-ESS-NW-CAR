@@ -361,10 +361,10 @@ On the respective service BeagleBones, SOME/IP messages are transmitted and rece
 payload may be any packet in Figure~\ref{fig:packets} except the GO Status packet. The received messages
 are written to a UNIX shared memory and the payload for messages to be transmitted are read from a UNIX
 shared memory. On the other end of the shared memory, a task runs that handles the SPI communication
-with the arduinos for the respective services, distance sensing and steering on one service BeagleBone and
+with the Arduinos for the respective services, distance sensing and steering on one service BeagleBone and
 motor control and speedometer on the other.
 
-Sensor Arduinos send measurement values to their respective master BeagleBone via SPI and actuator arduinos
+Sensor Arduinos send measurement values to their respective master BeagleBone via SPI and actuator Arduinos
 read instructions from their respective master BegleBone over SPI as well. On each Arduino runs a piece
 of Arduino code that interfaces with the hardware using the Arduinos GPIO pins.
 
