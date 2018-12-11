@@ -419,7 +419,7 @@ into the pipe.
 
 \subsection{Project management}
 Scrum project management is used during the process of our projects.
-The scrum framework has been adopted for use in this process because of it being agile as well as the fact that most group members had some type of previous experience or knowledge with it. Both software and physical tools were used for monitoring the projects progression. Excel was for example used to keep track of milestones, earned value and the resource plan and the online tool trello was used alongside a physical whiteboard to keep track of scrum sprints and the project backlog as depicted in figure \ref{fig:scrum-board}. A lot of design was also produced and kept on whiteboards as to promote discussion within the group and to keep everyone updated with updates or changes to design or models.
+The scrum framework has been adopted for use in this process because of it being agile as well as the fact that most group members had some type of previous experience or knowledge with it. Both software and physical tools were used for monitoring the projects progression. Excel was for example used to keep track of milestones, earned value and the resource plan and the online tool Trello was used alongside a physical whiteboard to keep track of scrum sprints and the project backlog as depicted in figure \ref{fig:scrum-board}. A lot of design was also produced and kept on whiteboards as to promote discussion within the group and to keep everyone updated with updates or changes to design or models.
 
 As with all projects where the team members have no previous experience in working with each other there will be a roll-seeking phase where the dynamic of the group is slowly figured out and which different positions the team members fit in. To make the group get into the process of working quickly the group decided to follow the results given by the belin test which was performed by all group members.
 
@@ -574,7 +574,7 @@ In the Arduino side, the communication request from the Beaglebone is treated as
 Three categories of sensors are implemented in the prototype vehicle to monitor its surrounding environments. Data from distance sensors and speed sensor will be sent to an Arduino initially, then sent to corresponding Beaglebone. Data from Pi Camera will be sent to the Raspberry Pi which is directly connected to the main network.
 %-------------------------------------------------------------------------
 \subsubsection{Ultrasonic sensor}
-The distance sensor used in the prototype vehicle is HC-SR04 which provides 2cm to 400cm non-contact distance measurement with accurancy to 3mm. Three HC-SR04 are mounted in our prototype in order to have a better scope of the distance measurement, as well as keep the prototype in a more safe way. To get data from HC-SR04, a short 10\textmu s pulse should be supplied to the trig pin of ultrasonic sensor, then the sensor will send out an 8 cycle burst of ultrasound at 40 kHz and raise echo. The echo signal we get is a distance object which is pulse width and the range of the signal is in proportion. 
+The distance sensor used in the prototype vehicle is HC-SR04 which provides 2cm to 400cm non-contact distance measurement with accuracy to 3mm. Three HC-SR04 are mounted in our prototype in order to have a better scope of the distance measurement, as well as keep the prototype in a more safe way. To get data from HC-SR04, a short 10\textmu s pulse should be supplied to the trig pin of ultrasonic sensor, then the sensor will send out an 8 cycle burst of ultrasound at 40 kHz and raise echo. The echo signal we get is a distance object which is pulse width and the range of the signal is in proportion. 
 
 An Arduino Micro handles both the generating the trig pulse and interpreting the echo signal. The Arduino will set the output pin to low, wait for 5ms, set the pin to high, wait for 10ms, set the pin back to low. This is the process of generating the trig pulse. After the Arduino sends out the trig pulse, it waits for 2 ms, then reads the value from the pin connected to sensor's echo pin. The last step is convert the received value to distance in unit of centimetre.
 
@@ -838,14 +838,14 @@ Because we hade to use prototyping boards and the platform was designed to have 
 \hline
 Action & Expected outcome & Results (2018-12-11) \\ \hline
 Connect and start affected nodes properly  &   ---    & ---  \\ \hline
-Send correctly formated data via SPI interface to node  &  Data transmitted (Can be verified by adding logging and reading logs via the serial port of the steering node)      & Ok  \\ \hline
+Send correctly formatted data via SPI interface to node  &  Data transmitted (Can be verified by adding logging and reading logs via the serial port of the steering node)      & Ok  \\ \hline
 Send angle value 0  & Front wheels turns 20 degrees to the left      & Ok  \\ \hline
-Send angle value 50  & Front wheels centeres      & Ok. Off by a small angle to the right  \\ \hline
+Send angle value 50  & Front wheels centres      & Ok. Off by a small angle to the right  \\ \hline
 Send angle value 100  & Front wheels turns 20 degrees to the right      & Ok  \\ \hline
-Send angle value 50	  & Front wheels centeres      & Ok. Off by a small angle to the left  \\ \hline
+Send angle value 50	  & Front wheels centres      & Ok. Off by a small angle to the left  \\ \hline
 Send angle value 100	  & Front wheels turns 20 degrees to the right     & Ok  \\ \hline
 Send angle value 0	  & Front wheels turns 20 degrees to the left      & Ok  \\ \hline
-Send angle value 50	  & Front wheels centeres      & Ok. Off by a small angle to the right  \\ \hline
+Send angle value 50	  & Front wheels centres      & Ok. Off by a small angle to the right  \\ \hline
 
 \end{tabular}
 \end{table}
@@ -857,9 +857,9 @@ Send angle value 50	  & Front wheels centeres      & Ok. Off by a small angle to
 \hline
 Action & Expected outcome & Results (2018-12-11) \\ \hline
 Connect and start affected nodes properly	  & ---      & ---  \\ \hline
-Read correctly formated data via SPI interface from node  & Data received (Can be verified by adding logging and reading logs on the receiver node)      & Ok  \\ \hline
-Hold a solid object 1 decimeter in front of the left distance sensor, but not the center or right one  &  The node sends distance values ~10, X, Y where X and Y are any distances sensed by the middle or right sensor. ~ means within an error margin of 2 cm     & Ok  \\ \hline
-Hold a solid object 1 decimeter in front of the right distance sensor, but not the center or right one  & The node sends distance values X, Y, ~10 where X and Y are any distances sensed by the left or middle sensor. ~ means within an error margin of 2 cm      & Ok. Received data is a bit noisy  \\ \hline
+Read correctly formatted data via SPI interface from node  & Data received (Can be verified by adding logging and reading logs on the receiver node)      & Ok  \\ \hline
+Hold a solid object 1 decimetre in front of the left distance sensor, but not the centre or right one  &  The node sends distance values ~10, X, Y where X and Y are any distances sensed by the middle or right sensor. ~ means within an error margin of 2 cm     & Ok  \\ \hline
+Hold a solid object 1 decimetre in front of the right distance sensor, but not the centre or right one  & The node sends distance values X, Y, ~10 where X and Y are any distances sensed by the left or middle sensor. ~ means within an error margin of 2 cm      & Ok. Received data is a bit noisy  \\ \hline
 Hold a solid object 1 meter in front of the car  &  The node sends distance values ~100, ~100, ~100. ~ means within an error margin of 20 cm     & Ok. Needs calibration, but sensors agree on a distance  \\ \hline
 Keep the area from 0 meter to 1 meter in front of the car clear  & The node sends distances \textgreater100, \textgreater100, \textgreater100      & Ok  \\ \hline
 
@@ -873,10 +873,10 @@ Keep the area from 0 meter to 1 meter in front of the car clear  & The node send
 \hline
 Action & Expected outcome & Results (2018-12-11) \\ \hline
 Connect and start affected nodes properly  &  ---     & ---  \\ \hline
-Read correctly formated data via SPI interface from node  & Data received (Can be verified by adding logging and reading logs on the receiver node)      & Ok  \\ \hline
+Read correctly formatted data via SPI interface from node  & Data received (Can be verified by adding logging and reading logs on the receiver node)      & Ok  \\ \hline
 Keep the wheel still  & The node continuously sends a speed value of 0      & Ok  \\ \hline
-Start turning the wheel at some approximate rate  & The node sends speed value of X cm/s where X is the distance in cm traveled per second if the wheel would turn at the current rate and be placed on the ground      & Ok  \\ \hline
-Start turning the wheel at some other approximate rate  & The node sends speed value of X cm/s where X is the distance in cm traveled per second if the wheel would turn at the current rate and be placed on the ground      & Ok  \\ \hline
+Start turning the wheel at some approximate rate  & The node sends speed value of X cm/s where X is the distance in cm travelled per second if the wheel would turn at the current rate and be placed on the ground      & Ok  \\ \hline
+Start turning the wheel at some other approximate rate  & The node sends speed value of X cm/s where X is the distance in cm travelled per second if the wheel would turn at the current rate and be placed on the ground      & Ok  \\ \hline
 Keep the wheel still  &  The node starts to continuously send a speed value of 0 within one second     & Ok  \\ \hline
 
 \end{tabular}
@@ -889,14 +889,14 @@ Keep the wheel still  &  The node starts to continuously send a speed value of 0
 \hline
 Action & Expected outcome & Results (2018-12-11) \\ \hline
 Connect and start affected nodes properly  & ---      & ---  \\ \hline
-Send correctly formated data via SPI interface to node  &  Data transmitted (Can be verified by adding logging and reading logs via the serial port of the motor node)     & Ok  \\ \hline
+Send correctly formatted data via SPI interface to node  &  Data transmitted (Can be verified by adding logging and reading logs via the serial port of the motor node)     & Ok  \\ \hline
 Send target speed value 10 with the current speed value 0  & The motor starts running and runs faster and faster with time, but stops before it reaches less than half of its maximum power      & Ok  \\ \hline
 Stop, connect to a fully functioning speed sensing node and add speed data to the data sent via SPI, and start the motor node  & The speed sensor starts logging values in cm/s      & Ok  \\ \hline
-Send a target speed value of 10 with the meassured speed values and continuously send meassured speed values and the target speed values as soon as they are updated by the speed sensor node  &  The motor starts running and modulates itself until the speed of 10 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation     & Ok. Parameters needs tuning  \\ \hline
-Send a target speed value of 0 with the meassured speed values and continuously send meassured speed values as before  & The motor slows down to a halt in less than a second      & Ok. A bit longer than a second  \\ \hline
-Send a target speed value of 120 cm/s with the meassured speed values as before  & The motor starts running and modulates itself until the speed of 120 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation      & Ok. Parameters needs tuning  \\ \hline
-Send a target speed value of 20 with the meassured speed values as before  & The motor slows down and modulates itself until the speed of 20 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation      & Ok. Parameters needs tuning  \\ \hline
-Send a target speed value of 0 with the meassured speed values and continuously send meassured speed values as before  & and continuously send meassured speed values as before	The motor slows down to a halt in less than a second      & Ok.  \\ \hline
+Send a target speed value of 10 with the measured speed values and continuously send measured speed values and the target speed values as soon as they are updated by the speed sensor node  &  The motor starts running and modulates itself until the speed of 10 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation     & Ok. Parameters needs tuning  \\ \hline
+Send a target speed value of 0 with the measured speed values and continuously send measured speed values as before  & The motor slows down to a halt in less than a second      & Ok. A bit longer than a second  \\ \hline
+Send a target speed value of 120 cm/s with the measured speed values as before  & The motor starts running and modulates itself until the speed of 120 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation      & Ok. Parameters needs tuning  \\ \hline
+Send a target speed value of 20 with the measured speed values as before  & The motor slows down and modulates itself until the speed of 20 cm/s is read by the speed sensor and maintains this speed after at most 1 second of modulation      & Ok. Parameters needs tuning  \\ \hline
+Send a target speed value of 0 with the measured speed values and continuously send measured speed values as before  & and continuously send measured speed values as before	The motor slows down to a halt in less than a second      & Ok.  \\ \hline
 
 \end{tabular}
 \end{table}
@@ -951,13 +951,13 @@ Connect and start affected nodes properly  &  ---     & ---  \\ \hline
 Hold something with a red colour in front of the camera (Android app, or mobile webpage can be found in the project git repositories)  & The vision controller should send the message "1X " within 1 second, where 1 means red, and X is any direction towards the red thing      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
 Hold something with a green colour in front of the camera but a bit to the left  & The vision controller sends the message "21" within 1 second, where 2 means green, and 1 means left      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
 Hold something with a green colour in front of the camera but a bit to the right  & The vision controller sends the message "22" within 1 second, where 2 means green, and the second 2 means right     & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
-Hold something with a green colour in front of the camera but center in view  & The vision controller sends the message "23" within 1 second, where 2 means green, and the 3 means center      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
+Hold something with a green colour in front of the camera but centre in view  & The vision controller sends the message "23" within 1 second, where 2 means green, and the 3 means centre      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
 Hold something with a red colour in front of the camera but a bit to the left  & The vision controller sends the message "11" within 1 second, where 1 means red, and the second 1 means left      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
 Hold something with a red colour in front of the camera but a bit to the right  & The vision controller sends the message "12" within 1 second, where 1 means red, and the 2 means right      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
-Hold something with a red colour in front of the camera but center in view  &  The vision controller sends the message "13" within 1 second, where 1 means red, and the 3 means center     & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
+Hold something with a red colour in front of the camera but centre in view  &  The vision controller sends the message "13" within 1 second, where 1 means red, and the 3 means centre     & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
 Hold something with a yellow colour in front of the camera but a bit to the left  & The vision controller sends the message "31" within 1 second, where 1 means red, and the 1 means left      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
 Hold something with a yellow colour in front of the camera but a bit to the right  & The vision controller sends the message "32" within 1 second, where 1 means red, and the 2 means right      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
-Hold something with a yellow colour in front of the camera but center in view  & The vision controller sends the message "33" within 1 second, where 1 means red, and the second 3 means center      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
+Hold something with a yellow colour in front of the camera but centre in view  & The vision controller sends the message "33" within 1 second, where 1 means red, and the second 3 means centre      & Not ok. Timing issues and detection works sometimes. Bad test conditions?  \\ \hline
 Keep very green, very red, and very yellow coloured object away from the camera field of view  &  The vision controller sends "00", which represents no control flag object in view     & Ok  \\ \hline
 \end{tabular}
 \end{table}
@@ -992,9 +992,9 @@ Start car  & Car starts      & Ok  \\ \hline
 Start flag app  & 	App starts and shows a red or green screen      & Ok. Yellow is possible as well \\ \hline
 Get green flag from the app  & App displays a green screen      & Ok  \\ \hline
 Put phone with screen turned towards the car in view of the car camera  & Car should move forwards      & Not ok. State machine and vision not yet integrated properly.  \\ \hline
-Before the car reaches a distance of minimum 1 meter from the phone, put an obstacle directly infront of the car  &  The car should stop before hitting the obstacle     & Acceptable. Car stops within a reasonable time. Could only simulate.  \\ \hline
+Before the car reaches a distance of minimum 1 meter from the phone, put an obstacle directly in front of the car  &  The car should stop before hitting the obstacle     & Acceptable. Car stops within a reasonable time. Could only simulate.  \\ \hline
 Put phone with screen turned towards the car in view of the car camera  &  Car should move forwards     & Not ok. State machine and vision not yet integrated properly.  \\ \hline
-Before the car reaches a distance of minimum 1 meter from the phone, put an obstacle infront of the car but off-center to the left or right  & The car should stop before hitting the obstacle and turn in the other direction      & Not ok. State machine and vision not yet integrated properly.  \\ \hline
+Before the car reaches a distance of minimum 1 meter from the phone, put an obstacle in front of the car but off-centre to the left or right  & The car should stop before hitting the obstacle and turn in the other direction      & Not ok. State machine and vision not yet integrated properly.  \\ \hline
 
 \end{tabular}
 \end{table}
@@ -1013,8 +1013,8 @@ Disconnect ethernet cable for motor-speed node  &  Car stops within 2 seconds an
 Disconnect ethernet cable for SDN-controller node  & 	Car stops within 2 seconds and stays still until boot up without faulty nodes      & Ok. Slightly more than 2 seconds with debug compilation. Could be improved?  \\ \hline
 Disconnect ethernet cable for vision node  &  	Car stops within 2 seconds and stays still until boot up without faulty nodes     & Ok. Slightly more than 2 seconds with debug compilation. Could be improved?  \\ \hline
 Disconnect ethernet cable for car controller node  &  Car stops within 2 seconds and stays still until boot up without faulty nodes     & Ok. Slightly more than 2 seconds with debug compilation. Could be improved?  \\ \hline
-Disconnect any spi pin for speed sensing node  &  e	Car stops within 2 seconds and stays still until boot up without faulty nodes     & Not ok. Not implemented \\ \hline
-Disconnect any spi pin for distance sensing node  & Car stops within 2 seconds and stays still until boot up without faulty nodes      & Not ok. Not implemented  \\ \hline
+Disconnect any SPI pin for speed sensing node  &  e	Car stops within 2 seconds and stays still until boot up without faulty nodes     & Not ok. Not implemented \\ \hline
+Disconnect any SPI pin for distance sensing node  & Car stops within 2 seconds and stays still until boot up without faulty nodes      & Not ok. Not implemented  \\ \hline
 
 \end{tabular}
 \end{table} 
