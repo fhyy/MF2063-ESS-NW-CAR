@@ -801,7 +801,16 @@ The idea for the project was to design our own PCBs because the project should c
 
 Because we hade to use prototyping boards and the platform was designed to have PCB mounted to it and not prototyping boards. This led to the assembly of the car was not as optimal as it could have been and the placement of come components and boards had to be placed at a different location. If the car would have been able to move around all it would have been affected of this, due the cable wiring was not optimal and the reliability of connections and wound have affected the car's performance. 
 
+\subsection{Software Architecture}
+The main backbone of the software architecture seems to run well. It is well commented, structured and documented
+and should provide a basis for anyone who wishes to extend upon the project. Thanks to VSOMEIP, some basic system
+monitoring can be performed and corresponding failsafe measures can be taken. The software driving the car has access
+to see if any of the service BeagleBones or the camera Raspberry Pi gets disconnected and can thereafter react accordingly.
+And should the BeagleBone that runs the motor service somehow get isolated, it notices this and stops the car.
 
+There still remains quite a lot of work to be done, however. Due to time constraints, very little effort was
+spent on fine-tuning the periods of the different tasks in the system. The responsiveness of the system is
+heavily dependant on the periods of the tasks and thus also the performance.
 
 
 %-------------------------------------------------------------------------
