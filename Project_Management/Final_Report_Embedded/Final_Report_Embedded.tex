@@ -442,7 +442,16 @@ The second Arduino board has the same functionality as the previous one. The dif
 
 %-------------------------------------------------------------------------
 \subsection{System overview}
-maybe put communication diagram here
+The overall architecture of our system is shown in figure \ref{fig:system_overview}. Basically, it presents how the hardware is assembled in our system.The cloud which consists of three SDN switches and Raspberry Pi is our SDN network, which also called support network in this report. The three SDN switches are all connected to each other, as well as to the SDN controller.
+
+The System also have have three Beaglebone units and one Raspberry Pi. Two of the Beaglebone units are connected to two Arduino Micros each, so four Arduinos are assembled in the system. Theses Arduinos read sensor data or control the actuators and communicate with corresponding Beaglebone through SPI. Beaglebones connecting with Arduino receives the data from the Arduinos and posts it to the main network, Then the last Beaglebone, who  acts as controller and subscribes the data, makes decisions based on current environment and then sends commands to other Beaglebones who will decode the command and transfer it to Arduinos connecting to the actuators. The last node Raspberry Pi with Pi camera is used  to detect object in front of the prototype vehicle through which color and position of the flag are able to be detected.
+
+\begin{figure}
+	\centering
+   	\includegraphics[scale=0.7]{overview.pdf}
+   	\caption{System overview}
+    \label{fig:system_overview}
+\end{figure}
 
 %-------------------------------------------------------------------------
 \subsection{SDN network Implementation}
