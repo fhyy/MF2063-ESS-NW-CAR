@@ -224,7 +224,7 @@ void MotorSpeedService::on_state(vsomeip::state_type_e state) {
                 false);
         app_->subscribe(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENTGROUP_ID);
     }
-    else if (state == vsomeip::state_type_e::ST_REGISTERED) {
+    else if (state == vsomeip::state_type_e::ST_DEREGISTERED) {
         // Stop the speed event group.
         app_->stop_offer_event(SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SPEED_EVENT_ID);
         app_->stop_offer_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
@@ -240,6 +240,12 @@ void MotorSpeedService::on_state(vsomeip::state_type_e state) {
         app_->unsubscribe(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENTGROUP_ID);
         app_->release_event(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENT_ID);
         app_->release_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
+
+        // Write to shared memory (stop the car because we are not running vsomeip anymore)
+        shm_mo.Lock();
+        buf_mo.write(0);
+        shm_mo.UnLock();
+
     }
 }
 
@@ -361,6 +367,12 @@ void MotorSpeedService::on_go_availability(vsomeip::service_t serv,
     if (GO_SERVICE_ID == serv && GO_INSTANCE_ID == inst) {
         if (go_ && !go) {
             go_ = false;
+
+            // Write to shared memory (stop the car because services are unavailable)
+            shm_mo.Lock();
+            buf_mo.write(req);
+            shm_mo.UnLock();
+
             #if (DEBUG)
 	            std::cout << "## DEBUG ## motor_speed_service waiting for go-service ## DEBUG ##"
                           << std::endl;
