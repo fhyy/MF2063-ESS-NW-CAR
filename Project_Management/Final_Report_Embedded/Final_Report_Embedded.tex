@@ -177,16 +177,23 @@
 
 \clearpage
 \section*{Abstract}
-Abstract starts here,
-what should be included:
+Ethernet is emerging as an interest for use in communication between computers in autonomous vehicles. 
+Software defined networking seeks to solve the types of problems that emerges when using ethernet in a time-critial system.
+This report proposes a small scale prototype of an autonomoous vehicle running a local ethernet network between four devices running embedded linux.
+The prototype also aims to also incorporate 
+There are five different services implemented that have been implemented to populate the network.
+These services has shown to pass x out of y tests that were aimed to fulfill the given requirements of the vehicle which included time-criticality aspects.
+The results shows a promising prototype but also that a lot more research needs to go into verification and validation of the time-criticality before such a system can be used in actual autonomous vehicles.
+%Abstract starts here,
+%what should be included:
 
-The problem issue subject being addressed
+%The problem issue subject being addressed
 
-How the problem is tackled
+%How the problem is tackled
 
-Overview of the results, and indication as to what level they solve the problem.
+%Overview of the results, and indication as to what level they solve the problem.
 
-Implications of the results
+%Implications of the results
 
 %-------------------------------------------------------------------------
 \clearpage
@@ -201,12 +208,16 @@ Implications of the results
 \listoftables
 
 %-------------------------------------------------------------------------
-
+\clearpage
 \section*{List of Acronyms and Abbreviations}
 \begin{itemize}
+        \item ESC : Electronic Speed Controller
+        \item FIFO : First In First Out
+        \item IR : Infra Red
+        \item PCB : Printed Circuit Board
+	\item PWM : Pulse-width modulation
 	\item SDN : Software Defined Network
-	\item pwm :  Pulse-width modulation
-	\item spi: Serial Peripheral Interface
+	\item SPI : Serial Peripheral Interface
 \end{itemize}
 %-------------------------------------------------------------------------
 
@@ -215,6 +226,8 @@ Implications of the results
 This report presents the process and results of two projects "Embedded Service for Self-adaptive Network" (ESS-NW) and "Embedded Service for Self-adaptive Car" (ESS-CAR). This chapter will start by describing the background of the two projects. The next thing to be described is formulation, goals and motivation of the two projects. Following this will be a short discussion on the delimitations for our team. The last part of this chapter will present an explicit report disposition which helps readers to get a sense of the overall report.
 
 \subsection{Background}
+Autonomous cars is a very popular field of study, within academia as well as the industry. In recent years, big companies such as Google,
+Amazon and Apple and Swedish companies such as Volvo and Scania have been investing heavily
 
 \subsection{Project Description}
 The two projects "ESS-Car Embedded Services for Self-Adaptive Car" and "ESS-Network Embedded Services for Self-Adaptive Network" were provided by professor De-Jiu Chen at KTH Royal Institute of Technology. The idea of the two projects are from Viktor Karlquist's master thesis [??] where he presented a design and an implementation of an automotive experimental platform for ADAS. And the "ESS-Car" team from last year's MF2063 course has already implemented an autonomous vehicle prototype based on the thesis. Our projects are focused on the development and extension of the prototype.
@@ -301,6 +314,28 @@ the car. Some examples include controlling the steering, getting speedometer rea
 Input and output to ESSPrototype is done via a UNIX shared memory and the IO packets can be seen in Figure~\ref{fig:packets}. Table~\ref{tab:packets}
 contain brief descriptions of the packets.
 
+At the other end of the UNIX shared memory that ESSPrototype uses, a client/server software
+runs and it is based on an application-layer protocol called SOME/IP \cite{someip}. The C++ implementation of the 
+protocol used for this project was VSOMEIP \cite{vsomeip}. The client BeagleBone uses SOME/IP to communicate over
+Ethernet with the two service BeagleBones who provide one actuator service and one sensor service each, namely
+distance sensing and steering, and motor control and speedometer. The Raspberry Pi that handles the camera
+also communicates with the Client BeagleBone in a very similar way using SOME/IP.
+
+On the respective service BeagleBones, SOME/IP messages are transmitted and received. In fact, the message
+payload may be any packet in Figure~\ref{fig:packets} except the GO Status packet. The received messages
+are written to a UNIX shared memory and the payload for messages to be transmitted are read from a UNIX
+shared memory. On the other end of the shared memory, a task runs that handles the SPI communication
+with the arduinos for the respective services, distance sensing and steering on one service BeagleBone and
+motor control and speedometer on the other.
+
+Sensor Arduinos send measurement values to their respective master BeagleBone via SPI and actuator arduinos
+read instructions from their respective master BegleBone over SPI as well. On each Arduino runs a piece
+of Arduino code that interfaces with the hardware using the Arduinos GPIO pins.
+
+The camera communication works a bit differently. Firstly, it is a one-way communication since the camera
+is acts solely as a sensor. SOME/IP transmits a feature extraction that it reads from a standard UNIX
+pipe (|). At the other end of the pipe, a Python program running openCV feeds the extracted features
+into the pipe.
 
 \begin{figure}[H]
 	\centering
@@ -342,9 +377,9 @@ contain brief descriptions of the packets.
 
 %-------------------------------------------------------------------------
 \subsection{VSOME/IP}
+
 %-------------------------------------------------------------------------
-\subsection{Engineering approaches ?}
-\subsection{Tool-chains ?}
+
 \subsection{Project management}
 Scrum project management is used during the process of our projects.
 The scrum framework has been adopted for use in this process because of it being agile as well as the fact that most group members had some type of previous experience or knowledge with it. Both software and physical tools were used for monitoring the projects progression. Excel was for example used to keep track of milestones, earned value and the resource plan and the online tool trello was used alongside a physical whiteboard to keep track of scrum sprints and the project backlog as depicted in figure \ref{fig:scrum-board}. A lot of design was also produced and kept on whiteboards as to promote discussion within the group and to keep everyone updated with updates or changes to design or models.
@@ -375,7 +410,7 @@ To place all the required components on the car had some kind of platform be cre
 To make this platform was it first draw in a Cad Fusion 360 to make a 3D model of the car. This model could then be used to add models of the devices used in the car to find the optimal place for them, so the are places in at an easy position to get access too and close to its devices its depended on. The result of the design is shown in figure \ref{fig:3d_platform}. 
 
 \begin{figure}
-	\includegraphics{platform.png}
+	%\includegraphics{platform.png}
 	\caption{3D model of the platform}
 	\label{fig:3d_platform}
 \end{figure}
@@ -400,14 +435,15 @@ The second converter is to generate the 9V and this is done via a DC-DC converte
 
 
 \begin{figure}
-	\includegraphics[width=0.9\textwidth]{boost_converter_curcuit.pdf}
+	\includegraphics[width=0.7\textwidth]{boost_converter_curcuit.pdf}
 	\caption{Circuit of the boost converter}
 	\label{fig:circuit_boost_converter}
+	\centering
 \end{figure}
 
 \begin{figure}
 	\includegraphics{graph_of_boost_out.png}
-	\caption{Out puth grapth of the Boost converter}
+	\caption{Output graph of the Boost converter}
 	\label{fig:graph_boost}
 \end{figure}
 
@@ -417,6 +453,7 @@ All the powering of the car's devices should be handled by one PCB board, that c
 	\includegraphics[width=0.3\textwidth]{power_board_layout.png}
 	\label{fig:power_pcb_layout}
 	\caption{Layout of Power PCB board}
+	
 \end{figure}
 
 For the Arduinos was two PCB boards made to easily connect the SPI connection between the Beaglebones and the Arduinos, and to connect external sensors. The first board was designed to easily connect the ultrasonic sensors and the steering servo with correct Arduino. The schematic and layout of this board was also made in Eagle and is shown in figure \ref{fig:board_layout_ultra_servo}. The board is powered via a power via the DC power jack, to supply the Arduinos. On the top of the board is three connectors and they are for the Ultrasonic to be connected, and in the bottom is the connector for the steering servo. In the middle of the board is the connection to add the Logic level converter and the pins to connect the connection from the Beaglebone. 
@@ -442,7 +479,16 @@ The second Arduino board has the same functionality as the previous one. The dif
 
 %-------------------------------------------------------------------------
 \subsection{System overview}
-maybe put communication diagram here
+The overall architecture of our system is shown in figure \ref{fig:system_overview}. Basically, it presents how the hardware is assembled in our system.The cloud which consists of three SDN switches and Raspberry Pi is our SDN network, which also called support network in this report. The three SDN switches are all connected to each other, as well as to the SDN controller.
+
+The System also have have three Beaglebone units and one Raspberry Pi. Two of the Beaglebone units are connected to two Arduino Micros each, so four Arduinos are assembled in the system. Theses Arduinos read sensor data or control the actuators and communicate with corresponding Beaglebone through SPI. Beaglebones connecting with Arduino receives the data from the Arduinos and posts it to the main network, Then the last Beaglebone, who  acts as controller and subscribes the data, makes decisions based on current environment and then sends commands to other Beaglebones who will decode the command and transfer it to Arduinos connecting to the actuators. The last node Raspberry Pi with Pi camera is used  to detect object in front of the prototype vehicle through which colour and position of the flag are able to be detected.
+
+\begin{figure}
+	\centering
+   	\includegraphics[scale=0.7]{overview.pdf}
+   	\caption{System overview}
+    \label{fig:system_overview}
+\end{figure}
 
 %-------------------------------------------------------------------------
 \subsection{SDN network Implementation}
@@ -462,11 +508,11 @@ To monitor the traffic load on the network was a webpage made to present the use
 
 %-------------------------------------------------------------------------
 \subsection{Interprocess communication}
-To increase coherency and decrease coupling in the software architecture we chose to have several running processes on all of the beaglebones. Each process is focused on doing a fewer amount of tasks which makes development easier. An example of this is the BeagleBone connected to the speedometer and the motor controller. It is running one process whose task is to talk to two Arduinos over SPI, where it sends information to the motor Arduino and gathers information from the speedometer Arduino. The other process on the BeagleBone is running the VsomeIP application. It is clear that these processes need to communicate with one another as the first process needs to access the ethernet.
+To increase coherency and decrease coupling in the software architecture we chose to have several running processes on all of the Beaglebones. Each process is focused on doing a fewer amount of tasks which makes development easier. An example of this is the BeagleBone connected to the speedometer and the motor controller. It is running one process whose task is to talk to two Arduinos over SPI, where it sends information to the motor Arduino and gathers information from the speedometer Arduino. The other process on the BeagleBone is running the VsomeIP application. It is clear that these processes need to communicate with one another as the first process needs to access the ethernet.
 
 The interprocess communication is implemented using shared memory. This is a POSIX concept which is implemented in Linux where more than one process can load in the same physical memory blocks into their own private virtual memory space. This is done using a few system functions and the operating system will make sure to take care of all the complex implementations.
 
-Using shared memory is not enough, the communication also needs to be defined such that all processes using the shared memory knows how it should be used. For the cars specific need a circular buffer is implemented on the shared memory. This is to have a type of flow control where the values in the buffer are always relatively fresh. If a FIFO buffer was used instead and it is not being read as often as it is written to  the buffer might overflow, whereas now the oldest values in the buffer is just overwritten. When values are read from a FIFO the oldest value is always read first. There is no guarantee of how old this data is and might not be usefull to read any longer. With a circular buffer it is possible to adjust the size such that the oldest value is always relatively fresh.
+Using shared memory is not enough, the communication also needs to be defined such that all processes using the shared memory knows how it should be used. For the cars specific need a circular buffer is implemented on the shared memory. This is to have a type of flow control where the values in the buffer are always relatively fresh. If a FIFO buffer was used instead and it is not being read as often as it is written to  the buffer might overflow, whereas now the oldest values in the buffer is just overwritten. When values are read from a FIFO the oldest value is always read first. There is no guarantee of how old this data is and might not be useful to read any longer. With a circular buffer it is possible to adjust the size such that the oldest value is always relatively fresh.
 
 
 \subsection{Communication between Beaglebone and Arduino ?}
@@ -475,7 +521,7 @@ Using shared memory is not enough, the communication also needs to be defined su
 %TODO reference to the simple gpio library (github page)
 % NOT SURE: PUT simple gpio lib to management chapter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-As the Beaglebone only supports to be the master in a SPI connection, so we have two Beaglebones with SPI configurations and each of them has two Arduino slaves. One Beaglebone has two spi devices: SPIDEV0 and SPIDEV1, and the SPIDEV1 device is disabled initially but is used for HDMI interface. 
+As the Beaglebone only supports to be the master in a SPI connection, so we have two Beaglebones with SPI configurations and each of them has two Arduino slaves. One Beaglebone has two SPI devices: SPIDEV0 and SPIDEV1, and the SPIDEV1 device is disabled initially but is used for HDMI interface. 
 
 In order to have one SPI device on Beaglebone connecting to multiple Arduino slaves, we use a third party C++ library called SimpleGPIO which enables us to use other general purpose pins as slave select of the SPI connection. Before we start communication with a specific Arduino slave, the corresponding slave select will be set to low, then we get access to that Arduino slave.
 
@@ -484,14 +530,9 @@ In the Arduino side, the communication request from the Beaglebone is treated as
 Three categories of sensors are implemented in the prototype vehicle to monitor its surrounding environments. Data from distance sensors and speed sensor will be sent to an Arduino initially, then sent to corresponding Beaglebone. Data from Pi Camera will be sent to the Raspberry Pi which is directly connected to the main network.
 %-------------------------------------------------------------------------
 \subsubsection{Ultrasonic sensor}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% put why we choose HC-SR04 in other chapter, e.g. methdology
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-To get data from HC-SR04, a short 10\textmu s pulse should be supplied to the trig pin of ultrasonic sensor, then the sensor will send out an 8 cycle burst of ultrasound at 40 kHz and raise echo. The echo signal we get is a distance object which is pulse width and the range of the signal is in proportion. 
+The distance sensor used in the prototype vehicle is HC-SR04 which provides 2cm to 400cm non-contact distance measurement with accurancy to 3mm. Three HC-SR04 are mounted in our prototype in order to have a better scope of the distance measurement, as well as keep the prototype in a more safe way. To get data from HC-SR04, a short 10\textmu s pulse should be supplied to the trig pin of ultrasonic sensor, then the sensor will send out an 8 cycle burst of ultrasound at 40 kHz and raise echo. The echo signal we get is a distance object which is pulse width and the range of the signal is in proportion. 
 
 An Arduino Micro handles both the generating the trig pulse and interpreting the echo signal. The Arduino will set the output pin to low, wait for 5ms, set the pin to high, wait for 10ms, set the pin back to low. This is the process of generating the trig pulse. After the Arduino sends out the trig pulse, it waits for 2 ms, then reads the value from the pin connected to sensor's echo pin. The last step is convert the received value to distance in unit of centimetre.
-
-%TODO distance sensor working process figure
 
 \subsubsection{Reflective object sensor}
 A reflective object sensor consists of an IR-diode and an IR-receiver encapsulated in a housing and detects reflective material (such as white paper) placed perpendicular in front of its front. The sensor chosen was the OPB715Z from TT electronics and is characterised to detect white paper up to a distance of 12.7mm.
@@ -523,12 +564,12 @@ In Pi’s vision part, we tried to compare the performance of two different meth
 
 To improve the accuracy of the deep learning part, we investigated if transfer learning techniques can be applied on the specific problem. On the other hand, to improve the real time performance, we think that model compression should be evaluated to fit the network into a smaller and faster net topology, without losing significant accuracy. 
 
-We have chosen several different pre-trained network to meet our demands. Including “shape-detection” network and MobileNet. Shape detection network is a very simple and fast deep neural network which simply detect the shape of the object. But in the real test we found that this network is not robustness enough for our fast-moving scene since it frequently predict wrong results.
+We have chosen several different pre-trained network to meet our demands, including shape-detection network and MobileNet. Shape detection network is a very simple and fast deep neural network which simply detect the shape of the object. But in the real test we found that this network is not robustness enough for our fast-moving scene since it frequently predicts wrong results.
 
 Apart from using pretrained neural network, we have also train a Convolutional Neural Network to do the classification using online open source labelled dataset. The German Traffic Sign Detection Benchmark (GTSDB) is a labelled dataset for AI researchers who work on computer vision-based driver assistance. It contains 900 images, which divided in 600 images for training and 300 images for testing process. figure \ref{fig:GTSDB1} and figure \ref{fig:GTSDB2} are example images in dataset.
 \begin{figure}[]
 	\centering
-  	\includegraphics[scale=0.3]{GTSDB1.jpg}
+   	\includegraphics[scale=0.4]{GTSDB1.jpg}
    	\caption{Example image from dataset}
    	\label{fig:GTSDB1}
 \end{figure}
@@ -539,7 +580,7 @@ Apart from using pretrained neural network, we have also train a Convolutional N
    	\caption{Example image from dataset}
    	\label{fig:GTSDB2}
 \end{figure}
-In the neural network that we trained ourselves, we first down-sampling the images to 32*32 as input, then use 4 convolutional layers to extract the image features and use additional residual stack and dense layer to do the classification. The structure of neural network is shown in figure \ref{fig:network}. The overall accuracy is good using these network because of the powerful prediction ability of DNN. However, the model is not that fast to deal with our car and it takes a lot of time for this network to process one video frame and produce output. 
+In the neural network that we trained by ourselves, we first down-sampling the images to 32*32 as input, then use 4 convolutional layers to extract the image features and use additional residual stack and dense layer to do the classification. The structure of neural network is shown in figure \ref{fig:network}. The overall accuracy is good using these network because of the powerful prediction ability of DNN. However, the model is not that fast to deal with our car and it takes a lot of time for this network to process one video frame and produce output. 
 
 \begin{figure}[]
 	\centering
@@ -548,9 +589,9 @@ In the neural network that we trained ourselves, we first down-sampling the imag
    	\label{fig:network}
 \end{figure}
 
-Finally, we decided to use the technique of transfer learning to apply MobileNet on RPI, which is an efficient model for mobile and embedded vision applications. The speed remains slow although multiprocessing and hardware acceleration have been carried out to improve.
+Then, we decided to use the technique of transfer learning to apply MobileNet on RPI, which is an efficient model for mobile and embedded vision applications. The speed remains slow although multiprocessing and hardware acceleration have been carried out to improve.
 
-By using OpenCV’s DNN module to apply a pretrained object detection network. Then we are able to pass input images through the deep neural network and get a output image with bounding box of specific object and label.
+By using OpenCV’s DNN module to apply a pretrained object detection network, we are able to pass input images through the deep neural network and get a output image with bounding box of specific object and label.
 
 The distinct feature of MobileNet is that the core layer of it is depthwise separable filters. Depthwise separable convolution has a different structure from a standard convolution since the standard one put both filters and combines as inputs and get outputs in a single step, whereas depthwise separable one separate these two into two different layers, one of them as a filter and the other one for combining. This specific structure can largely reduce the computation cost and model size. The structure of these two convolution filters are demonstrated in figure \ref{fig:convolution1} and figure \ref{fig:convolution2}.
 
@@ -585,18 +626,16 @@ The layer of standard convolution and of depthwise separable convolution are sho
 
 \begin{figure}[]
 	\centering
-  	\includegraphics[scale=0.3]{convolution5.png}
-   	\caption{plot of ReLU activation function}
+   	\includegraphics[scale=0.3]{convolution5.png}
+   	\caption{Plot of ReLU activation function}
    	\label{fig:convolution5}
 \end{figure}
 
-Figure\ref{fig:convolution4} describes depthwise separable convolution layers with 3 x 3 depthwise convolution and 1 × 1 pointwise convolution following by batch normalization and ReLU activation function after each of the convolutional layer.
-
-Since we are working on source constrained device Raspberry Pi, we need to make the network simple and decrease computational cost, so we combined MobileNet with Single Shot Detector.
+Figure\ref{fig:convolution4} describes depthwise separable convolution layers with 3 x 3 depthwise convolution and 1 × 1 pointwise convolution following by batch normalization and ReLU activation function after each of the convolutional layer. 
 
 Additionally, in order to optimize the Raspberry efficiently and use sufficiently limited resource and memory on it when running neural network, we did some optimizations. We firstly applied hardware optimization which is to install optimized OpenCV compile. ARM NEON, as an optimization architecture extension for ARM processors is installed. It is used for faster video stream processing, image analysis and speech recognition that is exactly what we are look for in our application. This architecture can execute multiple processing in the pipeline by a single instruction. Besides, VFPV3 as a floating point optimization is also used. After the first stage improvement, we get a 30 percent speed increase since we have make full use of the 4× ARM Cortex-A53, 1.2GHz processor on Raspberry Pi, now the network is able to classify an object in 1.5 seconds. 
 
-When it comes to second stage of optimization, multiprocessing is used to increase the speed of processing video stream. The I/O tasks, dislike CPU bound operations, always take lots of time and delay the process. So moving the reading of frames to a separate thread from processing the frame can obtain higher speed. Otherwise, every time I/O port access Pi camera, the main thread of script is blocked until the frame is captures and return to script. Multiprocessing can decrease the influence of I/O on CPU heavy application like video stream processing, especially in our real-time case. Now we can obtain a classification result in 1 second.
+When it comes to second stage of optimization, multiprocessing is used to increase the speed of processing video stream. The I/O tasks, dislike CPU bound operations, always take lots of time and delay the process. So moving the reading of frames to a separate thread from processing the frame can obtain higher speed. Otherwise, every time I/O port access Pi camera, the main thread of script is blocked until the frame is captured and return to script. Multiprocessing can decrease the influence of I/O on CPU heavy application like video stream processing, especially in our real-time case. Now we can obtain a classification result in 1 second.
 
 Moreover, there is a tradeoff between accuracy and output speed. In our application, we set a threshold for the output, in more details, only when the confidence score of detection result is high enough (above the specified threshold), the result can be output as a signal to steer the car. Otherwise, it will grab another frame and do the object detection for the other iteration. As a result, if the threshold confidence score of output increase, the output speed will decrease. 
 
@@ -606,9 +645,9 @@ Then we try to process video stream by using OpenCV. OpenCV has offered many tra
 
 The colour detection algorithm can be separated to different phases. First, we need to do the image pre-processing: we down sampling the images using different scaling factors since we want both processing speed and accuracy optimized. Then we transfer the RGB colour space to the HSV colour space to make the colour easy to be identified. We define the upper and lower limits for pixel values to classify three colours. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV colour space value and output both the colour and position information. The speed of colour detection is fast and also accurate enough for real-time application.
 
-To enable our model communicate with the VsomeIP perfectly and precisely. We tried several methods to connect Python program and C++ program, including using Google protocol buffers and RAM pipe transfer. We have to ensure that both of programs can communicate simultaneously without block. 
+To enable our model communicate with the VsomeIP perfectly and precisely, we tried several methods to connect Python program and C++ program, including using Google protocol buffers and RAM pipe transfer. We have to ensure that both of programs can communicate simultaneously without block. 
 
-Apart from outputting the detection result and communicate with the SDN network, we have also tried to send the video stream through WIFI or Bluetooth to Android application so that we can know what the camera sees through smartphone. Although the real-time video stream can be sent to a web browser, the sending script cannot run when the detection script is running since they will block each other.
+Apart from outputting the detection results and communicate with the SDN network, we have also tried to send the video stream through WIFI or Bluetooth to Android application so that we can know what the camera sees through smartphone. Although the real-time video stream can be sent to a web browser, the sending script cannot run when the detection script is running since they will block each other.
 
 
 \subsection{Controlling actuators}
@@ -641,7 +680,7 @@ The ESC has a safety measure for when the motor PWM is set to anything higher th
 
 The Arduino program reads data for target speed and current speed through an SPI interface. This interface sends one byte at a time, where the most significant bit defines if the data is for target speed or current speed. This data structure puts a limit on the values as there are only 7 bits left for data. The data is defined as 2 centimetre per second to increase resolution; sending a 10 would mean a speed of 20 centimetres per second. This allows the controller to read and maintain speeds of at most 255 centimetres per second with the only limit being the frequency of the speed sensor. 
 
-The Arduino program has two possible implementation of speed keeping. To switch between these, one has to change a line in the source code. One implementation is a direct translation from target speed to motor pwm. If the pwm requirements for reaching a speed would change, this translation would not longer be valid. Driving on a flat surface would still be fine. The other implementation uses a PID controller which reads the current speed from the SPI. As the closed loop with data through SPI over two nodes, the data will be delayed by a couple of milliseconds, but tuning the PID parameters can result in a good PID controller.
+The Arduino program has two possible implementation of speed keeping. To switch between these, one has to change a line in the source code. One implementation is a direct translation from target speed to motor PWM. If the PWM requirements for reaching a speed would change, this translation would not longer be valid. Driving on a flat surface would still be fine. The other implementation uses a PID controller which reads the current speed from the SPI. As the closed loop with data through SPI over two nodes, the data will be delayed by a couple of milliseconds, but tuning the PID parameters can result in a good PID controller.
 
 A future implementation could focus on lowering the delay over SPI and tune the PID parameters properly. Sending multiple bytes over SPI at once would also remove the need of scaling the data before sending, and increase the resolution by at least one bit.
 
@@ -657,7 +696,7 @@ The platform pieces are achyle plastic and were cut via a laser cutter, the sche
 	\label{fig:platform_ass}
 \end{figure}
 
-The design of the platform was done to use PCB board and not prototyping boards, this made the assembly of the car not to be as the idea was. This is because it was difficult to make the prototyping bards small and compact as you can do with PCB. Two of the boards the power board and one of the Arduino boards were able to place in the targeted position but could not be mounted to the platform with screws but with cable ties. The other board had to be placed in front of the car due to it could not be fit at its target place because the power board and the Arduino board was too thick of the wiring on the boards. 
+The design of the platform was done to use PCB board and not prototyping boards, this made the assembly of the car not to be as the idea was. This is because it was difficult to make the prototyping board small and compact as you can do with PCB. Two of the boards the power board and one of the Arduino boards were able to place in the targeted position but could not be mounted to the platform with screws but with cable ties. The other board had to be placed in front of the car due to it could not be fit at its target place because the power board and the Arduino board was too thick of the wiring on the boards. 
  
 
 %-------------------------------------------------------------------------
@@ -665,7 +704,7 @@ The design of the platform was done to use PCB board and not prototyping boards,
 
 The idea of was to order the PCBs from a company, but due to course regulation ware we not allowed to order PCBs from China, and companies in Europe were too expensive to order from. This resulted in what we could not implement the boost converter we hade design due to the milling machine in both prototype centre and in Mentorspace was broken and they could not mill the layout for the boost converter. Because the milling machines were broken could the PCB for the Arduinos also not be made. The only way we could continue with was to make the design on a prototyping board. 
 
-The implementation on the prototype board was built from the same concept the PCB should have had, with USB-A ports cables to power the Arduino boards and external switch. The bard connects via a cable from the battery to a fuse, this fuse is implemented to protect the system if a short circuit happens. To solve the boost converter circuit did we buy a boost converter module MT3608 to receive a 9V. This module is not connected to the 5V level but instead to the to the 7.2V from the battery, to receive a current higher than 0.6A. To prevent previous years failure then they used the module, did we add the same solution to add an led with a resistor in series and $ 6.8\mu F$ in parallel to the output pins on the boost converter.
+The implementation on the prototype board was built from the same concept the PCB should have had, with USB-A ports cables to power the Arduino boards and external switch. The board connects via a cable from the battery to a fuse, this fuse is implemented to protect the system if a short circuit happens. To solve the boost converter circuit did we buy a boost converter module MT3608 to receive a 9V. This module is not connected to the 5V level but instead to the to the 7.2V from the battery, to receive a current higher than 0.6A. To prevent previous years failure then they used the module, did we add the same solution to add an led with a resistor in series and $ 6.8\mu F$ in parallel to the output pins on the boost converter.
 
 The Arduino boards hade also be made at prototyping board. They received the same functionality as the PCB version should have, but it takes larger space due to the cable wiring. This lead to one of the board could not be placed at its position on the platform. 
 
@@ -721,7 +760,7 @@ The idea for the project was to design our own PCBs because the project should c
 
 Because we hade to use prototyping boards and the platform was designed to have PCB mounted to it and not prototyping boards. This led to the assembly of the car was not as optimal as it could have been and the placement of come components and boards had to be placed at a different location. If the car would have been able to move around all it would have been affected of this, due the cable wiring was not optimal and the reliability of connections and wound have affected the car's performance. 
 
-The next step from this project is to make is to integrate PCBs so the car easily drives around so it will not be affected by the bad cable wiring the prototype boards had resulted in. 
+
 
 
 %-------------------------------------------------------------------------
@@ -732,6 +771,8 @@ The next step from this project is to make is to integrate PCBs so the car easil
 2.	Improve the communication between the colour detection python code and VsomeIP, which causes some delay in our current version application. One possible solution is convert the python code into C++, so that the communication protocol will be simple and feasible.
 \newline
 3.	Although we have already tried to send the camera video stream to Android phone through WIFI so that we can directly see what the car is facing during running. We failed since the scripts of sending stream and colour detection always block each other, it would be feasible to copy the video stream captured from Pi camera and one of them used as colour detection, the other one can be sent to phone.
+\newline
+4. A more advanced monitor of the controller and lets the user to modified the network from it. 
 %-------------------------------------------------------------------------
 \clearpage
 
