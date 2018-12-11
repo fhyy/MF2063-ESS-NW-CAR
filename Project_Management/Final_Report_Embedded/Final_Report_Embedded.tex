@@ -786,7 +786,15 @@ Each node and controller were developed and tested continuously to ensure that i
 %-------------------------------------------------------------------------
 \clearpage
 \section{Results}
+The results of the project can be summarized by what requirements that were fulfilled. As the testing protocols in Appendix B are directly derived from the functional requirements it gives a good indication of the results of the project. The first table depicts the requirement that the car should be able to follow a flag. This requirement was not finished as the tests didnt pass due to the state machine and vision not being integrated properly.
 
+Another requirement is collision avoidance. This requirement was met partially as the car was able to stop when detecting an object of a distance less than one meter from the front of the car. Because of the state machine and vision not being implemented properly the car was unable to detect objects on the sides and turn in the other direction.
+
+The car is supposed to be failsafe, which is another requirement whose test protocols are depicted in Table 11. The test cases shows that the car is able to detect faulty states such as disconnected ethernet cables. It is not however able to discover disconnected SPI cables as this is shown to not have been implemented. The test cases shows that the car is reacting slightly slower than 2 seconds for the ethernet cables however, but commented that the test were run using debug compilation which produces a lot of prints thus worsening the response time. 
+
+It was a requirement to have complete working implementations of all the seperate services/nodes on the car such as steering, distance sensoring, speedometer, motor controller and computer vision/vision controller. The test protocols for these requirements are found in Appendix A, tables 2-8. As can be seen the steering node passed all the tests and was thus sufficiently implemented. The distance sensor also passed all of its functional tests with some notes that the received data is a bit noise and could use some calibration. The speedometer node passed all of its tests without any further comments and was thus implemented correctly. The motor node also passed all of its tests with notes on four out of eight tests that its parameters need tuning.
+
+There were also requirements to implement nodes running embedded linux on BeagleBones to act as an interface between the Arduinos running actuators and sensors to the ethernet network. These had some requirements that the messages should be forwaded correctly both over SPI and over the ethernet network. The BeagleBone interfacing the distance and steering nodes passed all of its test as seen in Table 6 and was thus implemented correctly. The BeableBone interfacing the motor and speed nodes also passed all of its tests as seen in Table 7 and was thus also implemented correctly.
 %-------------------------------------------------------------------------
 \clearpage
 \section{Discussion and Conclusion}
