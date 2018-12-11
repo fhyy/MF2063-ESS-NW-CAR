@@ -210,8 +210,21 @@ This report presents the process and results of two projects "Embedded Service f
 \subsubsection{Background subsection blabla}
 
 \subsection{Project Description}
+The two projects "ESS-Car Embedded Services for Self-Adaptive Car" and "ESS-Network Embedded Services for Self-Adaptive Network" were provided by professor De-Jiu Chen at KTH Royal Institute of Technology. The idea of the two projects are from Viktor Karlquist's master thesis [??] where he presented a design and an implementation of an automotive experimental platform for ADAS. And the "ESS-Car" team from last year's MF2063 course has already implemented an autonomous vehicle prototype based on the thesis. Our projects are focused on the development and extension of the prototype.
 
-\subsubsection{Project Description sub blabla}
+\subsubsection{Project Goals}
+The goals of the two projects could be divided into two parts, goals concerning the network implementation and goals concerning the remaining hardware and software system architecture.
+The overarching goal of the network implementation part was to configure the network using software defined network method which could help researchers explore what network implementations can be beneficial in this kind of autonomous vehicle infrastructure. The overarching goal of the rest part became to increase the robustness of the system and to implement additional vision services into the system.
+
+\subsubsection{Project Challenges}
+The main challenge we faced during the process of projects was to have too many nodes in the system which greatly increased the burden of debug and test. Another challlenge was the data transfer between the local service and Vsome/Ip service in the Beaglebone. There was also a challenge coming from car assembly in which case every node shall be installed on the car and work smoothly. 
+
+\subsubsection{Prototype formulation}
+Our final prototype fulfils most project requirements we proposed at the beginning stage while there are still some requirements missing. This section will only describe what we have implemented.
+
+The prototype is able to measure current distance and speed data and detect defined flags. All nodes are mounted on the car and connected to the network. The network consists of SDN switches and controller is support network and the other network which is made up of Beaglebones is main network. Meanwhile, eanch of Beaglebones has its seperate function, one for reading distance data and sending steering angle, one for reading speed data and sending target speed. These two Beaglebones act as SPI master in SPI communication who have two slaves each. The last Beaglebone acts as the system controller. Also a Raspberry is directly connected to the network providing object detection function. Four arduinos are used to carry out specific functions, and communicate with corresponding Beaglebone through SPI.
+The prototype has two control modes, shell mode and automotive mode. In the shell mode, users could send commands from controller Beaglebone to other Beaglebones, then gather required information or change the status of the prototype. In the automotive mode, a statemachine will run which try to maintain the speed of the prototype and avoid collision. 
+
 
 \subsection{Delimitations}
 
