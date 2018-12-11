@@ -207,8 +207,6 @@ This report presents the process and results of two projects "Embedded Service f
 
 \subsection{Background}
 
-\subsubsection{Background subsection blabla}
-
 \subsection{Project Description}
 The two projects "ESS-Car Embedded Services for Self-Adaptive Car" and "ESS-Network Embedded Services for Self-Adaptive Network" were provided by professor De-Jiu Chen at KTH Royal Institute of Technology. The idea of the two projects are from Viktor Karlquist's master thesis [??] where he presented a design and an implementation of an automotive experimental platform for ADAS. And the "ESS-Car" team from last year's MF2063 course has already implemented an autonomous vehicle prototype based on the thesis. Our projects are focused on the development and extension of the prototype.
 
@@ -253,6 +251,8 @@ Serial Peripheral Interface (SPI) is a synchronous serial interface specificatio
 \end{figure}
 
 SPI has a higher throughput than those traditional transaction protocols, e.g. $I^{2}$C, UART, as it is not limited to any maximum clock speed enabling potentially high speed. And the hardware interface is pretty simple where slaves only use master's clock and are able to share the other three signals but the SS. Meanwhile, the software is not hard to implementation. For the opposite side, SPI has its limitations. There is no slave acknowledgement or hand-shaking mechanism in SPI, so the master could keep sending data to nowhere and not know it.
+
+\subsection{SOME/IP}
 
 
 %-------------------------------------------------------------------------
