@@ -370,7 +370,7 @@ void MotorSpeedService::on_go_availability(vsomeip::service_t serv,
 
             // Write to shared memory (stop the car because services are unavailable)
             shm_mo.Lock();
-            buf_mo.write(req);
+            buf_mo.write(0);
             shm_mo.UnLock();
 
             #if (DEBUG)
@@ -443,7 +443,7 @@ void MotorSpeedService::run_sp() {
 
         // prepare and send transmission if data was read from shared memory.
         if (sensor_data.size() > 0) {
-            
+
             // Use only newest sensor value for transmission.
             int sensor_data_latest = sensor_data.back();
 
@@ -461,13 +461,13 @@ void MotorSpeedService::run_sp() {
             // sensor_data_formatted[3] = priority;
 
             // set data and publish it on the network.
-		    payload_->set_data(sensor_data_formatted);
+            payload_->set_data(sensor_data_formatted);
             app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
                          SPEED_EVENT_ID, payload_, true, true);
 
             #if (DEBUG)
     	        std::cout << "## DEBUG ## Speed sensor data sent: ("
-                          << (int) sensor_data_formatted[0] 
+                          << (int) sensor_data_formatted[0]
                           << ", " << (int) sensor_data_formatted[1]
                           << ", " << (int) sensor_data_formatted[2]
                           << ", " << (int) sensor_data_formatted[3]
