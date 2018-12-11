@@ -299,9 +299,30 @@ software. The custom driving software controls the car through a library called 
 
 ESSPrototype is a C++ library that represent fundamental functionality for manoeuvring and monitoring
 the car. Some examples include controlling the steering, getting speedometer readings and checking if the distance sensors are online.
-Input and output to ESSPrototype is done via a UNIX shared memory and the IO packets can be seen in Figure~\ref{fig:packets}. Table~\ref{tab:packets}
-contain brief descriptions of the packets.
+Input and output to ESSPrototype is done via a UNIX shared memory and the IO packets can be seen in Figure~\ref{fig:packets}. Table~\ref{tab:packets} contain brief descriptions of the packets.
 
+At the other end of the UNIX shared memory that ESSPrototype uses, a client/server software
+runs and it is based on an application-layer protocol called SOME/IP \cite{someip}. The C++ implementation of the 
+protocol used for this project was VSOMEIP \cite{vsomeip}. The client BeagleBone uses SOME/IP to communicate over
+Ethernet with the two service BeagleBones who provide one actuator service and one sensor service each, namely
+distance sensing and steering, and motor control and speedometer. The Raspberry Pi that handles the camera
+also communicates with the Client BeagleBone in a very similar way using SOME/IP.
+
+On the respective service BeagleBones, SOME/IP messages are transmitted and received. In fact, the message
+payload may be any packet in Figure~\ref{fig:packets} except the GO Status packet. The received messages
+are written to a UNIX shared memory and the payload for messages to be transmitted are read from a UNIX
+shared memory. On the other end of the shared memory, a task runs that handles the SPI communication
+with the arduinos for the respective services, distance sensing and steering on one service BeagleBone and
+motor control and speedometer on the other.
+
+Sensor Arduinos send measurement values to their respective master BeagleBone via SPI and actuator arduinos
+read instructions from their respective master BegleBone over SPI as well. On each Arduino runs a piece
+of Arduino code that interfaces with the hardware using the Arduinos GPIO pins.
+
+The camera communication works a bit differently. Firstly, it is a one-way communication since the camera
+is acts solely as a sensor. SOME/IP transmits a feature extraction that it reads from a standard UNIX
+pipe (|). At the other end of the pipe, a Python program running openCV feeds the extracted features
+into the pipe.
 
 \begin{figure}[H]
 	\centering
