@@ -205,9 +205,8 @@ Implications of the results
 \section*{List of Acronyms and Abbreviations}
 \begin{itemize}
 	\item SDN : Software Defined Network
-	\item PWM : Pulse-width modulation
-	\item SPI : Serial Peripheral Interface
-	\item ESC : Electronic Speed Control 
+	\item PWM :  Pulse-width modulation
+	\item SPI: Serial Peripheral Interface
 \end{itemize}
 %-------------------------------------------------------------------------
 
@@ -292,15 +291,15 @@ Mininet is a Python-based application what an SDN network topology can be create
 The car network topology was simulated in Mininet to analyse its behaviour, and to develop code for the controller. Under this test did we discover what that Mininet simulation had a much lower delay then the real implementation had, even then the extra settings on the links and nodes were added. This resulted that Mininet could not be used to analyse the best topology for the car. It was instead used to simulate the network to create a code for the Ryu controller. To analyse the Car network was two different Mininet scripts created, one was to use the physical raspberry pi controller and the second one was to use the internal version of Ryu in the Mininet VM. For the external simulation to work has the script be configured with the right IP-address to the raspberry pi. 
 
 \subsection{Software Architecture}
-The driving system consists of several layers of software and communication. Figure~\ref{fig:bbb_arch} and~\ref{fig:rpi_arch} give a broad overview
-of how the software is structured. A custom driving software is running on the client BeagleBone. This can be either an interactive shell or a test suite
-of commands for testing and debugging basic functionality or a more intelligent autonomous driving software. The custom driving software controls
-the car through a library called ESSPrototype.
+The driving system consists of several layers of software and communication. Figure~\ref{fig:bbb_arch}
+and~\ref{fig:rpi_arch} give a broad overview of how the software is structured. A custom driving software
+is running on the client BeagleBone. This can be either an interactive shell or a test suite
+of commands for testing and debugging basic functionality or a more intelligent autonomous driving
+software. The custom driving software controls the car through a library called ESSPrototype.
 
 ESSPrototype is a C++ library that represent fundamental functionality for manoeuvring and monitoring
 the car. Some examples include controlling the steering, getting speedometer readings and checking if the distance sensors are online.
-Input and output to ESSPrototype is done via a UNIX shared memory and the IO packets can be seen in Figure~\ref{fig:packets}. Table~\ref{tab:packets}
-contain brief descriptions of the packets.
+Input and output to ESSPrototype is done via a UNIX shared memory and the IO packets can be seen in Figure~\ref{fig:packets}. Table~\ref{tab:packets} contain brief descriptions of the packets.
 
 At the other end of the UNIX shared memory that ESSPrototype uses, a client/server software
 runs and it is based on an application-layer protocol called SOME/IP \cite{someip}. The C++ implementation of the 
@@ -398,7 +397,7 @@ To place all the required components on the car had some kind of platform be cre
 To make this platform was it first draw in a Cad Fusion 360 to make a 3D model of the car. This model could then be used to add models of the devices used in the car to find the optimal place for them, so the are places in at an easy position to get access too and close to its devices its depended on. The result of the design is shown in figure \ref{fig:3d_platform}. 
 
 \begin{figure}
-	%\includegraphics{platform.png}
+	\includegraphics{platform.png}
 	\caption{3D model of the platform}
 	\label{fig:3d_platform}
 \end{figure}
@@ -423,15 +422,14 @@ The second converter is to generate the 9V and this is done via a DC-DC converte
 
 
 \begin{figure}
-	\includegraphics[width=0.7\textwidth]{boost_converter_curcuit.pdf}
+	\includegraphics[width=0.9\textwidth]{boost_converter_curcuit.pdf}
 	\caption{Circuit of the boost converter}
 	\label{fig:circuit_boost_converter}
-	\centering
 \end{figure}
 
 \begin{figure}
 	\includegraphics{graph_of_boost_out.png}
-	\caption{Output graph of the Boost converter}
+	\caption{Out puth grapth of the Boost converter}
 	\label{fig:graph_boost}
 \end{figure}
 
@@ -441,7 +439,6 @@ All the powering of the car's devices should be handled by one PCB board, that c
 	\includegraphics[width=0.3\textwidth]{power_board_layout.png}
 	\label{fig:power_pcb_layout}
 	\caption{Layout of Power PCB board}
-	
 \end{figure}
 
 For the Arduinos was two PCB boards made to easily connect the SPI connection between the Beaglebones and the Arduinos, and to connect external sensors. The first board was designed to easily connect the ultrasonic sensors and the steering servo with correct Arduino. The schematic and layout of this board was also made in Eagle and is shown in figure \ref{fig:board_layout_ultra_servo}. The board is powered via a power via the DC power jack, to supply the Arduinos. On the top of the board is three connectors and they are for the Ultrasonic to be connected, and in the bottom is the connector for the steering servo. In the middle of the board is the connection to add the Logic level converter and the pins to connect the connection from the Beaglebone. 
@@ -554,7 +551,15 @@ To improve the accuracy of the deep learning part, we investigated if transfer l
 
 We have chosen several different pre-trained network to meet our demands, including shape-detection network and MobileNet. Shape detection network is a very simple and fast deep neural network which simply detect the shape of the object. But in the real test we found that this network is not robustness enough for our fast-moving scene since it frequently predicts wrong results.
 
+<<<<<<< HEAD
+Apart from using pretrained neural network, we have also trained a Convolutional Neural Network to do the classification using online open source labeled dataset. The German Traffic Sign Detection Benchmark (GTSDB) is a labeled dataset for AI researchers who work on computer vision-based driver assistance. It contains 900 images, which divided in 600 images for training and 300 images for testing process. figure \ref{fig:GTSDB1} and figure \ref{fig:GTSDB2} are example images in dataset.
+
 Apart from using pretrained neural network, we have also train a Convolutional Neural Network to do the classification using online open source labelled dataset. The German Traffic Sign Detection Benchmark (GTSDB) is a labelled dataset for AI researchers who work on computer vision-based driver assistance. It contains 900 images, which divided in 600 images for training and 300 images for testing process. figure \ref{fig:GTSDB1} and figure \ref{fig:GTSDB2} are example images in dataset.
+
+=======
+
+Apart from using pretrained neural network, we have also trained a Convolutional Neural Network to do the classification using online open source labeled dataset. The German Traffic Sign Detection Benchmark (GTSDB) is a labeled dataset for AI researchers who work on computer vision-based driver assistance. It contains 900 images, which divided in 600 images for training and 300 images for testing process. figure \ref{fig:GTSDB1} and figure \ref{fig:GTSDB2} are example images in dataset.
+>>>>>>> 082248a626e6ecd93e4c11310b61d95566500647
 \begin{figure}[]
 	\centering
    	\includegraphics[scale=0.4]{GTSDB1.jpg}
@@ -627,11 +632,24 @@ When it comes to second stage of optimization, multiprocessing is used to increa
 
 Moreover, there is a tradeoff between accuracy and output speed. In our application, we set a threshold for the output, in more details, only when the confidence score of detection result is high enough (above the specified threshold), the result can be output as a signal to steer the car. Otherwise, it will grab another frame and do the object detection for the other iteration. As a result, if the threshold confidence score of output increase, the output speed will decrease. 
 
+<<<<<<< HEAD
+After several tests, we found that it is not feasible to use DNN on the RPI because of the predicting speed, RPI has really limited computational capability and has no GPU that can be used to do the DNN-accelerate. After the mid-term, we decided to try another strategy which using the traditional computer vision technique offered by OpenCV. OpenCV has offered many traditional and start-of-art computer vision techniques. We tried several algorithms for the detection in our specific scenario, including SIFT/SURF keypoint detection, mog2 background subtraction, hough transform, and color detection using HSV space. Among these methods, we eventually chose color detection as our camera detection algorithm.
+
+The color detection algorithm can be separated into following phases. First, we need to do the image pre-processing. We downsampling the images using different scaling factors since we want to get a balance between both processing speed and detection accuracy. Then we transfer the RGB color space to the HSV color space to make the color easy to be identified. We define the upper and lower limits for pixel values to classify three colors. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV color space value and output both the color and position information. The speed of color detection is fast and also accurate enough for real-time application.
+
 After several tests, we found that it is not feasible to use DNN on the RPI because of the predicting speed, RPI has really limited computational capability and has no GPU that can be used to do the DNN-accelerate. After the mid-term, we decided to try another strategy which using the traditional computer vision technique offered by OpenCV.
 
 Then we try to process video stream by using OpenCV. OpenCV has offered many traditional and start-of-art computer vision techniques which can be used . We tried several algorithms for the detection in our specific scenario, including SIFT/SURF key point detection, mog2 background subtraction, hough transform, and colour detection using HSV space. Among these methods, we eventually chose colour detection as our camera detection algorithm.
 
 The colour detection algorithm can be separated to different phases. First, we need to do the image pre-processing: we down sampling the images using different scaling factors since we want both processing speed and accuracy optimized. Then we transfer the RGB colour space to the HSV colour space to make the colour easy to be identified. We define the upper and lower limits for pixel values to classify three colours. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV colour space value and output both the colour and position information. The speed of colour detection is fast and also accurate enough for real-time application.
+
+=======
+
+After several tests, we found that it is not feasible to use DNN on the RPI because of the predicting speed, RPI has really limited computational capability and has no GPU that can be used to do the DNN-accelerate. After the mid-term, we decided to try another strategy which using the traditional computer vision technique offered by OpenCV. OpenCV has offered many traditional and start-of-art computer vision techniques. We tried several algorithms for the detection in our specific scenario, including SIFT/SURF keypoint detection, mog2 background subtraction, hough transform, and color detection using HSV space. Among these methods, we eventually chose color detection as our camera detection algorithm.
+
+The color detection algorithm can be separated into following phases. First, we need to do the image pre-processing. We downsampling the images using different scaling factors since we want to get a balance between both processing speed and detection accuracy. Then we transfer the RGB color space to the HSV color space to make the color easy to be identified. We define the upper and lower limits for pixel values to classify three colors. Then specify which pixels fall into specified upper and lower range by masking. Finally, we do the detection by comparing the HSV value of our processing frame and the pre-defined HSV color space value and output both the color and position information. The speed of color detection is fast and also accurate enough for real-time application.
+
+>>>>>>> 082248a626e6ecd93e4c11310b61d95566500647
 
 To enable our model communicate with the VsomeIP perfectly and precisely, we tried several methods to connect Python program and C++ program, including using Google protocol buffers and RAM pipe transfer. We have to ensure that both of programs can communicate simultaneously without block. 
 
@@ -684,7 +702,7 @@ The platform pieces are achyle plastic and were cut via a laser cutter, the sche
 	\label{fig:platform_ass}
 \end{figure}
 
-The design of the platform was done to use PCB board and not prototyping boards, this made the assembly of the car not to be as the idea was. This is because it was difficult to make the prototyping board small and compact as you can do with PCB. Two of the boards the power board and one of the Arduino boards were able to place in the targeted position but could not be mounted to the platform with screws but with cable ties. The other board had to be placed in front of the car due to it could not be fit at its target place because the power board and the Arduino board was too thick of the wiring on the boards. 
+The design of the platform was done to use PCB board and not prototyping boards, this made the assembly of the car not to be as the idea was. This is because it was difficult to make the prototyping bards small and compact as you can do with PCB. Two of the boards the power board and one of the Arduino boards were able to place in the targeted position but could not be mounted to the platform with screws but with cable ties. The other board had to be placed in front of the car due to it could not be fit at its target place because the power board and the Arduino board was too thick of the wiring on the boards. 
  
 
 %-------------------------------------------------------------------------
@@ -692,7 +710,7 @@ The design of the platform was done to use PCB board and not prototyping boards,
 
 The idea of was to order the PCBs from a company, but due to course regulation ware we not allowed to order PCBs from China, and companies in Europe were too expensive to order from. This resulted in what we could not implement the boost converter we hade design due to the milling machine in both prototype centre and in Mentorspace was broken and they could not mill the layout for the boost converter. Because the milling machines were broken could the PCB for the Arduinos also not be made. The only way we could continue with was to make the design on a prototyping board. 
 
-The implementation on the prototype board was built from the same concept the PCB should have had, with USB-A ports cables to power the Arduino boards and external switch. The board connects via a cable from the battery to a fuse, this fuse is implemented to protect the system if a short circuit happens. To solve the boost converter circuit did we buy a boost converter module MT3608 to receive a 9V. This module is not connected to the 5V level but instead to the to the 7.2V from the battery, to receive a current higher than 0.6A. To prevent previous years failure then they used the module, did we add the same solution to add an led with a resistor in series and $ 6.8\mu F$ in parallel to the output pins on the boost converter.
+The implementation on the prototype board was built from the same concept the PCB should have had, with USB-A ports cables to power the Arduino boards and external switch. The bard connects via a cable from the battery to a fuse, this fuse is implemented to protect the system if a short circuit happens. To solve the boost converter circuit did we buy a boost converter module MT3608 to receive a 9V. This module is not connected to the 5V level but instead to the to the 7.2V from the battery, to receive a current higher than 0.6A. To prevent previous years failure then they used the module, did we add the same solution to add an led with a resistor in series and $ 6.8\mu F$ in parallel to the output pins on the boost converter.
 
 The Arduino boards hade also be made at prototyping board. They received the same functionality as the PCB version should have, but it takes larger space due to the cable wiring. This lead to one of the board could not be placed at its position on the platform. 
 
@@ -746,17 +764,30 @@ The idea for the project was to design our own PCBs because the project should c
 
 Because we hade to use prototyping boards and the platform was designed to have PCB mounted to it and not prototyping boards. This led to the assembly of the car was not as optimal as it could have been and the placement of come components and boards had to be placed at a different location. If the car would have been able to move around all it would have been affected of this, due the cable wiring was not optimal and the reliability of connections and wound have affected the car's performance. 
 
-
+ 
 
 
 %-------------------------------------------------------------------------
 \clearpage
 \section{Future Work}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 082248a626e6ecd93e4c11310b61d95566500647
+1.	In our current version, the Pi camera is used to detect color and steer the car. Actually, it can also output the distance, so that it can work as an alternative of the ultrasonic sensor. Since we are attempting to build a fault tolerant and self-adaptive system, we need the car be able to get the required data even when some sensors break down. Additionally, we can also take the distance into account when steering the car. For example, only when the distance from the car to the signal up to a specific value, the car start to follow the signal. Otherwise, it receive the signal but not carry out steering.
+\newline
+2.	The communication between the color detection python code and VsomeIP can be improved because the communication process causes some delay in our current version application. One possible solution is convert the python code into C++, so that the communication protocol will be simple and feasible.
+\newline3.	Although we have already tried to send the camera video stream to Android phone through WIFI, we failed since the scripts of sending stream and color detection always block each other. It would be feasible to copy the video stream captured from Pi camera, one of them used as color detection, the other one can be sent to phone.
+<<<<<<< HEAD
+
 1.	The Pi camera can also output the distance, so that it can work as an alternative of the ultrasonic sensor. Since we are attempting to build a fault tolerant and self-adaptive system, we need the car be able to get the required data even when some sensors break down. Additionally, we can also take the distance into account when steering the car. For example, only when the distance from the car to the signal up to a specific value, the car start to follow the signal. Otherwise, it receive the signal but not carry out steering.
 \newline
 2.	Improve the communication between the colour detection python code and VsomeIP, which causes some delay in our current version application. One possible solution is convert the python code into C++, so that the communication protocol will be simple and feasible.
 \newline
 3.	Although we have already tried to send the camera video stream to Android phone through WIFI so that we can directly see what the car is facing during running. We failed since the scripts of sending stream and colour detection always block each other, it would be feasible to copy the video stream captured from Pi camera and one of them used as colour detection, the other one can be sent to phone.
+
+=======
+>>>>>>> 082248a626e6ecd93e4c11310b61d95566500647
 %-------------------------------------------------------------------------
 \clearpage
 
