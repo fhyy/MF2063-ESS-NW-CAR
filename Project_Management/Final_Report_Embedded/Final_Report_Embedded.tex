@@ -47,8 +47,10 @@
 \usepackage{lastpage}
 \usepackage{rotating}
 \usepackage{textcomp} %get the correct micro sec display
+\usepackage{float}
 %---------- Enable IEEEtran.bst configurations ------
 \usepackage{IEEEtrantools}
+\usepackage{verbatim}
 %----------------------------------------------------
 
 %%% END Article customizations
@@ -142,7 +144,11 @@
         % and comment the code above
 	%{\large\textit{Author}}\\
 	%John \textsc{Smith} % Your name
-	
+	\vskip 8cm
+	\begin{figure}[H]
+   		\centering
+    	\includegraphics[scale=0.4]{funLogo.png}
+	\end{figure}
 	%------------------------------------------------
 	%	Date
 	%------------------------------------------------
@@ -181,19 +187,19 @@ How the problem is tackled
 Overview of the results, and indication as to what level they solve the problem.
 
 Implications of the results
-\clearpage
+
 %-------------------------------------------------------------------------
 \clearpage
 \tableofcontents
-\clearpage
+
 %-------------------------------------------------------------------------
 \clearpage
 \listoffigures
-\clearpage
+
 %-------------------------------------------------------------------------
 \clearpage
 \listoftables
-\clearpage
+
 %-------------------------------------------------------------------------
 \clearpage
 \section{Introduction}
@@ -210,7 +216,7 @@ This report presents the process and results of two projects "Embedded Service f
 \subsection{Delimitations}
 
 \subsection{Report disposition}
-
+Chapter 1 describes the projects' background and gives an introduction to the two projects. Chapter 2 provides a short description of theories used in the projects. In chapter 3, The methods, tools and techniques used to solve the problems in the project are specified. The implementation of the autonomous vehicle prototype is presented in chapter 4. Chapter 5 describes how we verify and validate the prototype. The results of the two projects are shown in chapter 6, then chapter 7, has a discussion and a conclusion on the final results. The last chapter, chapter 8, lists some future work.  
 %-------------------------------------------------------------------------
 \clearpage
 \section{Literature Review and State of the Art}
@@ -218,11 +224,24 @@ This report presents the process and results of two projects "Embedded Service f
 \section{Network}
 %-------------------------------------------------------------------------
 \subsection{Software defined network}
-Software-defined network (SDN) is a type of network where a controller decides how the traffic in the network should go. In a traditional network is the intelligence in the switches and they decided on what port the package should be sent out on. In SDN is a device called controller connected to all switches and monitors the traffic load on the links and find the most optimal path between node A to node B. The controller’s task is to request information from the switches about what links are up or down and the traffic load with this information and decides how packages should be forwarded on the switch. Because the controller can monitor the topology of the network is it easy to scale the network with new nodes and switches. 
+Software-defined network (SDN) is a type of network where a controller decides how the traffic in the network should go. In a traditional network is the intelligence in the switches and they decided on what port the package should be sent out on. In SDN is a device called controller connected to all switches and monitors the traffic load on the links and find the most optimal path between node A to node B. The controller’s task is to request information from the switches about what links are up or down and the traffic load with this information and decides how packages should be forwarded on the switch. Because the controller can monitor the topology of the network is it easy to scale the network with new nodes and switches\cite{doi:10.1002/sec.1737}. 
 
-Then the controller send directives to the switches uses it OpenFlow and it as a protocol used to send the forwarding plan to the switches.
 
-sources !!!
+%-------------------------------------------------------------------------
+\subsection{Serial Peripheral Interface}
+Serial Peripheral Interface (SPI) is a synchronous serial interface specification for short distance communication. SPI supports full duplex mode using a master-slave architecture with one single master, and the SPI master originates the whole communication. The SPI bus has four logic signals: serial clock (SCK), master output slave input (MOSI), master input and slave output (MISO), slave select (SS). The detailed pin mapping of SPI master and slaves is shown in figure ??.
+
+% figure: one master and multiple slave connection
+\begin{figure}[H]
+	\centering
+   	\includegraphics[scale=0.5]{spi-literature.jpg}
+   	\caption{Connection of one SPI master and two SPI slaves}
+    \label{fig:spi-literature}
+\end{figure}
+
+SPI has a higher throughput than those traditional transaction protocols, e.g. $I^{2}$C, UART, as it is not limited to any maximum clock speed enabling potentially high speed. And the hardware interface is pretty simple where slaves only use master's clock and are able to share the other three signals but the SS. Meanwhile, the software is not hard to implementation. For the opposite side, SPI has its limitations. There is no slave acknowledgement or hand-shaking mechanism in SPI, so the master could keep sending data to nowhere and not know it.
+
+
 %-------------------------------------------------------------------------
 \subsection{Assembly of the car}
 To make the car moving all the devices and components on the car has to placed on the car and because of there many devices on the car that communicates via SDN and has all of them be placed in an efficient way. To do that needs some kind of platform to be created to mount all the devices on and they are close to the other devices its depended on. 
@@ -238,6 +257,8 @@ To generate a voltage at 9V from 5V or 7.2V has some kind of DC-DC converter be 
 %-------------------------------------------------------------------------
 \clearpage
 \section{Methodology}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%TODO chapter overview
 %-------------------------------------------------------------------------
 \subsection{Network}
 %-------------------------------------------------------------------------
@@ -247,13 +268,11 @@ The SDN switches used in this implementation is the Zodiac FX from Northbound Ne
 
 Mininet is a Python-based application what an SDN network topology can be created and simulated to test that the controller works and analyse how the network will operate. The program also has the opportunity to connect the simulated topology to your physical SDN controller. 
 
-The car network topology was simulated in Mininet to analyse its behaviour, and to develop code for the controller. Under this test did we discover what that Mininet simulation had a much lower delay then the real implementation had, even then the extra settings on the links and nodes were added. This resulted that Mininet could not be used to analyse the best topology for the car. It was instead used to simulate the network to create a code for the Ryu controller. 
+The car network topology was simulated in Mininet to analyse its behaviour, and to develop code for the controller. Under this test did we discover what that Mininet simulation had a much lower delay then the real implementation had, even then the extra settings on the links and nodes were added. This resulted that Mininet could not be used to analyse the best topology for the car. It was instead used to simulate the network to create a code for the Ryu controller. To analyse the Car network was two different Mininet scripts created, one was to use the physical raspberry pi controller and the second one was to use the internal version of Ryu in the Mininet VM. For the external simulation to work has the script be configured with the right ip-address to the raspberry pi. 
 
-
-
-
+%-------------------------------------------------------------------------
 \subsection{VSOME/IP}
-
+%-------------------------------------------------------------------------
 \subsection{Engineering approaches ?}
 \subsection{Tool-chains ?}
 \subsection{Project management}
@@ -342,19 +361,31 @@ maybe put communication diagram here
 
 At the beginning of the project was floodlight that SDN controller framework we decided to work with. Under the project way was a lot of problem coming up to integrate floodlight on raspberry pi due to some java packages used in Floodlight was not supported, and it had difficulties to communicate with the SDN switches. This resulted in that another SDN framework was selected, and it was a framework called Ryu. Ryu was selected because it was well documented with some example code to start with, and it was developed in python, so it should be no problem with integrating it on a raspberry pi. 
 
+The code for the Ryu controller is based on the example simple-monitor.py there the scripts requests information from the switches about how many ports that are used and the amount received and send traffic. The modification don to it is to save the received information so it can be presented in on a webpage.
 
-The code for the Ryu controller is based on the example simple_monitor there the scripts requests information from the switches about how many ports that are used and the amount received and send traffic. The modification don to it is to save the received information so it can be presented in on a webpage.  
+To monitor the traffic load on the network was a webpage made to present the user with data. The webpage is developt from the provided network webpage included in Ryu. On the webpage, as shown in figure \ref{fig:webpage_sdn} is a table what presented the data that has been transmitted and received on each port, and the number of packages has been dropped. The web pages are designed to update itself every 10s to be updated with the latest information.  This has to do with the controller request new information from the switches every 10s.  In the bottom of the webpage is a picture of how the network is configured. 
 
+\begin{figure}
+	\includegraphics[width=0.3\textwidth]{webpage.PNG}
+	\label{fig:webpage_sdn}
+	\caption{Webpage to monitor the SDN network}
+\end{figure}
+
+
+%-------------------------------------------------------------------------
 \subsection{shared memory things}
 
 \subsection{Communication between Beaglebone and Arduino ?}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% SPI introduction in literature review
+% SPI introduction in literature review, pros over UART
 %TODO reference to the simple gpio library (github page)
+% NOT SURE: PUT simple gpio lib to management chapter
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 As the Beaglebone only supports to be the master in a SPI connection, so we have two beaglebones with SPI configurations and each of them has two Arduino slaves. One Beaglebone has two spi devices: SPIDEV0 and SPIDEV1, and the SPIDEV1 device is disabled initially but is used for HDMI interface. 
 
-In order to have one SPI device on Beaglebone connecting to multiple Arduino slaves, we use a third party C++ library called SimpleGPIO which enables us to use other general purpose pins as slave select of the SPI connection. 
+In order to have one SPI device on Beaglebone connecting to multiple Arduino slaves, we use a third party C++ library called SimpleGPIO which enables us to use other general purpose pins as slave select of the SPI connection. Before we start communication with a specific Arduino slave, the corresponding slave select will be set to low, then we get access to that Arduino slave.
+
+In the Arduino side, the communication request from the Beaglebone is treated as an interrupt. Then the Arduino writes/reads to/from the Serial Peripheral Data Register (SPDR). 
 \subsection{Sensors}
 Three categories of sensors are implemented in the prototype vehicle to monitor its surrounding environments. Data from distance sensors and speed sensor will be sent to an Arduino initially, then sent to corresponding Beaglebone. Data from Pi Camera will be sent to the Raspberry Pi which is directly connected to the main network.
 %-------------------------------------------------------------------------
@@ -402,29 +433,47 @@ So we finally apply the color detection on our car, we use the result of detecti
 \subsection{Assembly of the car}
 
 
-The platform pieces are achyle plastic and were cut via a laser cutter, the schematic for the pieces was exported from the 3D model to Illustrator to be sent to the laser cutter. The result of it is shown in figure \ref{fig:3d_platform}.
+The platform pieces are achyle plastic and were cut via a laser cutter, the schematic for the pieces was exported from the 3D model to Illustrator to be sent to the laser cutter. The result of it is shown in figure \ref{fig:3d_platform}. The platform was mounted via board spacer of different sizes to mount the levels together. All the devices on were mounted via screws and nuts to keep them in place. 
 
 
 \begin{figure}
-	\includegraphics{platform_assembely.jpg}
+	\includegraphics[width=0.3\textwidth]{platform_assembely.jpg}
 	\caption{Platform}
 	\label{fig:platform_ass}
 \end{figure}
 
+The design of the platform was done to use PCB bards and not prototyping bards, this made the assembly of the car not to be as the idea was. This is because it was difficult to make the prototyping bards small and compact as you can do with PCB.  Two of the boards The power board and one of the Arduino boards were able to place in the targeted position but could not be mounted to the platform with screws but with cable ties. The other board had to be placed in front of the car due to it could not be fit at its target place because the power board and the Arduino board was too thick of the wiring on the boards. 
+ 
+
 %-------------------------------------------------------------------------
 \subsection{Power Supply and PCB}
 
-The idea of was to order the PCBs from a company, but due to course regulation ware we not allowed to order PCBs from China, and companies in Europe were too expensive to order from. This resulted in what we could not implement the boost converter we hade design due to the milling machine in both prototype centre and in Mentorspace was broken and they could not mill the layout for the boost converter. Because the milling machines were broken could the PCB for the Arduinos also not be made. The only way we could continue with was to make the design on a prototyping board.
- 
+The idea of was to order the PCBs from a company, but due to course regulation ware we not allowed to order PCBs from China, and companies in Europe were too expensive to order from. This resulted in what we could not implement the boost converter we hade design due to the milling machine in both prototype centre and in Mentorspace was broken and they could not mill the layout for the boost converter. Because the milling machines were broken could the PCB for the Arduinos also not be made. The only way we could continue with was to make the design on a prototyping board. 
 
 The implementation on the prototype board was built from the same concept the PCB should have had, with USB-A ports cables to power the Arduino boards and external switch. The bard connects via a cable from the battery to a fuse, this fuse is implemented to protect the system if a short circuit happens. To solve the boost converter circuit did we buy a boost converter module MT3608 to receive a 9V. This module is not connected to the 5V level but instead to the to the 7.2V from the battery, to receive a current higher than 0.6A. To prevent previous years failure then they used the module, did we add the same solution to add an led with a resistor in series and $ 6.8\mu F$ in parallel to the output pins on the boost converter.
 
 The Arduino boards hade also be made at prototyping board. They received the same functionality as the PCB version should have, but it takes larger space due to the cable wiring. This lead to one of the board could not be placed at its position on the platform. 
 
-%Figure of the power board
+The result of the prototyping is shown in figure \ref{fig:board_ultra_steering}, \ref{fig:board_speed_engine} and \ref{fig:Power_board}. All of them has the functionality has the same PCBs should have had. 
 
-%Figure of the Arduino boards
 
+\begin{figure}
+	\includegraphics[width=0.3\textwidth]{arduino1.jpg}
+	\caption{Arduino board for the steering and Ultrasound}
+	\label{fig:board_ultra_steering}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=0.3\textwidth]{arduino2.jpg}
+	\caption{Arduino board for the engine and speed sensor}
+	\label{fig:board_speed_engine}
+\end{figure}
+
+\begin{figure}
+	\includegraphics[width=0.3\textwidth]{power_board.jpg}
+	\label{fig:Power_board}
+	\caption{Power board}
+\end{figure}
 
 
 
@@ -442,12 +491,22 @@ The Arduino boards hade also be made at prototyping board. They received the sam
 \clearpage
 \section{Discussion and Conclusion}
 
+\subsection{Assembly and PCB}
+Due course regulation was we not allowed to order PCBs from China and to order it from a European company was too expensive. 
+The idea for the project was to design our own PCBs because the project should combine the knowledge we hade learned during our masters and some of the students in the project is taking the electronics track. But due to the course regulation were we not allowed to order from companies that did not accept invoice as a payment, it resulted that we could not order from the cheap PCB manufactures in China. The group tried to find a European company but they were too expensive. This lead to a redesign of the powering and we decided to use the milling machines but they there also broken so the only solution was to use prototype boards. There is kind of strange that there is no machines or ways to order PCB because the electronic track is to about design the electronics and there is no way for us to be able to satisfy the course goals. 
+
+Because we hade to use prototyping boards and the platform was designed to have PCB mounted to it and not prototyping boards. This led to the assembly of the car was not as optimal as it could have been and the placement of come components and boards had to be placed at a different location. If the car would have been able to move around all it would have been affected of this, due the cable wiring was not optimal and the reliability of connections and wound have affected the car's performance. 
+
+
 %-------------------------------------------------------------------------
 \clearpage
 \section{Future Work}
 %-------------------------------------------------------------------------
 \clearpage
-%TODO reference
+
+\bibliographystyle{IEEEtran}
+
+\bibliography{reference}
 \clearpage
 %-------------------------------------------------------------------------
 \clearpage
