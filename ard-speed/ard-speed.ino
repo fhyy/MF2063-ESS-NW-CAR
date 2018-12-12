@@ -1,11 +1,11 @@
+/**@file ard-speed.ino */
+
 //
 // ard-speed.ino: Calculates the vehicle speed using information from the IR-sensor.
 //
 // Authors:
 //      Jacob Kimblad (jacobki@kth.se)
 //
-// License:
-//      AFL 3.0 
 //
 
 #include <SPI.h>
