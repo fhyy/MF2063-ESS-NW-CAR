@@ -459,6 +459,7 @@ To place all the required components on the car had some kind of platform be cre
 To make this platform was it first draw in a Cad Fusion 360 to make a 3D model of the car. This model could then be used to add models of the devices used in the car to find the optimal place for them, so the are places in at an easy position to get access too and close to its devices its depended on. The result of the design is shown in figure \ref{fig:3d_platform}. 
 
 \begin{figure}
+    \centering
 	\includegraphics[width=0.7\textwidth]{platform.png}
 	\caption{3D model of the platform}
 	\label{fig:3d_platform}
@@ -484,13 +485,14 @@ The second converter is to generate the 9V and this is done via a DC-DC converte
 
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.7\textwidth]{boost_converter_curcuit.pdf}
 	\caption{Circuit of the boost converter}
 	\label{fig:circuit_boost_converter}
-	\centering
 \end{figure}
 
 \begin{figure}
+	\centering
 	\includegraphics{graph_of_boost_out.png}
 	\caption{Output graph of the Boost converter}
 	\label{fig:graph_boost}
@@ -499,6 +501,7 @@ The second converter is to generate the 9V and this is done via a DC-DC converte
 All the powering of the car's devices should be handled by one PCB board, that contained USB ports and the boost converter to power the external switch. There the USB-A type ports should be used to power the Arduinos, Beaglebones, Raspberry Pi and Zodiac FX. For the powering of the external switch should a cable be connected from the PCB to the switch, it also to power outlets to power the PCB board for the Arduinos. This PCB board was designed in Eagle and the result is shown in figure \ref{fig:power_pcb_layout}. 
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.3\textwidth]{power_board_layout.png}
 	\caption{Layout of Power PCB board}
     \label{fig:power_pcb_layout}
@@ -507,6 +510,7 @@ All the powering of the car's devices should be handled by one PCB board, that c
 For the Arduinos was two PCB boards made to easily connect the SPI connection between the Beaglebones and the Arduinos, and to connect external sensors. The first board was designed to easily connect the ultrasonic sensors and the steering servo with correct Arduino. The schematic and layout of this board was also made in Eagle and is shown in figure \ref{fig:board_layout_ultra_servo}. The board is powered via a power via the DC power jack, to supply the Arduinos. On the top of the board is three connectors and they are for the Ultrasonic to be connected, and in the bottom is the connector for the steering servo. In the middle of the board is the connection to add the Logic level converter and the pins to connect the connection from the Beaglebone. 
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.3\textwidth]{borad_layout_seervo_ultra.png}
 	\caption{Layout of the Board for ultrasound and steering servo}
 	\label{fig:board_layout_ultra_servo}
@@ -515,6 +519,7 @@ For the Arduinos was two PCB boards made to easily connect the SPI connection be
 The second Arduino board has the same functionality as the previous one. The difference is that this is designed to connect the speed sensor and the ESC to control the engine. The layout of this design is showed in figure \ref{fig:board_layout_ir_esc}.
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.3\textwidth]{borad_layout_ir_esc.png}
 	\caption{Layout of the Board for speed sensor and ESC}
 	\label{fig:board_layout_ir_esc}
@@ -548,6 +553,7 @@ The code for the Ryu controller is based on the example simple-monitor.py there 
 To monitor the traffic load on the network was a webpage made to present the user with data. The webpage is developt from the provided network webpage included in Ryu. On the webpage, as shown in figure \ref{fig:webpage_sdn} is a table what presented the data that has been transmitted and received on each port, and the number of packages has been dropped. The web pages are designed to update itself every 10s to be updated with the latest information.  This has to do with the controller request new information from the switches every 10s.  In the bottom of the webpage is a picture of how the network is configured. 
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.3\textwidth]{webpage.PNG}
 	\caption{Webpage to monitor the SDN network}
 	\label{fig:webpage_sdn}
@@ -735,6 +741,7 @@ The platform pieces are achyle plastic and were cut via a laser cutter, the sche
 
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.3\textwidth]{platform_assembely.jpg}
 	\caption{Platform}
 	\label{fig:platform_ass}
@@ -756,18 +763,21 @@ The result of the prototyping is shown in figure \ref{fig:board_ultra_steering},
 
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.3\textwidth]{arduino1.jpg}
 	\caption{Arduino board for the steering and Ultrasound}
 	\label{fig:board_ultra_steering}
 \end{figure}
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.3\textwidth]{arduino2.jpg}
 	\caption{Arduino board for the engine and speed sensor}
 	\label{fig:board_speed_engine}
 \end{figure}
 
 \begin{figure}
+	\centering
 	\includegraphics[width=0.3\textwidth]{power_board.jpg}
 	\caption{Power board}
 	\label{fig:power_board}
