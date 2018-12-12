@@ -1,0 +1,263 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt, titlepage]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+\geometry{margin=2cm, headsep=5mm, includefoot, includehead}
+
+\usepackage{graphicx} % support the \includegraphics command and options
+\graphicspath{{figures/}} % Location of the graphics files
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\fancyhead{}
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+\usepackage{lastpage}
+\usepackage{rotating}
+\usepackage{textcomp} %get the correct micro sec display
+\usepackage{float}
+%---------- Enable IEEEtran.bst configurations ------
+\usepackage{IEEEtrantools}
+\usepackage{verbatim}
+%----------------------------------------------------
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+%%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setlength{\headheight}{53pt}
+\lhead{MF2063 Embedded Systems Design Project \\		 
+       ESS-NW/ESS-CAR \\
+       Leon Fernandez, leonfe@kth.se}
+\rhead{Final Report \\
+       Version 1 \\
+       \thepage(\pageref{LastPage})}
+\renewcommand{\headrulewidth}{1pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Footer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\cfoot{blablablabla}
+%\renewcommand{\footrulewidth}{0.4pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+%\maketitle
+\bstctlcite{BSTcontrol} % IEEEtran.bst controls enabled
+
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+	\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for horizontal lines, change thickness here
+	
+	\center % Centre everything on the page
+	
+	%------------------------------------------------
+	%	Headings
+	%------------------------------------------------
+	
+	\begin{figure}
+   		\centering
+    	\includegraphics[scale=1]{kthLogo.png}
+	\end{figure}
+	
+	\textsc{\LARGE KTH Mechatronics Advanced Course}\\[1cm] % Main heading such as the name of your university/college
+	
+	\textsc{\Large MF2063, HT 2018}\\[0.5cm] % Major heading such as course name
+	
+	\textsc{\Large FINAL REPORT}\\[0.5cm] % Major heading as well
+	
+	%------------------------------------------------
+	%	Title
+	%------------------------------------------------
+	
+	\HRule\\[0.4cm]
+	
+	{\huge\bfseries ESS-NW/ESS-CAR}\\[0.4cm] % Title of your document
+	
+	\HRule\\[1.5cm]	
+	
+	%------------------------------------------------
+	%	Author(s)
+	%------------------------------------------------
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft}
+			\large
+                        \textsc{Jonas Ekman}
+			\\
+			\textsc{Yini Gao}
+                        \\
+                        \textsc{Jacob Kimblad}
+		\end{flushleft}
+	\end{minipage}
+	~
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushright}
+			\large
+                        \textsc{Leon Fernandez}
+			\\
+			\textsc{Fredrik Hyyrynen}
+                        \\
+                        \textsc{Yifan Ruan}
+		\end{flushright}
+	\end{minipage}
+	
+	% If you don't want a supervisor, uncomment the two lines below
+        % and comment the code above
+	%{\large\textit{Author}}\\
+	%John \textsc{Smith} % Your name
+	\vskip 8cm
+	\begin{figure}[H]
+   		\centering
+    	\includegraphics[scale=0.4]{funLogo.png}
+	\end{figure}
+	%------------------------------------------------
+	%	Date
+	%------------------------------------------------
+	
+	\vfill\vfill\vfill % Position the date 3/4 down the remaining page
+	
+	{\large\today} % Date, change the \today to a set date if you want
+                       % to be precise
+	
+	%------------------------------------------------
+	%	Logo
+	%------------------------------------------------
+	
+	%\vfill\vfill
+	%\includegraphics[width=0.2\textwidth]{placeholder.jpg}\\[1cm]
+        % Include a department/university logo
+        % - this will require the graphicx package
+	 
+	%-------------------------------------------------------------------
+	
+	\vfill % Push the date up 1/4 of the remaining page
+	
+\end{titlepage}
+
+%-------------------------------------------------------------------------
+
+\clearpage
+\section*{Abstract}
+Abstract starts here,
+what should be included:
+
+The problem issue subject being addressed
+
+How the problem is tackled
+
+Overview of the results, and indication as to what level they solve the problem.
+
+Implications of the results
+
+%-------------------------------------------------------------------------
+\clearpage
+\tableofcontents
+
+%-------------------------------------------------------------------------
+%\clearpage
+%\listoffigures
+
+%-------------------------------------------------------------------------
+%\clearpage
+%\listoftables
+
+%-------------------------------------------------------------------------
+\clearpage
+\section{General Summary}
+This paragraph should provide the reader with a brief description of how the project was performed
+\begin{itemize}
+    \item Which results were reached?
+    \item Differences between planned outcomes (time, budget, results) and the actual outcome
+    \item Discuss the problems that occured and their impact on the project
+\end{itemize}
+
+
+\section{Follow-up of objectives}
+Take up the objectives that were achieved, not achieved, and any work remaining in the curren tor future project.
+\begin{itemize}
+    \item List of obtained goals
+    \item Table of missed requirements and an action plan
+\end{itemize}
+
+
+\section{Lessons learned and suggestions for improvement}
+The most important part of the final report! The purpose of the section is to reflect on the experience you have had in the project and documenting it
+\begin{itemize}
+    \item A good way to get a balance picture of the whole project is to think of 5 good and 5 bad experiences during the project.
+    \item What went well in the project and why?
+    \item What could have been done better?
+\end{itemize}
+
+This section should also bring up other factors that have influenced the project such as: seminars, tools, suppliers, tutors, etc.
+
+
+\section{Summary of time and resource plans}
+Comments on the time and resource plan and its milestones and tollgates
+\begin{itemize}
+    \item Which tasks were dealt with on time?
+    \item Which tasks took too long and what was forgotten in the planning?
+    \item The final versions of the time and resource plans are attached as an appedix
+\end{itemize}
+
+
+\section{Final comment/other}
+This section can include the project manager's sub-project managers' own views and comments on the project, for example: valid documentation, work practices, project management and more.
+
+
+\section{Attachments}
+Final resource plan
+Final milestone char (or Gantt Chart if used)
+
+
+\clearpage
+
+\bibliographystyle{IEEEtran}
+
+\bibliography{reference}
+\clearpage
+%-------------------------------------------------------------------------
+\clearpage
+%TODO appendix
+\appendix
+\clearpage
+
+\end{document}
