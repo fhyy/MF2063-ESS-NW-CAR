@@ -28,7 +28,8 @@ this script to work.
 
 Depending on how BeagleBone connects to the Internet, it might sometimes require knowledge
 of where it can find a resolv Internet addresses. This file configures the BeagleBone
-to use Google's public DNS server, which should be enough for most cases.
+to use Google's public DNS server, which should be enough for most cases. The file should
+reside in /etc/resolv.conf.
 
 # spi_setup.sh
 
