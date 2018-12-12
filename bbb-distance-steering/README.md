@@ -1,4 +1,3 @@
-
 # Startup
 
 To start the processes it is sufficient to build the executables using cmake and executing /bbb-distance-steering/autostart.sh

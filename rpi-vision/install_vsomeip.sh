@@ -9,3 +9,4 @@ mkdir /home/pi/someip/vsomeip/build
 cd /home/pi/someip/vsomeip/build
 cmake -DENABLE_SIGNAL_HANDLING=1 ..
 make
+make install
