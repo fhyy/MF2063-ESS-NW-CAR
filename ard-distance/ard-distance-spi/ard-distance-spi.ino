@@ -1,3 +1,4 @@
+/**@file ard-distance-spi.ino */
 //
 // ard-distance-spi.ino: get distance data from Ultrasonic sensor and send to Beaglebone through SPI
 //

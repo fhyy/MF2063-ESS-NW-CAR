@@ -7,19 +7,19 @@ Link to the sensor's [datasheet](https://www.mouser.com/ds/2/813/HCSR04-1022824.
 
 ## Pin mappings
 Left sensor: (D for digital pins)
-Arduino|Sensor
--------|-------
-D4|Trig
-D5|Echo
+|Arduino|Sensor|
+|-------|-------|
+|D4|Trig|
+|D5|Echo|
 
 Middle sensor:
-Arduino|Sensor
--------|-------
-D6|Trig
-D7|Echo
+|Arduino|Sensor|
+|-------|-------|
+|D6|Trig|
+|D7|Echo|
 
 Right sensor: 
-Arduino|Sensor
--------|-------
-D8|Trig
-D9|Echo
+|Arduino|Sensor|
+|-------|-------|
+|D8|Trig|
+|D9|Echo|
