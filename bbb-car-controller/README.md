@@ -25,13 +25,13 @@ Note that the bottom two files reside in "/cfg_bbb" (where / is the toplevel of 
 scripts can be found that help with the configurations. By running the script /deploy_code.sh, all files needed
 for a smooth, scripted setup should be copied neatly onto the respective BegleBone nodes.
 
-| File          | Place in Linux filesystem
-|---------------|---------------------------------------------------------------------------------------------------------
-| hostname      | /etc/hostname
-| hosts         | /etc/hosts
-| interfaces    | /etc/network/interfaces
-| resolv.conf   | /etc/resolv.conf (run "sudo chattr +i /etc/resolv.conf" to prevent other programs from editing this file)
-| debian        | /etc/sudoers.d/debian
+| File          | Place in Linux filesystem                                                                                |
+|---------------|----------------------------------------------------------------------------------------------------------|
+| hostname      | /etc/hostname                                                                                            |
+| hosts         | /etc/hosts                                                                                               |
+| interfaces    | /etc/network/interfaces                                                                                  |
+| resolv.conf   | /etc/resolv.conf (run "sudo chattr +i /etc/resolv.conf" to prevent other programs from editing this file)|
+| debian        | /etc/sudoers.d/debian                                                                                    |
 
 # Building the car controller client
 
@@ -57,6 +57,7 @@ OR
 
 This will run the controller statemachine or the ESS SHELL, respectively.
 Additionally the following flags can be passed to "car-ctrl-client":
+
 | Flag           | Argument        |Description
 |----------------|-----------------|-----------------------------------------------------------------------------------------------
 | --skip-go      | [EMPTY]         | Makes all threads unpausable, essentially means that availability of services will be ignored
