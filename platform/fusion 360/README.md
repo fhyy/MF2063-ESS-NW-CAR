@@ -1,12 +1,12 @@
-#Cad Files
+# Cad Files
 
-##3d
+## 3d
 This file is the file there all the Cad designs are put together. 
 
-##BeagleboneBlack
+## BeagleboneBlack
 This is file contains a design corresponding to a Beagelbone black
 
-##RPI & _PI B
+## RPI & _PI B
 This file is the design corresponding to a Raspberry pi model 3.
 
 ## ZodiacFX
