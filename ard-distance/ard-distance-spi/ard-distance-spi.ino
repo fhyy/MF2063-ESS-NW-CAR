@@ -1,3 +1,12 @@
+//
+// ard-distance-spi.ino: get distance data from Ultrasonic sensor and send to Beaglebone through SPI
+//
+// Authors:
+//      Yifan Ruan(yifanr@kth.se)
+//
+// License:
+//      AFL 3.0 
+//
 #include <SPI.h>
 
 volatile boolean send_it = false;
