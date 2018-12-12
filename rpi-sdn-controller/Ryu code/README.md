@@ -1,6 +1,6 @@
 # Ryu controller
 
-To start the controller has the Ryu program be install from this GitHub page "https://github.com/osrg/ryu" and then run the shell script as shown 
+To start the controller has the Ryu framework be install from this GitHub page "https://github.com/osrg/ryu" and then run the shell script as shown 
 
 ```
 ./startsdn.sh
