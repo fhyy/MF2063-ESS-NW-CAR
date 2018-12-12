@@ -35,3 +35,7 @@ for a smooth, scripted setup should be copied neatly onto the respective BegleBo
 | interfaces    | /etc/network/interfaces
 | resolv.conf   | /etc/resolv.conf (run "sudo chattr +i /etc/resolv.conf" to prevent other programs from editing this file)
 | debian        | /etc/sudoers.d/debian
+
+# Software Architecture Overview
+**Architecture Overview**  
+![Architecture Overview](../figures/software_architecture_bbb_files.png)

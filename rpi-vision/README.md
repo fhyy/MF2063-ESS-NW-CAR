@@ -13,3 +13,7 @@ this script to work.
 
 The folder called "object_detection" contains the object detection code, which can run on laptop and Raspberry Pi. To run color
 detection on Raspberry Pi, execute python3 color_detection_cpp.py
+
+# Software Architecture Overview
+**Architecture Overview**  
+![Architecture Overview](../figures/software_architecture_rpi_files.png)
