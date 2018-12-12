@@ -3,6 +3,11 @@
 #define DEBUG 0
 #define WAKEUP_DEBUG 0
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- constructor ---------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setmin_sleep, bool skip_go) :
     run_(false),
     go_(false),
@@ -33,6 +38,7 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
 
     int *p;
 
+    // Initialize consumer memory (where input is read from).
     shm_mo.Create(BUFFER_SIZE, O_RDWR);
     shm_mo.Attach(PROT_WRITE);
     p = (int*) shm_mo.GetData();
@@ -53,6 +59,8 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     p = (int*) shm_shutdown.GetData();
     buf_shutdown = Buffer(BUFFER_SIZE, p, B_CONSUMER);
 
+    // Sleep so the program on the other end of the shared memory
+    // gets a chance to initialize its consumers.
     sleep(5);
 
     #if (DEBUG)
@@ -60,6 +68,8 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
                   << std::endl;
     #endif
 
+    // Initialize producer memory (where output is written). Hopefully consumers of this memory
+    // have been initialized properly while we where sleeping a couple of lines above.
     shm_sp.Create(BUFFER_SIZE, O_RDWR);
     shm_sp.Attach(PROT_WRITE);
     p = (int*) shm_sp.GetData();
@@ -81,25 +91,37 @@ CarCTRLClient::CarCTRLClient(uint32_t mo_sleep, uint32_t st_sleep, uint32_t setm
     buf_cam = Buffer(BUFFER_SIZE, p, B_PRODUCER);
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- init ----------------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 bool CarCTRLClient::init() {
+    // Lock down all threads while initializing.
     std::lock_guard<std::mutex> run_lock(mu_run_);
 
+    // Initialize all threads
     req_mo_thread_ = std::thread(std::bind(&CarCTRLClient::send_motor_req, this));
     req_st_thread_ = std::thread(std::bind(&CarCTRLClient::send_steer_req, this));
     req_setmin_thread_ = std::thread(std::bind(&CarCTRLClient::send_setmin_req, this));
     req_shutdown_thread_ = std::thread(std::bind(&CarCTRLClient::send_shutdown_req, this));
 
+    // Create and initialize applicaiton, payload and request that will hold message data.
     app_ = vsomeip::runtime::get()->create_application("car_ctrl_client");
     if (!app_->init()) {
+
+        // Initialization was unsuccesful.
         return false;
     }
     payload_ = vsomeip::runtime::get()->create_payload();
     request_ = vsomeip::runtime::get()->create_request(false); // false=>UDP
 
+    // Register function that handles behaviour when using app_->start and app_->stop.
     app_->register_state_handler(
         std::bind(&CarCTRLClient::on_state, this,
         std::placeholders::_1));
 
+    // Register function for handling behaviour when availability of services on the network change
     app_->register_availability_handler(vsomeip::ANY_SERVICE,
                                         vsomeip::ANY_INSTANCE,
                                         std::bind(&CarCTRLClient::on_availability,
@@ -108,6 +130,7 @@ bool CarCTRLClient::init() {
                                                   std::placeholders::_2,
                                                   std::placeholders::_3));
 
+    // Register function for handling events published by the distance sensors system
     app_->register_message_handler(
         DIST_SERVICE_ID,
         DIST_INSTANCE_ID,
@@ -115,6 +138,7 @@ bool CarCTRLClient::init() {
         std::bind(&CarCTRLClient::on_dist_eve, this,
                   std::placeholders::_1));
 
+    // Register function for handling events published by the speedometer system
     app_->register_message_handler(
         SPEED_SERVICE_ID,
         SPEED_INSTANCE_ID,
@@ -122,6 +146,7 @@ bool CarCTRLClient::init() {
         std::bind(&CarCTRLClient::on_speed_eve, this,
                   std::placeholders::_1));
 
+    // Register function for handling events published by the camera system
     app_->register_message_handler(
         CAM_SERVICE_ID,
         CAM_INSTANCE_ID,
@@ -129,6 +154,7 @@ bool CarCTRLClient::init() {
         std::bind(&CarCTRLClient::on_cam_eve, this,
                   std::placeholders::_1));
 
+    // Register function for handling emergency break events published by the motor system
     app_->register_message_handler(
         vsomeip::ANY_SERVICE,
         vsomeip::ANY_INSTANCE,
@@ -136,17 +162,29 @@ bool CarCTRLClient::init() {
         std::bind(&CarCTRLClient::on_embreak_eve, this,
                   std::placeholders::_1));
 
+    // Set all threads free
     run_ = true;
     cond_run_.notify_all();
 
+    // Initialization was succesful
     return true;
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- start ---------------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::start() {
     app_->start();
 
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- stop ----------------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::stop() {
     req_mo_thread_.join();
     req_st_thread_.join();
@@ -158,14 +196,23 @@ void CarCTRLClient::stop() {
 }
 
 /*
- *-------------------------------------------------------------------------------------------------
- *                                  HERE BE PRIVATE MEMBER FUNCTIONS
- *-------------------------------------------------------------------------------------------------
+ *#################################################################################################
+ *################################# HERE BE PRIVATE MEMBER FUNCTIONS ##############################
+ *#################################################################################################
  */
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- update_go_status ----------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::update_go_status() {
+    // If the threads are not freed, we don't do anything here. Thus, go_ will always be false.
     if (!run_)
         return;
+
+    // Update go_ depending on which services are avaiable. If go_ is true, bring up the go service
+    // to signal to the other nodes that the entire system is online.
     else if (is_ava_di_ && is_ava_st_ &&
              is_ava_mo_ && is_ava_sp_ &&
              is_ava_cam_) {
@@ -177,12 +224,16 @@ void CarCTRLClient::update_go_status() {
         app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
 
+    // One hot encoding of which systems are online.
+    // LSB represents online status of motor (0 -> NOT online, 1 -> online)
+    // second LSB represents online status of steering and so on.
     int service_status = (is_ava_mo_ << 0) |
                          (is_ava_st_ << 1) |
                          (is_ava_sp_ << 2) |
                          (is_ava_di_ << 3) |
                          (is_ava_cam_<< 4);
 
+    // Write the int which holds the encoding to the shared memory.
     shm_go.Lock();
     buf_go.write(service_status);
     shm_go.UnLock();
@@ -490,13 +541,16 @@ void CarCTRLClient::send_shutdown_req() {
              * int req_data_latest = req_data.back();
              * Analyze req_data_latest to see which services the request wants to shut down
              * and the shut down only those services. This needs to be implemented on the
-             * ESSPrototype-side aswell.
+             * ESSPrototype-side and on the respective services. At the time of writing
+             * a "shutdown" message ALWAYS shuts down ALL services at the receiver.
              */
 
             // Dummy data with some random value since the contents does not matter anyway
+            // TODO Replace dummy data with ID if the service that will be shut down.
             std::vector<vsomeip::byte_t> dummy_data(7);
 
             // Send the request.
+            // TODO Send the request only to the node which holds the service will be shut down.
             send_req(dummy_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
             send_req(dummy_data, STEER_SERVICE_ID, STEER_INSTANCE_ID, SHUTDOWN_METHOD_ID);
             send_req(dummy_data, SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SHUTDOWN_METHOD_ID);
@@ -523,6 +577,11 @@ void CarCTRLClient::send_shutdown_req() {
     }
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- on_dist_eve ---------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
     // Store received packet, should always have a length of 4
     vsomeip::byte_t *data = msg->get_payload()->get_data();
@@ -547,6 +606,11 @@ void CarCTRLClient::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg) {
     #endif
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- on_speed_eve --------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &msg) {
     // Store received packet, should always have a length of 4
     vsomeip::byte_t *data = msg->get_payload()->get_data();
@@ -572,6 +636,11 @@ void CarCTRLClient::on_speed_eve(const std::shared_ptr<vsomeip::message> &msg) {
     #endif
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- on_cam_eve ----------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::on_cam_eve(const std::shared_ptr<vsomeip::message> &msg) {
     // Store received packet, should always have a length of 4
     vsomeip::byte_t *data = msg->get_payload()->get_data();
@@ -595,34 +664,27 @@ void CarCTRLClient::on_cam_eve(const std::shared_ptr<vsomeip::message> &msg) {
     #endif
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- on_embreak_eve ------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::on_embreak_eve(const std::shared_ptr<vsomeip::message> &msg) {
     std::cout << "## WARNING ## Motor has performed an emergency break ## WARNING ##" << std::endl;
 
-    // Lock down the vsomeip app before sending.
-    std::unique_lock<std::mutex> app_lk(mu_app_);
-    while (app_busy_)
-        cond_app_.wait(app_lk);
-    app_busy_ = true;
-
-    // Dummy data with some random value since the contents does not matter anyway
-    std::vector<vsomeip::byte_t> dummy_data(7);
-
-    // Shutdown the motor service.
     /*
-    send_req(dummy_data, MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, SHUTDOWN_METHOD_ID);
-
-    #if (DEBUG)
-        std::cout << "## DEBUG ## Shutdown request sent to motor service! ## DEBUG ##"
-                  << std::endl;
-    #endif
-    */
-
-    // Unlock the vsomeip app.
-    app_busy_ = false;
-    app_lk.unlock();
-    cond_app_.notify_one();
+     * TODO
+     * Define some appropriate behavior when an emergency break is detected.
+     * At the time of writing, the motor service itself sets the speed to 0
+     * before publishing the emergency break event.
+     */
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- send_req ------------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::send_req(std::vector<vsomeip::byte_t> data,
                              vsomeip::service_t serv,
                              vsomeip::instance_t inst,
@@ -637,8 +699,17 @@ void CarCTRLClient::send_req(std::vector<vsomeip::byte_t> data,
     app_->send(request_, true);
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- on_state ------------------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::on_state(vsomeip::state_type_e state) {
+
+    // If we are registered to the vsomeip RTE (by calling app_->start()).
     if(state == vsomeip::state_type_e::ST_REGISTERED) {
+
+        // Subscribe to distance sensor events.
         app_->request_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
         std::set<vsomeip::eventgroup_t> dist_group;
         dist_group.insert(DIST_EVENTGROUP_ID);
@@ -647,11 +718,13 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
                 DIST_INSTANCE_ID,
                 DIST_EVENT_ID,
                 dist_group,
-                false); // TODO what does this boolean do?
+                false);
         app_->subscribe(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENTGROUP_ID);
 
+        // Request the steering service.
         app_->request_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
 
+        // Subscribe to speedometer events.
         app_->request_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
         std::set<vsomeip::eventgroup_t> speed_group;
         speed_group.insert(SPEED_EVENTGROUP_ID);
@@ -660,9 +733,10 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
                 SPEED_INSTANCE_ID,
                 SPEED_EVENT_ID,
                 speed_group,
-                false); // TODO what does this boolean do?
+                false);
         app_->subscribe(SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SPEED_EVENTGROUP_ID);
 
+        // Subscribe to camera sensor events.
         app_->request_service(CAM_SERVICE_ID, CAM_INSTANCE_ID);
         std::set<vsomeip::eventgroup_t> cam_group;
         cam_group.insert(CAM_EVENTGROUP_ID);
@@ -671,9 +745,10 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
                 CAM_INSTANCE_ID,
                 CAM_EVENT_ID,
                 cam_group,
-                false); // TODO what does this boolean do?
+                false);
         app_->subscribe(CAM_SERVICE_ID, CAM_INSTANCE_ID, CAM_EVENTGROUP_ID);
 
+        // Subscribe to emergency break events.
         app_->request_service(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID);
         std::set<vsomeip::eventgroup_t> embreak_group;
         embreak_group.insert(EMERGENCY_BREAK_EVENTGROUP_ID);
@@ -682,9 +757,12 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
                 MOTOR_INSTANCE_ID,
                 EMERGENCY_BREAK_EVENT_ID,
                 embreak_group,
-                false); // TODO what does this boolean do?
+                false);
         app_->subscribe(MOTOR_SERVICE_ID, MOTOR_INSTANCE_ID, EMERGENCY_BREAK_EVENTGROUP_ID);
     }
+
+    // If we are NOT registered to the vsomeip RTE (by calling app_->stop()).
+    // Basically unsubscribe and unregister from everything.
     else if(state == vsomeip::state_type_e::ST_DEREGISTERED) {
         app_->release_service(STEER_SERVICE_ID, STEER_INSTANCE_ID);
 
@@ -704,13 +782,22 @@ void CarCTRLClient::on_state(vsomeip::state_type_e state) {
         app_->release_event(CAM_SERVICE_ID, CAM_INSTANCE_ID, CAM_EVENT_ID);
         app_->release_service(CAM_SERVICE_ID, CAM_INSTANCE_ID);
 
+        // If the go server was up when app_->stop() was called we withdraw the service
+        // and set go_ to false (which pauses all threads)
         if(go_)
             go_ = false;
             app_->stop_offer_service(GO_SERVICE_ID, GO_INSTANCE_ID);
     }
 }
 
+/*
+ *-------------------------------------------------------------------------------------------------
+ *--------------------------------- on_availability -----------------------------------------------
+ *-------------------------------------------------------------------------------------------------
+ */
 void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t inst, bool is_ava) {
+
+    // Is distance sensor service available?
     if (DIST_SERVICE_ID == serv && DIST_INSTANCE_ID == inst) {
         if (is_ava_di_ && !is_ava) {
             is_ava_di_ = false;
@@ -719,6 +806,8 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
             is_ava_di_ = true;
         }
     }
+
+    // Is steering actuator service available?
     else if (STEER_SERVICE_ID == serv && STEER_INSTANCE_ID == inst) {
         if (is_ava_st_ && !is_ava) {
             is_ava_st_ = false;
@@ -727,6 +816,8 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
             is_ava_st_ = true;
         }
     }
+
+    // Is motor actuator service available?
     else if (MOTOR_SERVICE_ID == serv && MOTOR_INSTANCE_ID == inst) {
         if (is_ava_mo_ && !is_ava) {
             is_ava_mo_ = false;
@@ -735,6 +826,8 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
             is_ava_mo_ = true;
         }
     }
+
+    // Is speedometer sensor service available?
     else if (SPEED_SERVICE_ID == serv && SPEED_INSTANCE_ID == inst) {
         if (is_ava_sp_ && !is_ava) {
             is_ava_sp_ = false;
@@ -743,6 +836,8 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
             is_ava_sp_ = true;
         }
     }
+
+    // Is camera sensor service available?
     else if (CAM_SERVICE_ID == serv && CAM_INSTANCE_ID == inst) {
         if (is_ava_cam_ && !is_ava) {
             is_ava_cam_ = false;
@@ -751,6 +846,9 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
             is_ava_cam_ = true;
         }
     }
+
+    // Update the go_ boolean and the availability of the go-service.
+    // Write the current availability status to the shared memory.
     update_go_status();
 }
 
@@ -760,6 +858,7 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
  *#################################################################################################
  */
 
+// Take care of signal handling if vsomeip was built without signal handling.
 #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
     CarCTRLClient *ccc_ptr(nullptr);
 
@@ -773,16 +872,19 @@ void CarCTRLClient::on_availability(vsomeip::service_t serv, vsomeip::instance_t
 
 int main(int argc, char** argv) {
 
+    // Default values for cmdline args.
     uint32_t mo_sleep = 1000;
     uint32_t st_sleep = 1500;
     uint32_t setmin_sleep = 1750;
     bool skip_go = false;
 
+    // Flags for passing cmdline args.
     std::string motor_flag("--motor-sleep");
     std::string steer_flag("--steer-sleep");
     std::string setmin_flag("--setmin-sleep");
     std::string skip_go_flag("--skip-go");
 
+    // See if user passed any flags while starting this program.
     for (int i=1; i<argc; i++) {
         if (steer_flag==argv[i] && i+1<argc) {
             i++;
@@ -807,14 +909,17 @@ int main(int argc, char** argv) {
         }
     }
 
+    // Instatiate client
     CarCTRLClient ccc(mo_sleep, st_sleep, setmin_sleep, skip_go);
 
+    // Take care of signal handling if vsomeip was built without signal handling.
     #ifndef VSOMEIP_ENABLE_SIGNAL_HANDLING
         ccc_ptr = &ccc;
         signal(SIGINT, handle_signal);
         signal(SIGTERM, handle_signal);
     #endif
 
+    // Initialize and start service.
     if (ccc.init()) {
         ccc.start();
         return 0;

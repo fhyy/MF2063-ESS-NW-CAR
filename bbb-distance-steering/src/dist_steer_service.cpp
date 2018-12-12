@@ -60,7 +60,7 @@ DistSteerService::DistSteerService(uint32_t di_sleep, bool skip_go) :
  *-------------------------------------------------------------------------------------------------
  */
 bool DistSteerService::init() {
-    // Lock down the run_di thread before while initializing.
+    // Lock down the run_di thread while initializing.
     std::lock_guard<std::mutex> run_lock(mu_run_);
 
     // Initialize the distance publisher thread.
