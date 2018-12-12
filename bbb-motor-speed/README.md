@@ -55,6 +55,7 @@ sudo ./motor-speed-service & sudo ./motor_speed
 
 This will run the vsomeip service and the SPI master program, respectively.
 Additionally the following flags can be passed to "motor-speed-service":
+
 | Flag           | Argument        |Description
 |----------------|-----------------|-----------------------------------------------------------------------------------------------
 | --skip-go      | [EMPTY]         | Speedometer events will always be published, even if client has not given any GO-signal

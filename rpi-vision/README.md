@@ -34,6 +34,7 @@ python3 color_detection_cpp.py | ./camera-service
 
 This will run the vsomeip service and the SPI master program, respectively.
 Additionally the following flags can be passed to "motor-speed-service":
+
 | Flag           | Argument        |Description
 |----------------|-----------------|-----------------------------------------------------------------------------------------------
 | --skip-go      | [EMPTY]         | Camera events will always be published, even if client has not given any GO-signal

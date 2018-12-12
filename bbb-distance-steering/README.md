@@ -56,6 +56,7 @@ sudo ./dist-steer-service & sudo ./dist_steer
 
 This will run the vsomeip service and the SPI master program, respectively.
 Additionally the following flags can be passed to "dist-steer-service":
+
 | Flag           | Argument        |Description
 |----------------|-----------------|-----------------------------------------------------------------------------------------------
 | --skip-go      | [EMPTY]         | Distance events will always be published, even if client has not given any GO-signal
