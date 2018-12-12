@@ -18,33 +18,12 @@ add_subdirectory(lib/controller_statemachine)
 
 add_executable(car-ctrl-client "${PROJECT_SOURCE_DIR}/src/car_ctrl_client.cpp")
 target_link_libraries(car-ctrl-client vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
-install(TARGETS car-ctrl-client DESTINATION bin)
 
 add_executable(main "${PROJECT_SOURCE_DIR}/src/main.cpp")
 target_link_libraries(main cbuf shm essproto ctrl-sm pthread rt)
-install(TARGETS main DESTINATION bin)
 
 add_executable(ess_shell "${PROJECT_SOURCE_DIR}/src/ess_shell.cpp")
 target_link_libraries(ess_shell cbuf shm essproto pthread rt)
-install(TARGETS ess_shell DESTINATION bin)
-#########################################################################################
-
-
-################### Build Docs ##########################################################
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    set(DOXYGEN_IN ${CMAKE_CURRENT_LIST_DIR}/Doxyfile.in)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_LIST_DIR}/doc/Doxyfile)
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-    add_custom_target(doxygen-doc ALL
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-        COMMENT "Doxygen is working..."
-	SOURCES ${DOXYGEN_OUT})
-
-else()
-  message("Doxygen not found. No documentation will be generated")
-endif()
 #########################################################################################
 
 ################### Link to vsomeip.json ################################################

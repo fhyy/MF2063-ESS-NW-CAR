@@ -1,4 +1,5 @@
-To access the flag on your phone or computer, go to [this site.](https://fhyy.github.io/MF2063-ESS-NW-CAR/index.html)
+To access the flag on your phone or computer, go to [this site.](https://fhyy.github.io/MF2063-ESS-NW-CAR/index.html)  
+If you have an Android phone, you could instead install the program from the [MF2063-ESS-NW-CAR-AndroidApp](https://github.com/fhyy/MF2063-ESS-NW-CAR-AndroidApp) repository.
 
 # Introduction
 **Network diagram**  

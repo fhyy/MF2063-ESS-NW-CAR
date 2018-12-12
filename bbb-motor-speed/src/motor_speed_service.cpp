@@ -22,12 +22,17 @@ MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist, bool s
                   << std::endl;
     #endif
 
-    int *p;
+
     // Initialize consumer memory (where input is read from).
-    shm_sp.Create(BUFFER_SIZE, O_RDWR);
-    shm_sp.Attach(PROT_WRITE);
-    p = (int*) shm_sp.GetData();
-    buf_sp = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    try {
+        shm_sp.Create(BUFFER_SIZE, O_RDWR);
+        shm_sp.Attach(PROT_WRITE);
+    }
+    catch (CSharedMemoryException& e) {
+        std::cout << e.what() << std::endl;
+    }
+    int *p_sp = (int*) shm_sp.GetData();
+    buf_sp = Buffer(BUFFER_SIZE, p_sp, B_CONSUMER);
 
     // Sleep so the program on the other end of the shared memory
     // gets a chance to initialize its consumers.
@@ -40,10 +45,15 @@ MotorSpeedService::MotorSpeedService(uint32_t sp_sleep, uint8_t min_dist, bool s
 
     // Initialize producer memory (where output is written). Hopefully consumers of this memory
     // have been initialized properly while we where sleeping a couple of lines above.
-    shm_mo.Create(BUFFER_SIZE, O_RDWR);
-    shm_mo.Attach(PROT_WRITE);
-    p = (int*) shm_mo.GetData();
-    buf_mo = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    try {
+        shm_mo.Create(BUFFER_SIZE, O_RDWR);
+        shm_mo.Attach(PROT_WRITE);
+    }
+    catch (CSharedMemoryException& e) {
+        std::cout << e.what() << std::endl;
+    }
+    int *p_mo = (int*) shm_mo.GetData();
+    buf_mo = Buffer(BUFFER_SIZE, p_mo, B_PRODUCER);
 
 }
 
@@ -214,7 +224,7 @@ void MotorSpeedService::on_state(vsomeip::state_type_e state) {
                 false);
         app_->subscribe(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENTGROUP_ID);
     }
-    else if (state == vsomeip::state_type_e::ST_REGISTERED) {
+    else if (state == vsomeip::state_type_e::ST_DEREGISTERED) {
         // Stop the speed event group.
         app_->stop_offer_event(SPEED_SERVICE_ID, SPEED_INSTANCE_ID, SPEED_EVENT_ID);
         app_->stop_offer_service(SPEED_SERVICE_ID, SPEED_INSTANCE_ID);
@@ -230,6 +240,12 @@ void MotorSpeedService::on_state(vsomeip::state_type_e state) {
         app_->unsubscribe(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENTGROUP_ID);
         app_->release_event(DIST_SERVICE_ID, DIST_INSTANCE_ID, DIST_EVENT_ID);
         app_->release_service(DIST_SERVICE_ID, DIST_INSTANCE_ID);
+
+        // Write to shared memory (stop the car because we are not running vsomeip anymore)
+        shm_mo.Lock();
+        buf_mo.write(0);
+        shm_mo.UnLock();
+
     }
 }
 
@@ -270,6 +286,12 @@ void MotorSpeedService::on_dist_eve(const std::shared_ptr<vsomeip::message> &msg
                         EMERGENCY_BREAK_EVENT_ID,
                         payload,
                         true, true);
+
+        // Set speed to 0
+        shm_mo.Lock();
+        buf_mo.write(0);
+        shm_mo.UnLock();
+
         #if (DEBUG)
         	std::cout << "## DEBUG ## Embreak event sent! Min distance threshold: " << (int) min_dist_ 
                       << " ## DEBUG ##" << std::endl;
@@ -345,6 +367,12 @@ void MotorSpeedService::on_go_availability(vsomeip::service_t serv,
     if (GO_SERVICE_ID == serv && GO_INSTANCE_ID == inst) {
         if (go_ && !go) {
             go_ = false;
+
+            // Write to shared memory (stop the car because services are unavailable)
+            shm_mo.Lock();
+            buf_mo.write(0);
+            shm_mo.UnLock();
+
             #if (DEBUG)
 	            std::cout << "## DEBUG ## motor_speed_service waiting for go-service ## DEBUG ##"
                           << std::endl;
@@ -415,7 +443,7 @@ void MotorSpeedService::run_sp() {
 
         // prepare and send transmission if data was read from shared memory.
         if (sensor_data.size() > 0) {
-            
+
             // Use only newest sensor value for transmission.
             int sensor_data_latest = sensor_data.back();
 
@@ -433,13 +461,13 @@ void MotorSpeedService::run_sp() {
             // sensor_data_formatted[3] = priority;
 
             // set data and publish it on the network.
-		    payload_->set_data(sensor_data_formatted);
+            payload_->set_data(sensor_data_formatted);
             app_->notify(SPEED_SERVICE_ID, SPEED_INSTANCE_ID,
                          SPEED_EVENT_ID, payload_, true, true);
 
             #if (DEBUG)
     	        std::cout << "## DEBUG ## Speed sensor data sent: ("
-                          << (int) sensor_data_formatted[0] 
+                          << (int) sensor_data_formatted[0]
                           << ", " << (int) sensor_data_formatted[1]
                           << ", " << (int) sensor_data_formatted[2]
                           << ", " << (int) sensor_data_formatted[3]

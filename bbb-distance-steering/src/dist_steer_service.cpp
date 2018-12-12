@@ -20,12 +20,17 @@ DistSteerService::DistSteerService(uint32_t di_sleep, bool skip_go) :
                   << std::endl;
     #endif
 
-    int *p;
+
     // Initialize consumer memory (where input is read from).
-    shm_di.Create(BUFFER_SIZE, O_RDWR);
-    shm_di.Attach(PROT_WRITE);
-    p = (int*) shm_di.GetData();
-    buf_di = Buffer(BUFFER_SIZE, p, B_CONSUMER);
+    try {
+        shm_di.Create(BUFFER_SIZE, O_RDWR);
+        shm_di.Attach(PROT_WRITE);
+    }
+    catch (CSharedMemoryException& e) {
+        std::cout << e.what() << std::endl;
+    }
+    int *p_di = (int*) shm_di.GetData();
+    buf_di = Buffer(BUFFER_SIZE, p_di, B_CONSUMER);
 
     // Sleep so the program on the other end of the shared memory
     // gets a chance to initialize its consumers.
@@ -38,10 +43,15 @@ DistSteerService::DistSteerService(uint32_t di_sleep, bool skip_go) :
 
     // Initialize producer memory (where output is written). Hopefully consumers of this memory
     // have been initialized properly while we where sleeping a couple of lines above.
-    shm_st.Create(BUFFER_SIZE, O_RDWR);
-    shm_st.Attach(PROT_WRITE);
-    p = (int*) shm_st.GetData();
-    buf_st = Buffer(BUFFER_SIZE, p, B_PRODUCER);
+    try {
+        shm_st.Create(BUFFER_SIZE, O_RDWR);
+        shm_st.Attach(PROT_WRITE);
+    }
+    catch (CSharedMemoryException& e) {
+        std::cout << e.what() << std::endl;
+    }
+    int *p_st = (int*) shm_st.GetData();
+    buf_st = Buffer(BUFFER_SIZE, p_st, B_PRODUCER);
 }
 
 /*

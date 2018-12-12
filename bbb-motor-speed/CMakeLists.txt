@@ -10,35 +10,15 @@ find_package(Boost 1.62 COMPONENTS system thread log REQUIRED)
 include_directories(${Boost_INCLUDE_DIR} ${VSOMEIP_INCLUDE_DIRS})
 
 include_directories("${PROJECT_SOURCE_DIR}/lib/shared_memory")
-add_subdirectory(lib/shared_memory) 
+add_subdirectory(lib/shared_memory)
 include_directories("${PROJECT_SOURCE_DIR}/lib/simple_gpio")
-add_subdirectory(lib/simple_gpio) 
+add_subdirectory(lib/simple_gpio)
 
 add_executable(motor-speed-service "${PROJECT_SOURCE_DIR}/src/motor_speed_service.cpp")
 target_link_libraries(motor-speed-service vsomeip cbuf shm pthread rt ${Boost_LIBRARIES})
-install(TARGETS motor-speed-service DESTINATION bin)
 
-add_executable(speed "${PROJECT_SOURCE_DIR}/src/speed.cpp")
-target_link_libraries(speed gpio cbuf shm pthread rt)
-install(TARGETS speed DESTINATION bin)
-#########################################################################################
-
-
-################### Build Docs ##########################################################
-find_package(Doxygen)
-if(DOXYGEN_FOUND)
-    set(DOXYGEN_IN ${CMAKE_CURRENT_LIST_DIR}/Doxyfile.in)
-    set(DOXYGEN_OUT ${CMAKE_CURRENT_LIST_DIR}/doc/Doxyfile)
-    configure_file(${DOXYGEN_IN} ${DOXYGEN_OUT} @ONLY)
-
-    add_custom_target(doxygen-doc ALL
-        COMMAND ${DOXYGEN_EXECUTABLE} ${DOXYGEN_OUT}
-        COMMENT "Doxygen is working..."
-	SOURCES ${DOXYGEN_OUT})
-
-else()
-  message("Doxygen not found. No documentation will be generated")
-endif()
+add_executable(motor_speed "${PROJECT_SOURCE_DIR}/src/motor_speed.cpp")
+target_link_libraries(motor_speed gpio cbuf shm pthread rt)
 #########################################################################################
 
 ################### Link to vsomeip.json ################################################

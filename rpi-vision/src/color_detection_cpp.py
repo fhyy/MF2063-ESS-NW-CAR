@@ -56,17 +56,17 @@ while True:
 
             M = cv2.moments(c)
             (a, b) = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
-            if a < 300:
+            if a < 200:
                 loc = '1'
-            if a > 300:
+            elif a > 400:
                 loc = '2'
-            if a == 300:
+            else: # object is in the middle
                 loc = '3'
             # only proceed if the radius meets a minimum size. Correct this value for your obect's size
             if radius > 0.5:
                 # draw the circle and centroid on the frame,
                 # then update the list of tracked points
-                if streamCount < 10:
+                if streamCount < 5:
                     print(key + loc)
                     sys.stdout.flush()
                     streamBlock = False

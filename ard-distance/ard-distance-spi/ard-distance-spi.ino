@@ -2,14 +2,14 @@
 
 volatile boolean send_it = false;
 long cm1,cm2,cm3;
-int trigPin1 = 3;
-int echoPin1 = 4;
+int trigPin1 = 4;
+int echoPin1 = 5;
 
-int trigPin2 = 5;
-int echoPin2 = 6;
+int trigPin2 = 6;
+int echoPin2 = 7;
 
-int trigPin3 = 7;
-int echoPin3 = 8;
+int trigPin3 = 8;
+int echoPin3 = 9;
 
 
 void setup (void)
