@@ -1,6 +1,6 @@
-/**@file ard-distance-spi.ino */
+/**@file ard-distance.ino */
 //
-// ard-distance-spi.ino: get distance data from Ultrasonic sensor and send to Beaglebone through SPI
+// ard-distance.ino: get distance data from Ultrasonic sensor and send to Beaglebone through SPI
 //
 // Authors:
 //      Yifan Ruan(yifanr@kth.se)
@@ -70,7 +70,7 @@ void loop (void)
   Serial.println();
   delay(100);
 }  // end of loop
-
+// read data from Ultrasonic sensor
 long readDistance(int trigPin, int echoPin){
   long duration,cm;
   //trig sensor
