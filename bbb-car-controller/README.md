@@ -33,6 +33,44 @@ for a smooth, scripted setup should be copied neatly onto the respective BegleBo
 | resolv.conf   | /etc/resolv.conf (run "sudo chattr +i /etc/resolv.conf" to prevent other programs from editing this file)
 | debian        | /etc/sudoers.d/debian
 
+# Building the car controller client
+
+To build this program on the target node stand in the same folder as this README and type:
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
+
+This will build all executables needed to control the system over vsomeip.
+
+# Starting the car controller client
+To start the program, stand in the build folder and type:
+```bash
+./car-ctrl-client & ./main
+```
+OR
+```bash
+./car-ctrl-client & ./ess_shell
+```
+
+This will run the controller statemachine or the ESS SHELL, respectively.
+Additionally the following flags can be passed to "car-ctrl-client":
+| Flag           | Argument        |Description
+|----------------|-----------------|-----------------------------------------------------------------------------------------------
+| --skip-go      | [EMPTY]         | Makes all threads unpausable, essentially means that availability of services will be ignored
+| --motor-sleep  | A positive int  | Time spent sleeping (in millisec) between sending motor requests
+| --steer-sleep  | A positive int  | Time spent sleeping (in millisec) between sending steering requests
+| --setmin-sleep | A positive int  | Time spent sleeping (in millisec) between sending setmin requests
+
+**Example**
+To run the software with 300 milliseconds of sleep between setmin requests, and
+make it ignore the availability of the services, stand in the build folder and type:
+```bash
+./car-ctrl-client --skip-go --setmin-sleep 300 & ./main
+```
+
 # Software Architecture Overview
 **Architecture Overview**  
 ![Architecture Overview](../figures/software_architecture_bbb_files.png)

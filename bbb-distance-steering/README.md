@@ -36,6 +36,38 @@ for a smooth, scripted setup should be copied neatly onto the respective BegleBo
 | resolv.conf   | /etc/resolv.conf (run "sudo chattr +i /etc/resolv.conf" to prevent other programs from editing this file)
 | debian        | /etc/sudoers.d/debian
 
+# Building the distance/steering service
+
+To build this program on the target node stand in the same folder as this README and type:
+```bash
+mkdir build
+cd build
+cmake ..
+make
+```
+
+This will build all executables needed to publish sensor data and take actuator requests through vsomeip.
+
+# Starting the distance/steering service
+To start the program, stand in the build folder and type:
+```bash
+sudo ./dist-steer-service & sudo ./dist_steer
+```
+
+This will run the vsomeip service and the SPI master program, respectively.
+Additionally the following flags can be passed to "dist-steer-service":
+| Flag           | Argument        |Description
+|----------------|-----------------|-----------------------------------------------------------------------------------------------
+| --skip-go      | [EMPTY]         | Distance events will always be published, even if client has not given any GO-signal
+| --sleep        | A positive int  | Time spent sleeping (in millisec) between publishing distance events
+
+**Example**
+To run the software with 100 milliseconds of sleep between distance events, and
+make it ignore the availability of the go-signal, stand in the build folder and type:
+```bash
+sudo ./dist_steer_service --skip-go --sleep 100 & sudo ./dist_steer
+```
+
 # Software Architecture Overview
 **Architecture Overview**  
 ![Architecture Overview](../figures/software_architecture_bbb_files.png)
