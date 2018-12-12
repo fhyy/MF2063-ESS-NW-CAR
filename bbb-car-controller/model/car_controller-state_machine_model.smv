@@ -1,0 +1,185 @@
+MODULE main
+
+-- ACTIVITIES
+-- Execute this file as it is with the command NuSMV -bmc.
+--  (-bmc enables BMC instead of BDD checking)
+
+
+VAR
+-- system output (internal states)
+        state : {bootup, standing_still, accelerating, constant_speed, retarding, steering_left, steering_right, failsafe};
+
+IVAR
+-- system inputs (state vector)
+        -- Distance parameters
+        distance_sensor_check: boolean;
+        distance: {low, high};
+
+        -- Camera parameters
+        camera_check: boolean;
+        camera: {left, right, run, stop};
+
+        -- Speed parameters
+        speed_sensor_check: boolean;
+        speed: {low, high, ok, blind};
+
+        -- Steering parameters
+        steering_check: boolean;
+
+        -- Motor parameters
+        motor_check: boolean;
+
+
+ASSIGN
+-- Constraints for state transitions
+        init(state) := bootup;
+        next(state) := case
+                -- state = bootup
+                distance_sensor_check & camera_check & steering_check & motor_check & state = bootup : standing_still;
+
+                -- state = standing_still    
+                distance = high & speed = low & camera = run & state = standing_still : accelerating;
+                --stopping
+                (camera = stop | distance = low) & state = retarding : standing_still;
+                --failsafe
+                (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = standing_still : failsafe;
+
+                -- state = accelerating    
+                distance = high & speed = low & camera = run & state = accelerating : accelerating;
+                distance = high & speed = ok & camera = run & state = accelerating : constant_speed;
+                distance = high & speed = high & camera = run & state = accelerating : retarding;
+                --steering
+                camera = left & state = retarding : steering_right;
+                camera = right & state = retarding : steering_left;
+                --stopping
+                (camera = stop | distance = low) & state = retarding : standing_still;
+                --failsafe
+                (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = standing_still : failsafe;
+                
+                -- state = constant_speed    
+                distance = high & speed = ok & camera = run & state = constant_speed: constant_speed;
+                distance = high & speed = low & camera = run & state = constant_speed : accelerating;
+                distance = high & speed = high & camera = run & state = constant_speed : retarding;
+                --steering
+                camera = left & state = retarding : steering_right;
+                camera = right & state = retarding : steering_left;
+                --stopping
+                (camera = stop | distance = low) & state = retarding : standing_still;
+                --failsafe
+                (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = constant_speed : failsafe;
+                
+                -- state = retarding    
+                distance = high & speed = low & camera = run & state = retarding : accelerating;
+                distance = high & speed = ok & camera = run & state = retarding : constant_speed;
+                distance = high & speed = high & camera = run & state = retarding : retarding;
+                --steering
+                camera = left & state = retarding : steering_right;
+                camera = right & state = retarding : steering_left;
+                --stopping
+                (camera = stop | distance = low) & state = retarding : standing_still;
+                --failsafe
+                (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = retarding : failsafe;
+
+                -- state = steering_left
+                camera = ok & state = steering_left : constant_speed;
+                --stopping
+                (camera = stop | distance = low) & state = retarding : standing_still;
+                --failsafe
+                (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = retarding : failsafe;
+
+                -- state = steering_right
+                camera = ok & state = steering_right : constant_speed;
+                --stopping
+                (camera = stop | distance = low) & state = retarding : standing_still;
+                --failsafe
+                (!distance_sensor_check | !camera_check | !steering_check | !motor_check) & state = retarding : failsafe;
+
+                -- Catch reminding conditions by remaining in the same state    
+                TRUE : state;
+
+        esac;
+
+
+
+
+-- EXAMPLE CODE FOR COVERAGE TESTING
+
+
+-- Coverage tests
+
+-- NODE COVERAGE
+-- trap properties for node coverage
+LTLSPEC 
+    G(!(state = bootup))
+LTLSPEC 
+    G(!(state = standing_still))
+LTLSPEC 
+    G(!(state = accelerating))
+LTLSPEC 
+    G(!(state = constant_speed))
+LTLSPEC 
+    G(!(state = retarding))
+LTLSPEC 
+    G(!(state = steering_left))
+LTLSPEC 
+    G(!(state = steering_right))
+LTLSPEC 
+    G(!(state = failsafe))
+
+
+-- EDGE COVERAGE
+-- trap properties for edge coverage
+
+-- BOOTUP
+-- bootup sequence -> standing_still
+LTLSPEC
+    G(state = bootup & distance_sensor_check & camera_check & steering_check & motor_check -> X(state != standing_still))
+
+-- STANDING STILL
+-- standing_still -> accelerating
+LTLSPEC
+    G(state = standing_still & distance = high & speed = low & camera = run -> X(state != accelerating))
+-- standing_still -> steering_right
+-- standing_still -> steering_left
+
+-- ACCELERATING
+-- accelerating -> accelerating
+LTLSPEC
+    G(state = accelerating & distance = high & speed = low & camera = run -> X(state != accelerating))
+
+-- accelerating -> constant_speed
+LTLSPEC
+    G(state = accelerating & distance = high & speed = ok & camera = run -> X(state != constant_speed))
+
+-- accelerating -> retarding
+LTLSPEC
+    G(state = accelerating & distance = high & speed = high & camera = run -> X(state != retarding))
+
+-- CONSTANT_SPEED
+-- constant_speed -> constant_speed
+LTLSPEC
+    G(state = constant_speed & distance = high & speed = ok & camera = run -> X(state != constant_speed))
+
+-- constant_speed -> accelerating
+LTLSPEC
+    G(state = constant_speed & distance = high & speed = low & camera = run -> X(state != accelerating))
+
+-- constant_speed -> retarding
+LTLSPEC
+    G(state = constant_speed & distance = high & speed = high & camera = run -> X(state != retarding))
+
+-- RETARDING
+-- retarding -> retarding
+LTLSPEC
+    G(state = retarding & distance = high & speed = high & camera = run -> X(state != retarding))
+
+-- retarding -> accelerating
+LTLSPEC
+    G(state = retarding & distance = high & speed = low & camera = run -> X(state != accelerating))
+
+-- retarding -> constant_speed
+LTLSPEC
+    G(state = retarding & distance = high & speed = ok & camera = run -> X(state != constant_speed))
+
+
+
