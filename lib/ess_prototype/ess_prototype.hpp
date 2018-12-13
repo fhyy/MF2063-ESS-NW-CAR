@@ -29,6 +29,10 @@ public:
      */
     Flag() : col(Null_Color), pos(Null_Position) {}
 
+    /**
+     * @brief Enumeration representing the flag's color states.
+     *
+     */
     enum Color {
         Red,
         Green,
@@ -36,7 +40,10 @@ public:
         Null_Color
     };
 
-
+    /**
+     * @brief Enumeration representing the flag's position states.
+     *
+     */
     enum Position {
         Left,
         Right,
@@ -342,10 +349,10 @@ private:
     /**
      * @brief A one-hot encoded int where every bit represents the availability of a service
      *
-     * This member is updated every time @ref updateGoStatus is called and it holds
+     * This member is updated every time @see CarCTRLClient#update_go_status is called and it holds
      * the information of what services where available at the time. @ref checkMotor, @ref checkSteering
      * @ref checkSpeedSensor, @ref checkCameraSensor and @ref checkDistanceSensor only read from
-     * this int when they are called, which means that @ref updateGoStatus has to be called in order
+     * this int when they are called, which means that @see CarCTRLClient#update_go_status has to be called in order
      * to update the output of the check-methods.
      */
     int service_status_;
