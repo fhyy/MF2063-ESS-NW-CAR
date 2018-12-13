@@ -6,11 +6,11 @@ bbb-car-controller/lib
 
 bbb-distance-steering/build
 bbb-distance-steering/doc
-bbb-car-controller/lib
+bbb-distance-steering/lib
 
 bbb-motor-speed/build
 bbb-motor-speed/doc
-bbb-car-controller/lib
+bbb-motor-speed/lib
 
 rpi-vision/build
 rpi-vision/doc
