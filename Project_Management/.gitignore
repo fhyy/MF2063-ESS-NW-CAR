@@ -17,6 +17,9 @@ evm.pdf
 resource_plan.pdf
 timeplan.pdf
 
+## Ignore Final_Report_Management while it's still unfinished
+Final_Report_Management.pdf
+
 ## Intermediate documents:
 *.dvi
 *.xdv
