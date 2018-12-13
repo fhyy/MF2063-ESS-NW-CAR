@@ -1,10 +1,10 @@
 """@package docstring
-Documentation for this module.
-
-Blablabla
+This code is uesd for color detection. To run this code, you need to install OpenCV2
+Then run it use
+python3 color_detection_cpp.py
 """
 
-# python color_tracking.py
+
 
 # import the necessary packages
 import numpy as np
@@ -13,20 +13,16 @@ import cv2
 import time
 import sys
 
-## @var lower
-# define the lower boundaries of the colors in the HSV color space
+## @var lower define the lower boundaries of the colors in the HSV color space
 lower = {'1': (166, 84, 141), '2': (66, 122, 129), '3': (23, 59, 119)}
 
-## @var upper
-# define the upper boundaries of the colors in the HSV color space
+## @var upper define the upper boundaries of the colors in the HSV color space
 upper = {'1': (186, 255, 255), '2': (86, 255, 255),  '3': (54, 255, 255)}
 
-## @var colors
-# define standard colors for circle around the object
+## @var colors define standard colors for circle around the object
 colors = {'1': (0, 0, 255), '2': (0, 255, 0),  '3': (0, 255, 217)}
 
-## @var camera
-# Object representing the camera
+## @var camera denotes object representing the camera
 camera = cv2.VideoCapture(0)
 
 streamBlock = False
