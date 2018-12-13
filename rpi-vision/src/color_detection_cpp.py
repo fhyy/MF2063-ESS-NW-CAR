@@ -13,16 +13,20 @@ import cv2
 import time
 import sys
 
-## @var lower define the lower boundaries of the colors in the HSV color space
+## @var lower
+# define the lower boundaries of the colors in the HSV color space
 lower = {'1': (166, 84, 141), '2': (66, 122, 129), '3': (23, 59, 119)}
 
-## @var upper define the upper boundaries of the colors in the HSV color space
+## @var upper
+# define the upper boundaries of the colors in the HSV color space
 upper = {'1': (186, 255, 255), '2': (86, 255, 255),  '3': (54, 255, 255)}
 
-## @var colors define standard colors for circle around the object
+## @var colors
+# define standard colors for circle around the object
 colors = {'1': (0, 0, 255), '2': (0, 255, 0),  '3': (0, 255, 217)}
 
-## @var camera denotes object representing the camera
+## @var camera
+# denotes object representing the camera
 camera = cv2.VideoCapture(0)
 
 streamBlock = False
@@ -30,10 +34,14 @@ streamCount = 0
 
 # keep looping
 while True:
+    ## @var nothingDetected
+    # a flag to indicate whether there is a signal
     nothingDetected = True
 
     # grab the current frame
     (grabbed, frame) = camera.read()
+    ## @var frame
+    # the resized frame
     frame = imutils.resize(frame, width=600)
     blurred = cv2.GaussianBlur(frame, (11, 11), 0)
     hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
@@ -50,8 +58,12 @@ while True:
 
         # find contours in the mask and initialize the current
         # (x, y) center of the ball
+        ## @var cnts
+        # denotes contours found in the image
         cnts = cv2.findContours(mask.copy(), cv2.RETR_EXTERNAL,
                                 cv2.CHAIN_APPROX_SIMPLE)[-2]
+        ## @var center
+        # denotes center of the contour
         center = None
 
         # only proceed if at least one contour was found
@@ -59,12 +71,20 @@ while True:
             # find the largest contour in the mask, then use
             # it to compute the minimum enclosing circle andq
             # centroid
+            ## @var c
+            # denotes the largest contour in the mask
             c = max(cnts, key=cv2.contourArea)
             ((x, y), radius) = cv2.minEnclosingCircle(c)
 
+            ## @var a
+            # denotes the coordinate of the signal
+            ## @var b
+            # denotes the coordinate of the signal
             M = cv2.moments(c)
             (a, b) = (int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"]))
             if a < 200:
+                ## @var loc
+                # denotes the loction of the signal
                 loc = '1'
             elif a > 400:
                 loc = '2'
