@@ -1,3 +1,4 @@
+/**@file motor_control.ino */
 #include <Servo.h>
 #include <SPI.h>
 
