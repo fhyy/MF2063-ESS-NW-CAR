@@ -178,7 +178,7 @@ private:
      * Set to true when initialization is succesfully completed. Set to false when @ref stop is
      * called, causing all threads to run to completion so they can be joined.
      */
-    run_;
+    bool run_;
 
     /**
      * @brief Pause switch for all threads.
