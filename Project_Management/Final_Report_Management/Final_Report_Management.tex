@@ -178,13 +178,19 @@
 \clearpage
 
 \section{General Summary}
-This paragraph should provide the reader with a brief description of how the project was performed
-\begin{itemize}
-    \item Which results were reached?
-    \item Differences between planned outcomes (time, budget, results) and the actual outcome
-    \item Discuss the problems that occured and their impact on the project
-\end{itemize}
+A prototye for an autonomous car has been built. As requested, the car is able to
+do some basic self-monitoring and uses ethernet with a network controller for on-board
+communication. Unfortunately, it is not able to consistently track a flag, which was
+another requirement.
 
+Due to integration issues, a lot more time than planned had to be spent during the
+last weeks of the project. The budget was exceeded by roughly 74\%.
+
+The integration issues consisted mostly of problems with the interprocess communication
+between different software tasks. During integration, it was also found that ordering
+PCBs via KTH was not possible and that the PCB machines available to the group were broken.
+The interprocess communication and the PCB issues were the main causes of delay in the
+project.
 
 \section{Follow-up of objectives}
 \subsection{Goals}
@@ -242,7 +248,16 @@ prioritizing what would be the final deliverables.
 
 \subsection{Lessons learned}
 \begin{itemize}
-     \item afkjhaf
+    \item To improve the time utilization, it would have been good to have a project
+          manager who does little or no development.
+    \item To improve the Scrum system, only one board should have been employed instead
+          of using both a whiteboard and a digital Scrum board.
+    \item To improve the meeting efficiency, a more formal meeting structure should have been
+          employed.
+    \item More flexibility when it comes to restating the goals. For instance, the goals should
+          have been restated when it at one point was discovered that previous work would have to
+          be redone.
+    \item Write more detailed technical requirements that can help facilitate the task breakdown.
 \end{itemize}
 
 \section{Summary of time and resource plans}
@@ -259,6 +274,8 @@ prototype machines. Unfortunately there was nothing in the risk analysis that re
 this specific issue, which could probably have been mitigated with some simple proactive
 measures like hand soldering prototype cards early on in the project.
 
+\textit{Note: Milestones that were never met are denoted by a red semicircle in
+Figure~\ref{fig:timeplan}.}
 
 \section{Final comment/other}
 This section can include the project manager's sub-project managers' own views and comments on the project, for example: valid documentation, work practices, project management and more.
