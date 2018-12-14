@@ -33,4 +33,10 @@ reside in /etc/resolv.conf.
 
 # spi_setup.sh
 
+To use SPI on the BeagleBones the hardware needs to be configured correctly. This script
+is based on the instructions given [here]
+(http://www.nagavenkat.adurthi.com/arduini-beaglebone/479/). The script compiles a
+firmware file and places it under /lib/firmware.It also registers gpio60 and gpio48 to be
+used as slave select pins. The script works for debian9 and the system should be rebooted
+after running
 
