@@ -1,0 +1,315 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt, titlepage]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+\geometry{margin=2cm, headsep=5mm, includefoot, includehead}
+
+\usepackage{graphicx} % support the \includegraphics command and options
+\graphicspath{{figures/}} % Location of the graphics files
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\fancyhead{}
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+\usepackage{lastpage}
+\usepackage{rotating}
+\usepackage{textcomp} %get the correct micro sec display
+\usepackage{float}
+%---------- Enable IEEEtran.bst configurations ------
+\usepackage{IEEEtrantools}
+\usepackage{verbatim}
+%----------------------------------------------------
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+%%% Header %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\setlength{\headheight}{53pt}
+\lhead{EH2760 Management of Projects \\		 
+       ESS-NW/ESS-CAR \\
+       Leon Fernandez, leonfe@kth.se}
+\rhead{Final Report \\
+       Version 1 \\
+       \thepage(\pageref{LastPage})}
+\renewcommand{\headrulewidth}{1pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% Footer %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\cfoot{blablablabla}
+%\renewcommand{\footrulewidth}{0.4pt}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+%\maketitle
+\bstctlcite{BSTcontrol} % IEEEtran.bst controls enabled
+
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\begin{titlepage} % Suppresses displaying the page number on the title page and the subsequent page counts as page 1
+	\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for horizontal lines, change thickness here
+	
+	\center % Centre everything on the page
+	
+	%------------------------------------------------
+	%	Headings
+	%------------------------------------------------
+	
+	\begin{figure}
+   		\centering
+    	\includegraphics[scale=1]{kthLogo.png}
+	\end{figure}
+	
+	\textsc{\LARGE KTH Management of Projects}\\[1cm] % Main heading such as the name of your university/college
+	
+	\textsc{\Large EH2760, HT 2018}\\[0.5cm] % Major heading such as course name
+	
+	\textsc{\Large FINAL REPORT}\\[0.5cm] % Major heading as well
+	
+	%------------------------------------------------
+	%	Title
+	%------------------------------------------------
+	
+	\HRule\\[0.4cm]
+	
+	{\huge\bfseries ESS-NW/ESS-CAR}\\[0.4cm] % Title of your document
+	
+	\HRule\\[1.5cm]	
+	
+	%------------------------------------------------
+	%	Author(s)
+	%------------------------------------------------
+	
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushleft}
+			\large
+                        \textsc{Jonas Ekman}
+			\\
+			\textsc{Yini Gao}
+                        \\
+                        \textsc{Jacob Kimblad}
+		\end{flushleft}
+	\end{minipage}
+	~
+	\begin{minipage}{0.4\textwidth}
+		\begin{flushright}
+			\large
+                        \textsc{Leon Fernandez}
+			\\
+			\textsc{Fredrik Hyyrynen}
+                        \\
+                        \textsc{Yifan Ruan}
+		\end{flushright}
+	\end{minipage}
+	
+	% If you don't want a supervisor, uncomment the two lines below
+        % and comment the code above
+	%{\large\textit{Author}}\\
+	%John \textsc{Smith} % Your name
+	\vskip 8cm
+	\begin{figure}[H]
+   		\centering
+    	\includegraphics[scale=0.4]{funLogo.png}
+	\end{figure}
+	%------------------------------------------------
+	%	Date
+	%------------------------------------------------
+	
+	\vfill\vfill\vfill % Position the date 3/4 down the remaining page
+	
+	{\large\today} % Date, change the \today to a set date if you want
+                       % to be precise
+	
+	%------------------------------------------------
+	%	Logo
+	%------------------------------------------------
+	
+	%\vfill\vfill
+	%\includegraphics[width=0.2\textwidth]{placeholder.jpg}\\[1cm]
+        % Include a department/university logo
+        % - this will require the graphicx package
+	 
+	%-------------------------------------------------------------------
+	
+	\vfill % Push the date up 1/4 of the remaining page
+	
+\end{titlepage}
+
+%-------------------------------------------------------------------------
+
+\clearpage
+
+\section{General Summary}
+A prototype for an autonomous car has been built. As requested, the car is able to
+do some basic self-monitoring and uses ethernet with a network controller for on-board
+communication. Unfortunately, it is not able to consistently track a flag, which was
+another requirement.
+
+Due to integration issues, a lot more time than planned had to be spent during the
+last weeks of the project. The budget was exceeded by roughly 74\%.
+
+The integration issues consisted mostly of problems with the interprocess communication
+between different software tasks. During integration, it was also found that ordering
+PCBs via KTH was not possible and that the PCB machines available to the group were broken.
+The interprocess communication and the PCB issues were the main causes of delay in the
+project.
+
+\section{Follow-up of objectives}
+\subsection{Goals}
+\begin{enumerate}
+\item The computer vision system of the car does not have the required performance to
+properly follow a green circle held in front of the car.
+
+\item The hardware has been extended to include one unique processor for each sensor or actuator
+node and the car has all the functionality it needs to keep a distance of 30 cm to an
+object in front.
+
+\item The car has been made failsafe to the extent that it can detect if any of the major
+nodes are missing. Most importantly, the node that controls the motor can by itself
+stop the car within the required time, even if it gets isolated from the other nodes.
+No battery level reading has been implemented.
+
+\item The software running on the controller node checks the availability of all subsystem
+and does not start if any of them are missing.
+
+\item The physical layer has been set in a topology that allows the SDN-system
+to route packets to and from all nodes.
+
+\item The SDN system consists of a SDN-controller that runs on a Raspberry Pi and Zodiac FX OpenFlow
+switches.
+
+\item There is only one route between any two given nodes that are connected as hosts to the
+SDN system. As long as the SDN system is activated, packets are always take this route.
+
+\item The SDN controller does not reassign network resources during runtime.
+\end{enumerate}
+
+\subsection{Action Plan}
+Goals 1, 3 and 8 cannot be considered completed. No action will be taken for goal 3 since
+the current situation was deemed acceptable by the stakeholders. The cause of failure for
+goal 1 and 8 have been identified and the shareholders have been notified. The action taken
+for these failures is to hand over a well-documented repository to the stakeholders so that
+they can have another group of students solve these issues in a future course round.
+
+\section{Lessons learned and suggestions for improvement}
+The experience with the project has, in general, been good. Most members felt that they
+got to work with relevant topics and try out new ideas. Furthermore, all members got to try out
+professional engineering tools and methods that will be useful in the future. Some examples
+include cmake, Doxygen, Slack, Fusion 360, Eagle and PyChar.
+
+However, the group had quite a few experiences with inefficient meetings and throughout most
+of the project there was a consensus that more people were required. Although, an effort was
+made to implement a Scrum system using the Trello platform as well as a physical whiteboard, it
+did not work out in the end. Also, the integration of all the software subsystems got
+delayed, partly due to difficulties with both making and ordering a PCB.
+
+Despite the difficulties with ordering a PCB and the inefficient meetings, most of the
+communication with suppliers and stakeholders worked smoothly. Lastly, even though not
+all goals were fulfilled, the project members felt that they made the right choices in
+prioritizing what would be the final deliverables.
+
+\subsection{Lessons learned}
+\begin{itemize}
+    \item To improve the time utilization, it would have been good to have a project
+          manager who does little or no development.
+    \item To improve the Scrum system, only one board should have been employed instead
+          of using both a whiteboard and a digital Scrum board.
+    \item To improve the meeting efficiency, a more formal meeting structure should have been
+          employed.
+    \item More flexibility when it comes to restating the goals. For instance, the goals should
+          have been restated when it at one point was discovered that previous work would have to
+          be redone.
+    \item Write more detailed technical requirements that can help facilitate the task breakdown.
+\end{itemize}
+
+\section{Summary of time and resource plans}
+The final versions of the time and resource plans can be seen in Figure~\ref{fig:resource_plan}
+and~\ref{fig:timeplan}. All tasks up until mid-november were dealt with in time. After that,
+a lot of tasks hade to be postponed and the order of some of the tasks had to be changed as well.
+This was mostly due to integration problems with the different software subsystems that had
+been developed. Something that was missing in the time plan that could have mitigated this issue
+was to set aside a few days for implementing the interprocess communication between software tasks,
+as this was the main reason for the integration problems.
+
+Another reason for the delay was issues with ordering PCBs and broken PCB
+prototype machines. Unfortunately there was nothing in the risk analysis that reflected
+this specific issue, which could probably have been mitigated with some simple proactive
+measures like hand soldering prototype cards early on in the project.
+
+\textit{Note: Milestones that were never met are denoted by a red semicircle in
+Figure~\ref{fig:timeplan}.}
+
+\section{Final comments}
+We in the group felt that we really made an effort to conduct the project in a professional
+and structured way. However, we also felt that with a project manager who also was a developer,
+this was very difficult. The project would really have benefitted from having one person with an
+overview of the status of all subsystems, so that resources can be delegated accordingly.
+Despite the shortcomings of the project, we still feel that we have gained some valuable knowledge
+and experience, both in pure technical skills and within project management.
+
+%-------------------------------------------------------------------------
+\clearpage
+
+\appendix
+\section{EVM}
+\begin{figure}[H]
+     \centering
+     \includegraphics[scale=0.8]{evm.pdf}
+     \caption{Earned Value Management analysis.}
+     \label{fig:evm}
+\end{figure}
+
+\section{Time Plan}
+\begin{sidewaysfigure}
+     \centering
+     \includegraphics[scale=0.6]{timeplan.pdf}
+     \caption{Time plan for the project.}
+     \label{fig:timeplan}
+\end{sidewaysfigure}
+
+\section{Resource Plan}
+\begin{sidewaysfigure}
+     \centering
+     \includegraphics[scale=0.8]{resource_plan.pdf}
+     \caption{Resource plan for the project.}
+     \label{fig:resource_plan}
+ \end{sidewaysfigure}
+\end{document}
