@@ -228,12 +228,18 @@ they can have another group of students solve these issues in a future course ro
 
 
 \section{Summary of time and resource plans}
-Comments on the time and resource plan and its milestones and tollgates
-\begin{itemize}
-    \item Which tasks were dealt with on time?
-    \item Which tasks took too long and what was forgotten in the planning?
-    \item The final versions of the time and resource plans are attached as an appedix
-\end{itemize}
+The final versions of the time and resource plans can be seen in Figure~\ref{fig:resource_plan}
+and~\ref{fig:timeplan}. All tasks up until mid-november were dealt with in time. After that,
+alot of tasks hade to be postponed and the order of some of the tasks had to be changed as well.
+This was mostly due to integration problems with the different software subsystems that had
+been developed. Something that was missing in the timeplan that could have mitigated this issue
+was to set aside a few days for implementing the interprocess communication between software tasks,
+as this was the main reason for the integration problems.
+
+Another reason for the delay was issues with ordering PCBs and broken PCB
+prototype machines. Unfortunately there was nothing in the risk analysis that reflected
+this specific issue, which could probably have been mitigated with some simple proactive
+measures like hand soldering prototype cards early on in the project.
 
 
 \section{Final comment/other}
@@ -253,7 +259,7 @@ Final milestone char (or Gantt Chart if used)
 \clearpage
 %-------------------------------------------------------------------------
 \clearpage
-%TODO appendix
+
 \appendix
 \section{EVM}
 \begin{figure}[h]
@@ -263,20 +269,20 @@ Final milestone char (or Gantt Chart if used)
      \label{fig:evm}
 \end{figure}
 
-%\section{Time Plan}
-%\begin{sidewaysfigure}
-%     \centering
-%     \includegraphics[scale=0.6]{timeplan.pdf}
-%     \caption{Timeplan for the project.}
-%     \label{fig:resource}
-%\end{sidewaysfigure}
+\section{Time Plan}
+\begin{sidewaysfigure}
+     \centering
+     \includegraphics[scale=0.6]{timeplan.pdf}
+     \caption{Timeplan for the project.}
+     \label{fig:timeplan}
+\end{sidewaysfigure}
 
 \section{Resource Plan}
 \begin{sidewaysfigure}
      \centering
      \includegraphics[scale=0.8]{resource_plan.pdf}
      \caption{Resource plan for the project.}
-     \label{fig:resource}
+     \label{fig:resource_plan}
  \end{sidewaysfigure}
 \end{document}
 
